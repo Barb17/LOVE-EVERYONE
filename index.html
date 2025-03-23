@@ -3,15 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Love Everyone</title>
+    <title>HOME</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>LOVE EVERYONE</h1>
+    <div class="hamburger-menu">
+        <input id="menu__toggle" type="checkbox" />
+        <label class="menu__btn" for="menu__toggle">
+            <span></span>
+        </label>
+        <ul class="menu__box">
+            <li><a class="menu__item" href="index.html">HOME</a></li>
+            <li><a class="menu__item" href="music.html">SND</a></li>
+            <li><a class="menu__item" href="vsn.html">VSN</a></li>
+        </ul>
     </div>
+    <div class="content">
+        <div class="image-container">
+            <a href="music.html" id="snd-link"><img src="IMMAGINE/immagine.jpg" alt="SND" class="animated-image"></a>
+            <h2 class="image-label">SND</h2>
+        </div>
+        <div class="image-container">
+            <a href="vsn.html" id="vsn-link"><img src="IMMAGINE/immagine2.jpg" alt="VSN" class="animated-image"></a>
+            <h2 class="image-label">VSN</h2>
+        </div>
+    </div>
+    <script>
+        document.getElementById('snd-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            this.classList.add('zoom-in');
+            setTimeout(function() {
+                window.location.href = 'music.html';
+            }, 300);
+        });
+
+        document.getElementById('vsn-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            this.classList.add('zoom-in');
+            setTimeout(function() {
+                window.location.href = 'vsn.html';
+            }, 300);
+        });
+
+        const menuToggle = document.getElementById('menu__toggle');
+        const menuBox = document.querySelector('.menu__box');
+
+        menuToggle.addEventListener('change', () => {
+            if (menuToggle.checked) {
+                menuBox.style.visibility = 'visible';
+                menuBox.style.left = '0';
+            } else {
+                menuBox.style.visibility = 'hidden';
+                menuBox.style.left = '-100%';
+            }
+        });
+    </script>
 </body>
 </html>
