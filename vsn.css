@@ -31,23 +31,6 @@ video {
     font-family: 'IBM Plex Mono', monospace;
 }
 
-#back-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-family: 'IBM Plex Mono', monospace;
-    border: none;
-    background-color: transparent;
-    font-size: 1.5em;
-    outline: none;
-    box-shadow: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px;
-    height: 30px;
-}
-
 /* Stili per l'hamburger menu */
 .hamburger-menu {
     position: absolute;

@@ -22,23 +22,158 @@
             <li><a class="menu__item" href="vsn.html">VSN</a></li>
         </ul>
     </div>
-    <div class="video-container">
-        <button id="back-btn">←</button>
-        <video id="loop-video" loop autoplay muted>
-            <source src="VIDEO/video.mp4" type="video/mp4">
-        </video>
-        <h2 class="video-text">SND SOON</h2>
+    <div class="music-container">
+        <h2 id="page-title">SND</h2>
+        <div class="album">
+            <img src="album.jpg" alt="Copertina album">
+            <h3 id="album-title">LOVE EVERYONE</h3>
+            <h4 id="track-title">LOVE</h4>
+        </div>
+        <div class="player">
+            <div class="controls">
+                <button class="skip-btn" id="prev-btn">⏮</button>
+                <button id="play-pause-btn" class="play-pause-btn">▶</button>
+                <button class="skip-btn" id="next-btn">⏭</button>
+            </div>
+            <input type="range" id="progress-bar" value="0" step="0.01">
+            <div class="time-container">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <audio id="audio-1" src="MUSICA/1LOVE.MP3"></audio>
+            <audio id="audio-2" src="MUSICA/2MYSOUL.MP3"></audio>
+            <audio id="audio-3" src="MUSICA/3BUZZ.MP3"></audio>
+            <audio id="audio-4" src="MUSICA/4VSN.MP3"></audio>
+            <audio id="audio-5" src="MUSICA/5IWILL.MP3"></audio>
+            <audio id="audio-6" src="MUSICA/6STADIUM.MP3"></audio>
+            <audio id="audio-7" src="MUSICA/7CHURCH.MP3"></audio>
+            <audio id="audio-8" src="MUSICA/8WOLVESCRY.MP3"></audio>
+        </div>
     </div>
     <script>
-        const backBtn = document.getElementById('back-btn');
-        const videoContainer = document.querySelector('.video-container');
+        const trackTitle = document.getElementById('track-title');
+        const albumTitle = document.getElementById('album-title');
+        const pageTitle = document.getElementById('page-title');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        // const backBtn = document.getElementById('back-btn'); // Rimosso
+        const musicContainer = document.querySelector('.music-container');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+        const audios = [
+            document.getElementById('audio-1'),
+            document.getElementById('audio-2'),
+            document.getElementById('audio-3'),
+            document.getElementById('audio-4'),
+            document.getElementById('audio-5'),
+            document.getElementById('audio-6'),
+            document.getElementById('audio-7'),
+            document.getElementById('audio-8')
+        ];
+        const trackNames = [
+            'LOVE',
+            'MY SOUL',
+            'BUZZ',
+            'VSN',
+            'I WILL',
+            'STADIUM',
+            'CHURCH',
+            'WOLVES CRY'
+        ];
+        let isPlaying = false;
+        let currentTrackIndex = 0;
 
-        backBtn.addEventListener('click', () => {
-            videoContainer.style.opacity = '0';
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 300);
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        function loadTrack(index) {
+            trackTitle.textContent = trackNames[index];
+            audios.forEach((audio, i) => {
+                if (i === index) {
+                    audio.currentTime = 0;
+                } else {
+                    audio.pause();
+                }
+            });
+            if (isPlaying) {
+                audios[index].play();
+                playPauseBtn.textContent = '⏸';
+            } else {
+                playPauseBtn.textContent = '▶';
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const currentAudio = audios[currentTrackIndex];
+            const currentTime = currentAudio.currentTime;
+            const duration = currentAudio.duration || 0;
+            progressBar.value = duration ? (currentTime / duration) * 100 : 0;
+            currentTimeDisplay.textContent = formatTime(currentTime);
+            durationDisplay.textContent = formatTime(duration);
+        }
+
+        function setProgress() {
+            const currentAudio = audios[currentTrackIndex];
+            const duration = currentAudio.duration || 0;
+            const progress = progressBar.value / 100;
+            currentAudio.currentTime = duration * progress;
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audios[currentTrackIndex].pause();
+                playPauseBtn.textContent = '▶';
+            } else {
+                audios[currentTrackIndex].play();
+                playPauseBtn.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
         });
+
+        prevBtn.addEventListener('click', () => {
+            currentTrackIndex--;
+            if (currentTrackIndex < 0) {
+                currentTrackIndex = audios.length - 1;
+            }
+            loadTrack(currentTrackIndex);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentTrackIndex++;
+            if (currentTrackIndex > audios.length - 1) {
+                currentTrackIndex = 0;
+            }
+            loadTrack(currentTrackIndex);
+        });
+
+        // backBtn.addEventListener('click', () => { // Rimosso l'event listener
+        //     musicContainer.style.opacity = '0';
+        //     setTimeout(() => {
+        //         window.location.href = 'index.html';
+        //     }, 300);
+        // });
+
+        audios.forEach(audio => {
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('loadedmetadata', () => {
+                durationDisplay.textContent = formatTime(audio.duration || 0);
+                progressBar.value = 0;
+            });
+            audio.addEventListener('ended', () => {
+                isPlaying = false;
+                playPauseBtn.textContent = '▶';
+                progressBar.value = 0;
+                currentTimeDisplay.textContent = '0:00';
+            });
+        });
+
+        progressBar.addEventListener('input', setProgress);
 
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
@@ -52,6 +187,8 @@
                 menuBox.style.left = '-100%';
             }
         });
+
+        loadTrack(currentTrackIndex);
     </script>
 </body>
 </html>

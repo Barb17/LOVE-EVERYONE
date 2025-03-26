@@ -23,22 +23,13 @@
         </ul>
     </div>
     <div class="video-container">
-        <button id="back-btn">←</button>
         <video id="loop-video" loop autoplay muted>
             <source src="VIDEO/video2.mp4" type="video/mp4">
         </video>
-        <h2 class="video-text">VSN SOON</h2>
+        <p class="video-text">VSN SOON</p>
     </div>
     <script>
-        const backBtn = document.getElementById('back-btn');
         const videoContainer = document.querySelector('.video-container');
-
-        backBtn.addEventListener('click', () => {
-             videoContainer.style.opacity = '0'; //inizio animazione
-            setTimeout(() => {
-                window.location.href = 'index.html'; //reindirizza dopo l'animazione
-            }, 300); //tempo dell'animazione
-        });
 
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
@@ -46,12 +37,4 @@
         menuToggle.addEventListener('change', () => {
             if (menuToggle.checked) {
                 menuBox.style.visibility = 'visible';
-                menuBox.style.left = '0';
-            } else {
-                menuBox.style.visibility = 'hidden';
-                menuBox.style.left = '-100%';
-            }
-        });
-    </script>
-</body>
-</html>
+                menuBox
