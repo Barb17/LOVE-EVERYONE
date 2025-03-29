@@ -1,7 +1,7 @@
 {
-  "name": "SND-VSN",
-  "short_name": "SND-VSN",
-  "description": "SND e VSN - Musica e Video",
+  "name": "LOVE EVERYONE",
+  "short_name": "LV-EVR",
+  "description": "SND & VSN",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
