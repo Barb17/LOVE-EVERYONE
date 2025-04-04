@@ -23,8 +23,8 @@ body {
     width: 80%;
     max-width: 600px;
     position: relative;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
     transition: opacity 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
@@ -91,7 +91,8 @@ body {
     text-align: center;
 }
 
-#progress-bar {
+/* Stili per la barra di progresso (applicati a tutti gli elementi con classe 'progress-bar') */
+.progress-bar {
     width: 100%;
     margin-top: 5px;
     -webkit-appearance: none;
@@ -102,7 +103,7 @@ body {
     border-radius: 2px;
 }
 
-#progress-bar::-webkit-slider-thumb {
+.progress-bar::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     background: black;
@@ -112,7 +113,7 @@ body {
     cursor: pointer;
 }
 
-#progress-bar::-moz-range-thumb {
+.progress-bar::-moz-range-thumb {
     background: black;
     width: 8px;
     height: 8px;

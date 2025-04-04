@@ -9,8 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    
-    <!-- PWA Meta Tags -->
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -43,7 +42,7 @@
                 <button id="play-pause-btn" class="play-pause-btn">▶</button>
                 <button class="skip-btn" id="next-btn">⏭</button>
             </div>
-            <input type="range" id="progress-bar" value="0" step="0.01">
+            <input type="range" id="progress-bar" class="progress-bar" value="0" step="0.01">
             <div class="time-container">
                 <span id="current-time">0:00</span>
                 <span id="duration">0:00</span>
@@ -58,6 +57,36 @@
             <audio id="audio-8" src="MUSICA/8WOLVESCRY.mp3"></audio>
         </div>
     </div>
+
+    <div class="music-container">
+        <h2 id="page-title-2"></h2>
+        <div class="album">
+            <img id="album-cover-2" src="album2.jpg" alt="Copertina album secondo">
+            <h3 id="album-title-2">HATE EVERYONE</h3>
+            <h4 id="track-title-2">JEWS HANDS</h4>
+        </div>
+        <div class="player">
+            <div class="controls">
+                <button class="skip-btn" id="prev-btn-2">⏮</button>
+                <button id="play-pause-btn-2" class="play-pause-btn">▶</button>
+                <button class="skip-btn" id="next-btn-2">⏭</button>
+            </div>
+            <input type="range" id="progress-bar-2" class="progress-bar" value="0" step="0.01">
+            <div class="time-container">
+                <span id="current-time-2">0:00</span>
+                <span id="duration-2">0:00</span>
+            </div>
+            <audio id="audio-secondo-1" src="MUSICA/1.1JEWSHANDS.mp3"></audio>
+            <audio id="audio-secondo-2" src="MUSICA/1.2ANGEL.mp3"></audio>
+            <audio id="audio-secondo-3" src="MUSICA/1.3BLIND.mp3"></audio>
+            <audio id="audio-secondo-4" src="MUSICA/1.4BARK.mp3"></audio>
+            <audio id="audio-secondo-5" src="MUSICA/1.5GHOST.mp3"></audio>
+            <audio id="audio-secondo-6" src="MUSICA/1.6FLY.mp3"></audio>
+            <audio id="audio-secondo-7" src="MUSICA/1.7MARIA.mp3"></audio>
+            <audio id="audio-secondo-8" src="MUSICA/1.8POPE.mp3"></audio>
+        </div>
+    </div>
+
     <script>
         // Registrazione del Service Worker
         if ('serviceWorker' in navigator) {
@@ -71,14 +100,14 @@
                     });
             });
         }
-        
+
+        // Funzioni e variabili per il primo player (INALTERATE)
         const trackTitle = document.getElementById('track-title');
         const albumTitle = document.getElementById('album-title');
         const pageTitle = document.getElementById('page-title');
         const playPauseBtn = document.getElementById('play-pause-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
-        // const backBtn = document.getElementById('back-btn'); // Rimosso
         const musicContainer = document.querySelector('.music-container');
         const progressBar = document.getElementById('progress-bar');
         const currentTimeDisplay = document.getElementById('current-time');
@@ -106,46 +135,82 @@
         let isPlaying = false;
         let currentTrackIndex = 0;
 
+        // Funzioni e variabili per il secondo player (MODIFICATE)
+        const trackTitle2 = document.getElementById('track-title-2');
+        const albumTitle2 = document.getElementById('album-title-2');
+        const pageTitle2 = document.getElementById('page-title-2');
+        const albumCover2 = document.getElementById('album-cover-2'); // Nuova variabile per la copertina
+        const playPauseBtn2 = document.getElementById('play-pause-btn-2');
+        const prevBtn2 = document.getElementById('prev-btn-2');
+        const nextBtn2 = document.getElementById('next-btn-2');
+        const progressBar2 = document.getElementById('progress-bar-2');
+        const currentTimeDisplay2 = document.getElementById('current-time-2');
+        const durationDisplay2 = document.getElementById('duration-2');
+        const audios2 = [
+            document.getElementById('audio-secondo-1'),
+            document.getElementById('audio-secondo-2'),
+            document.getElementById('audio-secondo-3'),
+            document.getElementById('audio-secondo-4'),
+            document.getElementById('audio-secondo-5'),
+            document.getElementById('audio-secondo-6'),
+            document.getElementById('audio-secondo-7'),
+            document.getElementById('audio-secondo-8')
+        ];
+        const trackNames2 = [ // Nomi generici per le tracce del secondo player
+            'JEWS HANDS',
+            'ANGEL',
+            'BLIND',
+            'BARK',
+            'GHOST',
+            'FLY',
+            'MARIA',
+            'POPE'
+        ];
+        let isPlaying2 = false;
+        let currentTrackIndex2 = 0;
+
+        // Funzioni duplicate per il secondo player (MODIFICATE per usare le nuove variabili)
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
             return `${minutes}:${remainingSeconds}`;
         }
 
-        function loadTrack(index) {
-            trackTitle.textContent = trackNames[index];
-            audios.forEach((audio, i) => {
+        function loadTrack2(index) {
+            trackTitle2.textContent = trackNames2[index];
+            audios2.forEach((audio, i) => {
                 if (i === index) {
                     audio.currentTime = 0;
                 } else {
                     audio.pause();
                 }
             });
-            if (isPlaying) {
-                audios[index].play();
-                playPauseBtn.textContent = '⏸';
+            if (isPlaying2) {
+                audios2[index].play();
+                playPauseBtn2.textContent = '⏸';
             } else {
-                playPauseBtn.textContent = '▶';
+                playPauseBtn2.textContent = '▶';
             }
-            updateProgress();
+            updateProgress2();
         }
 
-        function updateProgress() {
-            const currentAudio = audios[currentTrackIndex];
+        function updateProgress2() {
+            const currentAudio = audios2[currentTrackIndex2];
             const currentTime = currentAudio.currentTime;
             const duration = currentAudio.duration || 0;
-            progressBar.value = duration ? (currentTime / duration) * 100 : 0;
-            currentTimeDisplay.textContent = formatTime(currentTime);
-            durationDisplay.textContent = formatTime(duration);
+            progressBar2.value = duration ? (currentTime / duration) * 100 : 0;
+            currentTimeDisplay2.textContent = formatTime(currentTime);
+            durationDisplay2.textContent = formatTime(duration);
         }
 
-        function setProgress() {
-            const currentAudio = audios[currentTrackIndex];
+        function setProgress2() {
+            const currentAudio = audios2[currentTrackIndex2];
             const duration = currentAudio.duration || 0;
-            const progress = progressBar.value / 100;
+            const progress = progressBar2.value / 100;
             currentAudio.currentTime = duration * progress;
         }
 
+        // Event listeners e logica per il primo player (INALTERATI)
         playPauseBtn.addEventListener('click', () => {
             if (isPlaying) {
                 audios[currentTrackIndex].pause();
@@ -162,7 +227,7 @@
             if (currentTrackIndex < 0) {
                 currentTrackIndex = audios.length - 1;
             }
-            loadTrack(currentTrackIndex);
+            loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
         });
 
         nextBtn.addEventListener('click', () => {
@@ -170,18 +235,11 @@
             if (currentTrackIndex > audios.length - 1) {
                 currentTrackIndex = 0;
             }
-            loadTrack(currentTrackIndex);
+            loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
         });
 
-        // backBtn.addEventListener('click', () => { // Rimosso l'event listener
-        //     musicContainer.style.opacity = '0';
-        //     setTimeout(() => {
-        //         window.location.href = 'index.html';
-        //     }, 300);
-        // });
-
         audios.forEach(audio => {
-            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('timeupdate', () => updateProgress(audio, progressBar, currentTimeDisplay, durationDisplay));
             audio.addEventListener('loadedmetadata', () => {
                 durationDisplay.textContent = formatTime(audio.duration || 0);
                 progressBar.value = 0;
@@ -194,7 +252,51 @@
             });
         });
 
-        progressBar.addEventListener('input', setProgress);
+        progressBar.addEventListener('input', () => setProgress(progressBar, audios, currentTrackIndex));
+
+        // Event listeners e logica per il secondo player (MODIFICATI per usare le nuove funzioni e variabili)
+        playPauseBtn2.addEventListener('click', () => {
+            if (isPlaying2) {
+                audios2[currentTrackIndex2].pause();
+                playPauseBtn2.textContent = '▶';
+            } else {
+                audios2[currentTrackIndex2].play();
+                playPauseBtn2.textContent = '⏸';
+            }
+            isPlaying2 = !isPlaying2;
+        });
+
+        prevBtn2.addEventListener('click', () => {
+            currentTrackIndex2--;
+            if (currentTrackIndex2 < 0) {
+                currentTrackIndex2 = audios2.length - 1;
+            }
+            loadTrack2(currentTrackIndex2);
+        });
+
+        nextBtn2.addEventListener('click', () => {
+            currentTrackIndex2++;
+            if (currentTrackIndex2 > audios2.length - 1) {
+                currentTrackIndex2 = 0;
+            }
+            loadTrack2(currentTrackIndex2);
+        });
+
+        audios2.forEach(audio => {
+            audio.addEventListener('timeupdate', updateProgress2);
+            audio.addEventListener('loadedmetadata', () => {
+                durationDisplay2.textContent = formatTime(audio.duration || 0);
+                progressBar2.value = 0;
+            });
+            audio.addEventListener('ended', () => {
+                isPlaying2 = false;
+                playPauseBtn2.textContent = '▶';
+                progressBar2.value = 0;
+                currentTimeDisplay2.textContent = '0:00';
+            });
+        });
+
+        progressBar2.addEventListener('input', setProgress2);
 
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
@@ -209,7 +311,8 @@
             }
         });
 
-        loadTrack(currentTrackIndex);
+        loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
+        loadTrack2(currentTrackIndex2); // Inizializza il secondo player
     </script>
 </body>
 </html>
