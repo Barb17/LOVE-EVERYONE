@@ -59,7 +59,7 @@
     </div>
 
     <div class="music-container">
-        <h2 id="page-title-2"></h2>
+        <h2 id="page-title-2">HATE EVERYONE</h2>
         <div class="album">
             <img id="album-cover-2" src="album2.jpg" alt="Copertina album secondo">
             <h3 id="album-title-2">HATE EVERYONE</h3>
@@ -101,7 +101,7 @@
             });
         }
 
-        // Funzioni e variabili per il primo player (INALTERATE)
+        // Funzioni e variabili per il primo player
         const trackTitle = document.getElementById('track-title');
         const albumTitle = document.getElementById('album-title');
         const pageTitle = document.getElementById('page-title');
@@ -135,11 +135,94 @@
         let isPlaying = false;
         let currentTrackIndex = 0;
 
-        // Funzioni e variabili per il secondo player (MODIFICATE)
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        function loadTrack(index) {
+            trackTitle.textContent = trackNames[index];
+            audios.forEach((audio, i) => {
+                if (i === index) {
+                    audio.currentTime = 0;
+                } else {
+                    audio.pause();
+                }
+            });
+            if (isPlaying) {
+                audios[index].play();
+                playPauseBtn.textContent = '⏸';
+            } else {
+                playPauseBtn.textContent = '▶';
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const currentAudio = audios[currentTrackIndex];
+            const currentTime = currentAudio.currentTime;
+            const duration = currentAudio.duration || 0;
+            progressBar.value = duration ? (currentTime / duration) * 100 : 0;
+            currentTimeDisplay.textContent = formatTime(currentTime);
+            durationDisplay.textContent = formatTime(duration);
+        }
+
+        function setProgress() {
+            const currentAudio = audios[currentTrackIndex];
+            const duration = currentAudio.duration || 0;
+            const progress = progressBar.value / 100;
+            currentAudio.currentTime = duration * progress;
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audios[currentTrackIndex].pause();
+                playPauseBtn.textContent = '▶';
+            } else {
+                audios[currentTrackIndex].play();
+                playPauseBtn.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentTrackIndex--;
+            if (currentTrackIndex < 0) {
+                currentTrackIndex = audios.length - 1;
+            }
+            loadTrack(currentTrackIndex);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentTrackIndex++;
+            if (currentTrackIndex > audios.length - 1) {
+                currentTrackIndex = 0;
+            }
+            loadTrack(currentTrackIndex);
+        });
+
+        audios.forEach(audio => {
+            audio.addEventListener('timeupdate', updateProgress);
+            audio.addEventListener('loadedmetadata', () => {
+                durationDisplay.textContent = formatTime(audio.duration || 0);
+                progressBar.value = 0;
+            });
+            audio.addEventListener('ended', () => {
+                isPlaying = false;
+                playPauseBtn.textContent = '▶';
+                progressBar.value = 0;
+                currentTimeDisplay.textContent = '0:00';
+            });
+        });
+
+        progressBar.addEventListener('input', setProgress);
+
+        // Funzioni e variabili per il secondo player (INALTERATE)
         const trackTitle2 = document.getElementById('track-title-2');
         const albumTitle2 = document.getElementById('album-title-2');
         const pageTitle2 = document.getElementById('page-title-2');
-        const albumCover2 = document.getElementById('album-cover-2'); // Nuova variabile per la copertina
+        const albumCover2 = document.getElementById('album-cover-2');
         const playPauseBtn2 = document.getElementById('play-pause-btn-2');
         const prevBtn2 = document.getElementById('prev-btn-2');
         const nextBtn2 = document.getElementById('next-btn-2');
@@ -156,7 +239,7 @@
             document.getElementById('audio-secondo-7'),
             document.getElementById('audio-secondo-8')
         ];
-        const trackNames2 = [ // Nomi generici per le tracce del secondo player
+        const trackNames2 = [
             'JEWS HANDS',
             'ANGEL',
             'BLIND',
@@ -169,8 +252,7 @@
         let isPlaying2 = false;
         let currentTrackIndex2 = 0;
 
-        // Funzioni duplicate per il secondo player (MODIFICATE per usare le nuove variabili)
-        function formatTime(seconds) {
+        function formatTime2(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
             return `${minutes}:${remainingSeconds}`;
@@ -199,8 +281,8 @@
             const currentTime = currentAudio.currentTime;
             const duration = currentAudio.duration || 0;
             progressBar2.value = duration ? (currentTime / duration) * 100 : 0;
-            currentTimeDisplay2.textContent = formatTime(currentTime);
-            durationDisplay2.textContent = formatTime(duration);
+            currentTimeDisplay2.textContent = formatTime2(currentTime);
+            durationDisplay2.textContent = formatTime2(duration);
         }
 
         function setProgress2() {
@@ -210,51 +292,6 @@
             currentAudio.currentTime = duration * progress;
         }
 
-        // Event listeners e logica per il primo player (INALTERATI)
-        playPauseBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audios[currentTrackIndex].pause();
-                playPauseBtn.textContent = '▶';
-            } else {
-                audios[currentTrackIndex].play();
-                playPauseBtn.textContent = '⏸';
-            }
-            isPlaying = !isPlaying;
-        });
-
-        prevBtn.addEventListener('click', () => {
-            currentTrackIndex--;
-            if (currentTrackIndex < 0) {
-                currentTrackIndex = audios.length - 1;
-            }
-            loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
-        });
-
-        nextBtn.addEventListener('click', () => {
-            currentTrackIndex++;
-            if (currentTrackIndex > audios.length - 1) {
-                currentTrackIndex = 0;
-            }
-            loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
-        });
-
-        audios.forEach(audio => {
-            audio.addEventListener('timeupdate', () => updateProgress(audio, progressBar, currentTimeDisplay, durationDisplay));
-            audio.addEventListener('loadedmetadata', () => {
-                durationDisplay.textContent = formatTime(audio.duration || 0);
-                progressBar.value = 0;
-            });
-            audio.addEventListener('ended', () => {
-                isPlaying = false;
-                playPauseBtn.textContent = '▶';
-                progressBar.value = 0;
-                currentTimeDisplay.textContent = '0:00';
-            });
-        });
-
-        progressBar.addEventListener('input', () => setProgress(progressBar, audios, currentTrackIndex));
-
-        // Event listeners e logica per il secondo player (MODIFICATI per usare le nuove funzioni e variabili)
         playPauseBtn2.addEventListener('click', () => {
             if (isPlaying2) {
                 audios2[currentTrackIndex2].pause();
@@ -285,7 +322,7 @@
         audios2.forEach(audio => {
             audio.addEventListener('timeupdate', updateProgress2);
             audio.addEventListener('loadedmetadata', () => {
-                durationDisplay2.textContent = formatTime(audio.duration || 0);
+                durationDisplay2.textContent = formatTime2(audio.duration || 0);
                 progressBar2.value = 0;
             });
             audio.addEventListener('ended', () => {
@@ -311,8 +348,8 @@
             }
         });
 
-        loadTrack(currentTrackIndex, trackTitle, albumTitle, playPauseBtn, progressBar, currentTimeDisplay, durationDisplay, audios, isPlaying, currentTrackIndex);
-        loadTrack2(currentTrackIndex2); // Inizializza il secondo player
+        loadTrack(currentTrackIndex);
+        loadTrack2(currentTrackIndex2);
     </script>
 </body>
 </html>
