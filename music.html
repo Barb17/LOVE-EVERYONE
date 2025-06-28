@@ -59,7 +59,7 @@
     </div>
 
     <div class="music-container">
-                <div class="album">
+        <div class="album">
             <img id="album-cover-2" src="album2.jpg" alt="Copertina album secondo">
             <h3 id="album-title-2">HATE EVERYONE</h3>
             <h4 id="track-title-2">JEWS HANDS</h4>
@@ -111,6 +111,34 @@
             <audio id="audio-terzo-6" src="MUSICA/1.6.6OHH.mp3"></audio>
             <audio id="audio-terzo-7" src="MUSICA/1.7.7LAUNDRY.mp3"></audio>
             <audio id="audio-terzo-8" src="MUSICA/1.8.8END.mp3"></audio>
+        </div>
+    </div>
+
+    <div class="music-container">
+        <div class="album">
+            <img id="album-cover-4" src="album4.jpg" alt="Copertina album quarto">
+            <h3 id="album-title-4">ECHOES OF NOTHING</h3>
+            <h4 id="track-title-4">WHISPERS</h4>
+        </div>
+        <div class="player">
+            <div class="controls">
+                <button class="skip-btn" id="prev-btn-4">⏮</button>
+                <button id="play-pause-btn-4" class="play-pause-btn">▶</button>
+                <button class="skip-btn" id="next-btn-4">⏭</button>
+            </div>
+            <input type="range" id="progress-bar-4" class="progress-bar" value="0" step="0.01">
+            <div class="time-container">
+                <span id="current-time-4">0:00</span>
+                <span id="duration-4">0:00</span>
+            </div>
+            <audio id="audio-quarto-1" src="MUSICA/1.1.1.1WHISPERS.mp3"></audio>
+            <audio id="audio-quarto-2" src="MUSICA/1.2.2.2HONEYLIGHT.mp3"></audio>
+            <audio id="audio-quarto-3" src="MUSICA/1.3.3.3BETWEEN SHADOWS.mp3"></audio>
+            <audio id="audio-quarto-4" src="MUSICA/1.4.4.4FIELDS.mp3"></audio>
+            <audio id="audio-quarto-5" src="MUSICA/1.5.5.5GOLDEN HUNGER.mp3"></audio>
+            <audio id="audio-quarto-6" src="MUSICA/1.6.6.6WHERE THE SKY MELTS.mp3"></audio>
+            <audio id="audio-quarto-7" src="MUSICA/1.7.7.7LANTERN.mp3"></audio>
+            <audio id="audio-quarto-8" src="MUSICA/1.8.8.8THE HOURS THAT FLOW.mp3"></audio>
         </div>
     </div>
 
@@ -479,6 +507,122 @@
 
         progressBar3.addEventListener('input', setProgress3);
 
+        // Funzioni e variabili per il quarto player
+        const trackTitle4 = document.getElementById('track-title-4');
+        const albumTitle4 = document.getElementById('album-title-4');
+        const albumCover4 = document.getElementById('album-cover-4'); 
+        const playPauseBtn4 = document.getElementById('play-pause-btn-4');
+        const prevBtn4 = document.getElementById('prev-btn-4');
+        const nextBtn4 = document.getElementById('next-btn-4');
+        const progressBar4 = document.getElementById('progress-bar-4');
+        const currentTimeDisplay4 = document.getElementById('current-time-4');
+        const durationDisplay4 = document.getElementById('duration-4');
+        const audios4 = [
+            document.getElementById('audio-quarto-1'),
+            document.getElementById('audio-quarto-2'),
+            document.getElementById('audio-quarto-3'),
+            document.getElementById('audio-quarto-4'),
+            document.getElementById('audio-quarto-5'),
+            document.getElementById('audio-quarto-6'),
+            document.getElementById('audio-quarto-7'),
+            document.getElementById('audio-quarto-8')
+        ];
+        const trackNames4 = [
+            'WHISPERS',
+            'HONEY LIGHT',
+            'BETWEEN SHADOWS',
+            'FIELDS',
+            'GOLDEN HUNGER',
+            'WHERE THE SKY MELTS',
+            'LANTERN',
+            'THE HOURS THAT FLOW'
+        ];
+        let isPlaying4 = false;
+        let currentTrackIndex4 = 0;
+
+        function formatTime4(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        function loadTrack4(index) {
+            trackTitle4.textContent = trackNames4[index];
+            audios4.forEach((audio, i) => {
+                if (i === index) {
+                    audio.currentTime = 0;
+                } else {
+                    audio.pause();
+                }
+            });
+            if (isPlaying4) {
+                audios4[index].play();
+                playPauseBtn4.textContent = '⏸';
+            } else {
+                playPauseBtn4.textContent = '▶';
+            }
+            updateProgress4();
+        }
+
+        function updateProgress4() {
+            const currentAudio = audios4[currentTrackIndex4];
+            const currentTime = currentAudio.currentTime;
+            const duration = currentAudio.duration || 0;
+            progressBar4.value = duration ? (currentTime / duration) * 100 : 0;
+            currentTimeDisplay4.textContent = formatTime4(currentTime);
+            durationDisplay4.textContent = formatTime4(duration);
+        }
+
+        function setProgress4() {
+            const currentAudio = audios4[currentTrackIndex4];
+            const duration = currentAudio.duration || 0;
+            const progress = progressBar4.value / 100;
+            currentAudio.currentTime = duration * progress;
+        }
+
+        playPauseBtn4.addEventListener('click', () => {
+            if (isPlaying4) {
+                audios4[currentTrackIndex4].pause();
+                playPauseBtn4.textContent = '▶';
+            } else {
+                audios4[currentTrackIndex4].play();
+                playPauseBtn4.textContent = '⏸';
+            }
+            isPlaying4 = !isPlaying4;
+        });
+
+        prevBtn4.addEventListener('click', () => {
+            currentTrackIndex4--;
+            if (currentTrackIndex4 < 0) {
+                currentTrackIndex4 = audios4.length - 1;
+            }
+            loadTrack4(currentTrackIndex4);
+        });
+
+        nextBtn4.addEventListener('click', () => {
+            currentTrackIndex4++;
+            if (currentTrackIndex4 > audios4.length - 1) {
+                currentTrackIndex4 = 0;
+            }
+            loadTrack4(currentTrackIndex4);
+        });
+
+        audios4.forEach(audio => {
+            audio.addEventListener('timeupdate', updateProgress4);
+            audio.addEventListener('loadedmetadata', () => {
+                durationDisplay4.textContent = formatTime4(audio.duration || 0);
+                progressBar4.value = 0;
+            });
+            audio.addEventListener('ended', () => {
+                isPlaying4 = false;
+                playPauseBtn4.textContent = '▶';
+                progressBar4.value = 0;
+                currentTimeDisplay4.textContent = '0:00';
+            });
+        });
+
+        progressBar4.addEventListener('input', setProgress4);
+
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
 
@@ -495,6 +639,7 @@
         loadTrack(currentTrackIndex);
         loadTrack2(currentTrackIndex2);
         loadTrack3(currentTrackIndex3);
+        loadTrack4(currentTrackIndex4); 
     </script>
 </body>
 </html>
