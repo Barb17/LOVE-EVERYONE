@@ -5,8 +5,8 @@ body {
     color: black;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Centra verticalmente gli elementi figli */
+    align-items: center;   /* Centra orizzontalmente gli elementi figli */
     min-height: 100vh;
 }
 
@@ -16,6 +16,7 @@ body {
     width: 80%;
     max-width: 800px;
     position: relative;
+    cursor: pointer;
     transition: opacity 0.3s ease-in-out;
 }
 
@@ -29,11 +30,94 @@ video {
     margin-top: 10px;
     font-size: 2em;
     font-family: 'IBM Plex Mono', monospace;
+    /* Animazione per suggerire il click */
+    animation: pulse 2s infinite ease-in-out;
+}
+
+/* Definizione dell'animazione per il testo */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02); /* Leggero ingrandimento */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Stili per la galleria di immagini */
+.image-gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px; /* Spazio tra gli elementi dell'immagine */
+    width: 100%;
+    max-width: 800px; /* Imposta una larghezza massima per la galleria */
+    box-sizing: border-box;
+
+    /* Nascondi la galleria di default e fai in modo che non occupi spazio */
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0; /* Utilizza max-height per un collasso effettivo dello spazio */
+    overflow: hidden;
+    padding: 0px 20px; /* Rimuovi il padding verticale quando nascosta */
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, visibility 0.5s ease-in-out, padding 0.5s ease-in-out;
+}
+
+/* Classe per rendere visibile la galleria */
+.image-gallery.visible {
+    opacity: 1;
+    visibility: visible;
+    max-height: 2000px; /* Un valore sufficientemente grande per contenere il contenuto */
+    padding: 40px 20px; /* Ripristina il padding originale quando visibile */
+}
+
+.image-item {
+    text-align: center;
+    width: 200px;
+    max-width: 200px;
+}
+
+.image-item img {
+    max-width: 200px;
+    width: 200px;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-item .image-title {
+    margin-top: 15px;
+    font-size: 1.5em;
+    font-family: 'IBM Plex Mono', monospace;
+    color: black;
+    width: 100%;
+    /* Rimosse le proprietà che causavano il troncamento del testo */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
+}
+
+.image-item .image-caption {
+    margin-top: 5px;
+    font-size: 1em;
+    font-family: 'IBM Plex Mono', monospace;
+    color: #555;
+    width: 100%;
+    /* Rimosse le proprietà che causavano il troncamento del testo */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
 }
 
 /* Stili per l'hamburger menu */
 .hamburger-menu {
-    position: absolute;
+    position: fixed;
     top: 20px;
     left: 20px;
     z-index: 1;
@@ -123,9 +207,33 @@ video {
     left: 0;
 }
 
+/* Media query per la responsività delle immagini, come in music.css */
 @media (max-width: 600px) {
     .video-container {
         width: 95%;
         padding: 10px;
+    }
+
+    .image-gallery {
+        gap: 30px;
+        padding: 30px 10px;
+    }
+
+    .image-item {
+        width: 150px;
+        max-width: 150px;
+    }
+
+    .image-item img {
+        max-width: 150px;
+        width: 150px;
+    }
+
+    .image-item .image-title {
+        font-size: 1.2em;
+    }
+
+    .image-item .image-caption {
+        font-size: 0.9em;
     }
 }

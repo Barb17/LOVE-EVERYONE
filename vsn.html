@@ -9,14 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="SND-VSN">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 </head>
 <body>
     <div class="hamburger-menu">
@@ -30,28 +22,44 @@
             <li><a class="menu__item" href="vsn.html">VSN</a></li>
         </ul>
     </div>
-    <div class="video-container">
+    <div class="video-container" id="videoContainer">
         <video id="loop-video" loop autoplay muted>
             <source src="VIDEO/video2.mp4" type="video/mp4">
         </video>
-        <p class="video-text">VSN SOON</p>
+        <p class="video-text">CLICK TO VIEW VSN</p>
+    </div>
+
+    <div class="image-gallery">
+        <div class="image-item">
+            <img src="album.jpg" alt="Test Image 1">
+            <h3 class="image-title">LOVE EVERYONE</h3>
+            <p class="image-caption">An album devoted to the boundless love that embraces all. Every soul is worthy of love, even those who have stumbled into darkness.</p>
+        </div>
+        <div class="image-item">
+            <img src="album2.jpg" alt="Test Image 2">
+            <h3 class="image-title">HATE EVERYONE</h3>
+            <p class="image-caption">Hate is the greatest form of love, this album is inspired by the man who loved more deeply than anyone in history</p>
+        </div>
+        <div class="image-item">
+            <img src="album3.jpg" alt="Test Image 3">
+            <h3 class="image-title">LAUNDRY</h3>
+            <p class="image-caption">This project is a journey of redemption, from darkness to ascension into the heavens</p>
+        </div>
+        <div class="image-item">
+            <img src="album4.jpg" alt="Test Image 4">
+            <h3 class="image-title">ECHOES OF NOTHING</h3>
+            <p class="image-caption">The project is inspired by the long silences of summer days. It follows the different phases of the day and is conceived as the soundtrack of our lives.</p>
+        </div>
     </div>
     <script>
-        // Registrazione del Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Registrazione ServiceWorker fallita:', error);
-                    });
-            });
-        }
-        
-        const videoContainer = document.querySelector('.video-container');
+        const videoContainer = document.getElementById('videoContainer'); // Seleziona il contenitore del video
+        const imageGallery = document.querySelector('.image-gallery'); // Seleziona la galleria di immagini
 
+        videoContainer.addEventListener('click', () => {
+            imageGallery.classList.toggle('visible'); // Togglie la classe 'visible' al clic
+        });
+
+        // Codice esistente per l'hamburger menu
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
 
