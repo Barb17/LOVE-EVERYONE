@@ -80,7 +80,7 @@
                     <span id="bar-album-title"></span>
                 </div>
             </div>
-            <button id="bar-play-pause-btn" class="play-pause-btn">▶</button>
+            <button id="bar-play-pause-btn" class="play-pause-btn"></button>
         </div>
     
         <div id="player-expanded">
@@ -98,7 +98,7 @@
                 
                 <div class="controls">
                     <button class="skip-btn" id="global-prev-btn">⏮</button>
-                    <button id="global-play-pause-btn" class="play-pause-btn">▶</button>
+                    <button id="global-play-pause-btn" class="play-pause-btn"></button>
                     <button class="skip-btn" id="global-next-btn">⏭</button>
                 </div>
             </div>
@@ -190,18 +190,14 @@
         let isPlaying = false;
 
         // 4. Selezione degli elementi del DOM (HTML)
-        // Container principale
+        // ... (tutte le selezioni DOM invariate) ...
         const globalPlayerContainer = document.getElementById('global-player-container');
-        
-        // Elementi barra collassata
         const playerBar = document.getElementById('player-bar');
         const openExpandedPlayerBtn = document.getElementById('open-expanded-player');
         const barAlbumCover = document.getElementById('bar-album-cover');
         const barTrackTitle = document.getElementById('bar-track-title');
         const barAlbumTitle = document.getElementById('bar-album-title');
         const barPlayPauseBtn = document.getElementById('bar-play-pause-btn');
-
-        // Elementi vista espansa
         const playerExpanded = document.getElementById('player-expanded');
         const closeExpandedPlayerBtn = document.getElementById('close-expanded-btn');
         const expandedAlbumCover = document.getElementById('expanded-album-cover');
@@ -213,21 +209,19 @@
         const globalPrevBtn = document.getElementById('global-prev-btn');
         const globalPlayPauseBtn = document.getElementById('global-play-pause-btn');
         const globalNextBtn = document.getElementById('global-next-btn');
-        
-        // Seleziona le copertine cliccabili
         const albumCoverImages = document.querySelectorAll('.album-cover-clickable');
-
-        // Seleziona gli elementi del Modal Tracklist
         const modalBackdrop = document.getElementById('modal-backdrop');
         const tracklistModal = document.getElementById('tracklist-modal');
         const closeTracklistBtn = document.getElementById('close-tracklist-btn');
         const tracklistContent = document.getElementById('tracklist-content');
-
-        // *** NUOVO: Seleziona l'hamburger menu ***
         const hamburgerMenu = document.querySelector('.hamburger-menu');
 
+        // --- MODIFICA 2: Definisci le icone SVG ---
+        const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
+        const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
 
-        // 5. Funzioni principali del player (invariate)
+
+        // 5. Funzioni principali del player 
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
@@ -235,6 +229,7 @@
         }
 
         function loadTrack(albumIndex, trackIndex) {
+            // ... (funzione invariata)
             currentAlbumIndex = albumIndex;
             currentTrackIndex = trackIndex;
             const album = allAlbums[albumIndex];
@@ -257,18 +252,20 @@
             }
         }
 
+        // --- MODIFICA 3: Funzione playAudio aggiornata ---
         function playAudio() {
             globalAudio.play();
             isPlaying = true;
-            barPlayPauseBtn.textContent = '⏸';
-            globalPlayPauseBtn.textContent = '⏸';
+            barPlayPauseBtn.innerHTML = pauseIconSVG;
+            globalPlayPauseBtn.innerHTML = pauseIconSVG;
         }
 
+        // --- MODIFICA 3: Funzione pauseAudio aggiornata ---
         function pauseAudio() {
             globalAudio.pause();
             isPlaying = false;
-            barPlayPauseBtn.textContent = '▶';
-            globalPlayPauseBtn.textContent = '▶';
+            barPlayPauseBtn.innerHTML = playIconSVG;
+            globalPlayPauseBtn.innerHTML = playIconSVG;
         }
 
         function togglePlayPause() {
@@ -280,6 +277,7 @@
         }
 
         function playNextTrack() {
+            // ... (funzione invariata)
             currentTrackIndex++;
             const currentAlbum = allAlbums[currentAlbumIndex];
             if (currentTrackIndex >= currentAlbum.tracks.length) {
@@ -289,6 +287,7 @@
         }
 
         function playPrevTrack() {
+            // ... (funzione invariata)
             currentTrackIndex--;
             if (currentTrackIndex < 0) {
                 const currentAlbum = allAlbums[currentAlbumIndex];
@@ -298,6 +297,7 @@
         }
 
         function updateProgress() {
+            // ... (funzione invariata)
             const currentTime = globalAudio.currentTime;
             const duration = globalAudio.duration || 0;
             globalProgressBar.value = duration ? (currentTime / duration) * 100 : 0;
@@ -305,43 +305,38 @@
         }
 
         function setProgress() {
+            // ... (funzione invariata)
             const duration = globalAudio.duration || 0;
             const progress = globalProgressBar.value / 100;
             globalAudio.currentTime = duration * progress;
         }
 
-        // 6. Funzioni per Aprire/Chiudere la vista espansa
+        // 6. Funzioni per Aprire/Chiudere la vista espansa (invariate)
         function openExpandedPlayer() {
             playerExpanded.classList.add('active');
-            // *** RIGA MODIFICATA ***
             hamburgerMenu.classList.add('hidden-by-player'); 
         }
         
         function closeExpandedPlayer() {
             playerExpanded.classList.remove('active');
-            // *** RIGA MODIFICATA ***
             hamburgerMenu.classList.remove('hidden-by-player'); 
         }
 
-        // 7. Funzioni per il Modal Tracklist
+        // 7. Funzioni per il Modal Tracklist (invariate)
         function showTracklist(albumIndex) {
+            // ... (funzione invariata)
             const album = allAlbums[albumIndex];
-            
             tracklistContent.innerHTML = '';
-
             const modalCover = document.createElement('img');
             modalCover.src = album.albumCover;
             modalCover.className = 'tracklist-cover';
             tracklistContent.appendChild(modalCover);
-
             const modalTitle = document.createElement('h3');
             modalTitle.textContent = album.albumTitle;
             modalTitle.className = 'tracklist-album-title';
             tracklistContent.appendChild(modalTitle);
-
             const trackListElement = document.createElement('ol');
             trackListElement.className = 'tracklist-ol';
-            
             album.tracks.forEach((track, trackIndex) => {
                 const trackItem = document.createElement('li');
                 trackItem.textContent = track.title;
@@ -350,28 +345,22 @@
                 trackItem.dataset.trackIndex = trackIndex;
                 trackListElement.appendChild(trackItem);
             });
-
             tracklistContent.appendChild(trackListElement);
-
             modalBackdrop.classList.add('active');
             tracklistModal.classList.add('active');
-            
-            // *** RIGA MODIFICATA ***
-            hamburgerMenu.classList.add('hidden-by-player'); // Nascondi il menu
+            hamburgerMenu.classList.add('hidden-by-player');
         }
 
         function closeTracklistModal() {
+            // ... (funzione invariata)
             modalBackdrop.classList.remove('active');
             tracklistModal.classList.remove('active');
-            
-            // *** RIGA MODIFICATA ***
-            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra di nuovo il menu
+            hamburgerMenu.classList.remove('hidden-by-player');
         }
 
 
-        // 8. Collegamento degli Eventi (Event Listeners)
+        // 8. Collegamento degli Eventi (Event Listeners) (invariati)
         
-        // Clic sulle copertine degli album
         albumCoverImages.forEach(image => {
             image.addEventListener('click', (e) => {
                 const albumIndex = parseInt(e.currentTarget.dataset.albumIndex);
@@ -379,43 +368,34 @@
             });
         });
 
-        // Clic su una traccia nel modal
         tracklistContent.addEventListener('click', (e) => {
             if (e.target && e.target.classList.contains('tracklist-item')) {
                 const albumIndex = parseInt(e.target.dataset.albumIndex);
                 const trackIndex = parseInt(e.target.dataset.trackIndex);
-                
                 loadTrack(albumIndex, trackIndex);
                 playAudio();
                 closeTracklistModal(); 
             }
         });
 
-        // Chiusura del modal
         closeTracklistBtn.addEventListener('click', closeTracklistModal);
         modalBackdrop.addEventListener('click', closeTracklistModal);
 
-
-        // Controlli Player (Play/Pausa, Next, Prev) - invariati
         barPlayPauseBtn.addEventListener('click', togglePlayPause);
         globalPlayPauseBtn.addEventListener('click', togglePlayPause);
         globalNextBtn.addEventListener('click', playNextTrack);
         globalPrevBtn.addEventListener('click', playPrevTrack);
 
-        // Barra di progresso - invariati
         globalAudio.addEventListener('timeupdate', updateProgress);
         globalProgressBar.addEventListener('input', setProgress);
         
-        // Fine traccia - invariato
         globalAudio.addEventListener('ended', () => {
             playNextTrack();
         });
         
-        // Apri/Chiudi vista espansa - invariati
         openExpandedPlayerBtn.addEventListener('click', openExpandedPlayer);
         closeExpandedPlayerBtn.addEventListener('click', closeExpandedPlayer);
 
-        // Menu hamburger (codice che avevi già) - invariato
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
 
@@ -429,10 +409,11 @@
             }
         });
 
-        // Caricamento iniziale (invariato)
+        // Caricamento iniziale
         loadTrack(0, 0);
         globalPlayerContainer.classList.add('hidden');
-        pauseAudio();
+        // --- MODIFICA 3: Assicura che l'icona iniziale sia 'play' ---
+        pauseAudio(); 
 
     </script>
 </body>

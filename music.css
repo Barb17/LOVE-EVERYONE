@@ -358,7 +358,6 @@ body {
     align-items: center;
     justify-content: center;
     
-    /* MODIFICA: Ritarda 'visibility' alla fine della transizione di 'top' */
     transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.4s;
     visibility: hidden;
 }
@@ -366,7 +365,6 @@ body {
 #player-expanded.active {
     top: 0;
     visibility: visible;
-    /* MODIFICA: Rendi 'visibility' immediata quando si apre */
     transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s;
 }
 
@@ -532,4 +530,17 @@ body {
 
 .tracklist-item:last-child {
     border-bottom: none;
+}
+
+/* --- NUOVO STILE PER LE ICONE SVG --- */
+.play-pause-btn svg {
+    /* Usa la dimensione del testo per scalare l'icona */
+    width: 1em; 
+    height: 1em;
+    /* Riempi l'icona con il colore del testo (nero) */
+    fill: currentColor; 
+    /* Allinea l'icona al centro verticalmente */
+    vertical-align: middle; 
+    /* Impedisce all'icona di "schiacciarsi" */
+    flex-shrink: 0; 
 }
