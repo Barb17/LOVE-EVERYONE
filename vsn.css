@@ -73,7 +73,8 @@ video {
 .image-gallery.visible {
     opacity: 1;
     visibility: visible;
-    max-height: 2000px; /* Un valore sufficientemente grande per contenere il contenuto */
+    /* Valore aumentato per fare spazio a tutti i modelli */
+    max-height: 5000px; 
     padding: 40px 20px; /* Ripristina il padding originale quando visibile */
 }
 
@@ -97,10 +98,6 @@ video {
     font-family: 'IBM Plex Mono', monospace;
     color: black;
     width: 100%;
-    /* Rimosse le proprietà che causavano il troncamento del testo */
-    /* overflow: hidden; */
-    /* text-overflow: ellipsis; */
-    /* white-space: nowrap; */
 }
 
 .image-item .image-caption {
@@ -109,11 +106,32 @@ video {
     font-family: 'IBM Plex Mono', monospace;
     color: #555;
     width: 100%;
-    /* Rimosse le proprietà che causavano il troncamento del testo */
-    /* overflow: hidden; */
-    /* text-overflow: ellipsis; */
-    /* white-space: nowrap; */
 }
+
+/* STILI PER IL MODELLO 3D (applicati a tutti i modelli) */
+.model-item {
+    text-align: center;
+    width: 90%; /* Occupa più larghezza delle immagini */
+    max-width: 600px; /* Ma con un limite */
+}
+
+.model-item .image-title { /* Riusiamo lo stile del titolo */
+    margin-top: 15px;
+    font-size: 1.5em;
+    font-family: 'IBM Plex Mono', monospace;
+    color: black;
+    width: 100%;
+}
+
+model-viewer {
+    width: 100%; /* Occupa tutta la larghezza del .model-item */
+    height: 450px; /* Altezza fissa per il visualizzatore */
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f8f8f8; /* Sfondo leggero */
+}
+/* FINE STILI 3D */
+
 
 /* Stili per l'hamburger menu */
 .hamburger-menu {
@@ -174,7 +192,8 @@ video {
     display: block;
     padding: 12px 24px;
     color: black;
-    font-family: sans-serif;
+    /* Ripristinato il font-family originale di vsn.css */
+    font-family: sans-serif; 
     font-size: 20px;
     text-decoration: none;
     transition-duration: .25s;
@@ -188,6 +207,7 @@ video {
     display: none;
 }
 
+/* --- INIZIO BLOCCO CORRETTO (REPLICATO DA STYLE.CSS) --- */
 #menu__toggle:checked ~ .menu__btn > span {
     transform: rotate(45deg);
 }
@@ -201,13 +221,15 @@ video {
     top: 0;
     transform: rotate(90deg);
 }
+/* --- FINE BLOCCO CORRETTO --- */
+
 
 #menu__toggle:checked ~ .menu__box {
     visibility: visible;
     left: 0;
 }
 
-/* Media query per la responsività delle immagini, come in music.css */
+/* Media query per la responsività */
 @media (max-width: 600px) {
     .video-container {
         width: 95%;
@@ -235,5 +257,14 @@ video {
 
     .image-item .image-caption {
         font-size: 0.9em;
+    }
+
+    /* Stili responsivi per il modello 3D */
+    .model-item {
+        width: 95%; /* Occupa quasi tutta la larghezza */
+    }
+
+    model-viewer {
+        height: 300px; /* Più basso su schermi piccoli */
     }
 }

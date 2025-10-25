@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <script nomodule src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer-legacy.js"></script>
 </head>
 <body>
     <div class="hamburger-menu">
@@ -22,6 +25,7 @@
             <li><a class="menu__item" href="vsn.html">VSN</a></li>
         </ul>
     </div>
+
     <div class="video-container" id="videoContainer">
         <video id="loop-video" loop autoplay muted>
             <source src="VIDEO/video2.mp4" type="video/mp4">
@@ -30,27 +34,65 @@
     </div>
 
     <div class="image-gallery">
-        <div class="image-item">
-            <img src="album.jpg" alt="Test Image 1">
+        
+        <div class="model-item">
             <h3 class="image-title">LOVE EVERYONE</h3>
-            <p class="image-caption">An album devoted to the boundless love that embraces all. Every soul is worthy of love, even those who have stumbled into darkness.</p>
+            <model-viewer 
+                src="3D/loveveryone3d.glb" 
+                alt="Modello 3D Love Everyone"
+                auto-rotate 
+                camera-controls
+                shadow-intensity="1"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                ios-src="3D/loveveryone3d.glb">
+            </model-viewer>
         </div>
-        <div class="image-item">
-            <img src="album2.jpg" alt="Test Image 2">
+
+        <div class="model-item">
             <h3 class="image-title">HATE EVERYONE</h3>
-            <p class="image-caption">Hate is the greatest form of love, this album is inspired by the man who loved more deeply than anyone in history</p>
+            <model-viewer 
+                src="3D/hateveryone3d.glb" 
+                alt="Modello 3D Hate Everyone"
+                auto-rotate 
+                camera-controls
+                shadow-intensity="1"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                ios-src="3D/hateveryone3d.glb">
+            </model-viewer>
         </div>
-        <div class="image-item">
-            <img src="album3.jpg" alt="Test Image 3">
+
+        <div class="model-item">
             <h3 class="image-title">LAUNDRY</h3>
-            <p class="image-caption">This project is a journey of redemption, from darkness to ascension into the heavens</p>
+            <model-viewer 
+                src="3D/laundry3d.glb" 
+                alt="Modello 3D Laundry"
+                auto-rotate 
+                camera-controls
+                shadow-intensity="1"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                ios-src="3D/laundry3d.glb">
+            </model-viewer>
         </div>
-        <div class="image-item">
-            <img src="album4.jpg" alt="Test Image 4">
+
+        <div class="model-item">
             <h3 class="image-title">ECHOES OF NOTHING</h3>
-            <p class="image-caption">The project is inspired by the long silences of summer days. It follows the different phases of the day and is conceived as the soundtrack of our lives.</p>
+            <model-viewer 
+                src="3D/echoesofnothing3d.glb" 
+                alt="Modello 3D Echoes of Nothing"
+                auto-rotate 
+                camera-controls
+                shadow-intensity="1"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                ios-src="3D/echoesofnothing3d.glb">
+            </model-viewer>
         </div>
+
     </div>
+
     <script>
         const videoContainer = document.getElementById('videoContainer'); // Seleziona il contenitore del video
         const imageGallery = document.querySelector('.image-gallery'); // Seleziona la galleria di immagini
