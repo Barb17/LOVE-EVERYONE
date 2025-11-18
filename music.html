@@ -26,6 +26,7 @@
         <ul class="menu__box">
             <li><a class="menu__item" href="index.html">HOME</a></li>
             <li><a class="menu__item" href="music.html">SND</a></li>
+            <li><a class="menu__item" href="lab.html">LAB</a></li>
             <li><a class="menu__item" href="vsn.html">VSN</a></li>
         </ul>
     </div>
@@ -108,12 +109,11 @@
     
     </div>
     <script>
-        // Registrazione del Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
+                        console.log('ServiceWorker registrato:', registration.scope);
                     })
                     .catch(error => {
                         console.log('Registrazione ServiceWorker fallita:', error);
@@ -121,9 +121,6 @@
             });
         }
 
-        // --- SCRIPT PLAYER GLOBALE MODIFICATO ---
-
-        // 1. Definizione dei dati di tutti gli album (invariato)
         const allAlbums = [
             {
                 albumTitle: "LOVE EVERYONE",
@@ -195,19 +192,13 @@
                     { title: 'NOISE', src: 'MUSICA/1.8.8.8.8NOISE.mp3' }
                 ]
             },
-
         ];
 
-        // 2. Creazione di un UNICO elemento Audio (invariato)
         const globalAudio = new Audio();
-        
-        // 3. Stato del player globale (invariato)
         let currentAlbumIndex = 0;
         let currentTrackIndex = 0;
         let isPlaying = false;
 
-        // 4. Selezione degli elementi del DOM (HTML)
-        // ... (tutte le selezioni DOM invariate) ...
         const globalPlayerContainer = document.getElementById('global-player-container');
         const playerBar = document.getElementById('player-bar');
         const openExpandedPlayerBtn = document.getElementById('open-expanded-player');
@@ -233,12 +224,9 @@
         const tracklistContent = document.getElementById('tracklist-content');
         const hamburgerMenu = document.querySelector('.hamburger-menu');
 
-        // --- MODIFICA 2: Definisci le icone SVG ---
         const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
         const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
 
-
-        // 5. Funzioni principali del player 
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
@@ -246,7 +234,6 @@
         }
 
         function loadTrack(albumIndex, trackIndex) {
-            // ... (funzione invariata)
             currentAlbumIndex = albumIndex;
             currentTrackIndex = trackIndex;
             const album = allAlbums[albumIndex];
@@ -269,7 +256,6 @@
             }
         }
 
-        // --- MODIFICA 3: Funzione playAudio aggiornata ---
         function playAudio() {
             globalAudio.play();
             isPlaying = true;
@@ -277,7 +263,6 @@
             globalPlayPauseBtn.innerHTML = pauseIconSVG;
         }
 
-        // --- MODIFICA 3: Funzione pauseAudio aggiornata ---
         function pauseAudio() {
             globalAudio.pause();
             isPlaying = false;
@@ -294,7 +279,6 @@
         }
 
         function playNextTrack() {
-            // ... (funzione invariata)
             currentTrackIndex++;
             const currentAlbum = allAlbums[currentAlbumIndex];
             if (currentTrackIndex >= currentAlbum.tracks.length) {
@@ -304,7 +288,6 @@
         }
 
         function playPrevTrack() {
-            // ... (funzione invariata)
             currentTrackIndex--;
             if (currentTrackIndex < 0) {
                 const currentAlbum = allAlbums[currentAlbumIndex];
@@ -314,7 +297,6 @@
         }
 
         function updateProgress() {
-            // ... (funzione invariata)
             const currentTime = globalAudio.currentTime;
             const duration = globalAudio.duration || 0;
             globalProgressBar.value = duration ? (currentTime / duration) * 100 : 0;
@@ -322,26 +304,23 @@
         }
 
         function setProgress() {
-            // ... (funzione invariata)
             const duration = globalAudio.duration || 0;
             const progress = globalProgressBar.value / 100;
             globalAudio.currentTime = duration * progress;
         }
 
-        // 6. Funzioni per Aprire/Chiudere la vista espansa (invariate)
+        // Funzioni per nascondere/mostrare il menu hamburger
         function openExpandedPlayer() {
             playerExpanded.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player'); 
+            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu
         }
         
         function closeExpandedPlayer() {
             playerExpanded.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player'); 
+            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
         }
 
-        // 7. Funzioni per il Modal Tracklist (invariate)
         function showTracklist(albumIndex) {
-            // ... (funzione invariata)
             const album = allAlbums[albumIndex];
             tracklistContent.innerHTML = '';
             const modalCover = document.createElement('img');
@@ -365,19 +344,15 @@
             tracklistContent.appendChild(trackListElement);
             modalBackdrop.classList.add('active');
             tracklistModal.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player');
+            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu anche qui
         }
 
         function closeTracklistModal() {
-            // ... (funzione invariata)
             modalBackdrop.classList.remove('active');
             tracklistModal.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player');
+            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
         }
 
-
-        // 8. Collegamento degli Eventi (Event Listeners) (invariati)
-        
         albumCoverImages.forEach(image => {
             image.addEventListener('click', (e) => {
                 const albumIndex = parseInt(e.currentTarget.dataset.albumIndex);
@@ -426,10 +401,8 @@
             }
         });
 
-        // Caricamento iniziale
         loadTrack(0, 0);
         globalPlayerContainer.classList.add('hidden');
-        // --- MODIFICA 3: Assicura che l'icona iniziale sia 'play' ---
         pauseAudio(); 
 
     </script>

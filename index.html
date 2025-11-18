@@ -19,36 +19,28 @@
         <ul class="menu__box">
             <li><a class="menu__item" href="index.html">HOME</a></li>
             <li><a class="menu__item" href="music.html">SND</a></li>
+            <li><a class="menu__item" href="lab.html">LAB</a></li>
             <li><a class="menu__item" href="vsn.html">VSN</a></li>
         </ul>
     </div>
     <div class="content">
         <div class="image-container">
-            <a href="music.html" id="snd-link"><img src="IMMAGINE/immagine.jpg" alt="SND" class="animated-image"></a>
+            <a href="music.html"><img src="IMMAGINE/immagine.jpg" alt="SND" class="animated-image"></a>
             <h3 class="image-label">SND</h3>
         </div>
+
         <div class="image-container">
-            <a href="vsn.html" id="vsn-link"><img src="IMMAGINE/immagine2.jpg" alt="VSN" class="animated-image"></a>
+            <a href="lab.html"><img src="IMMAGINE/immagine3.png" alt="LAB" class="animated-image"></a>
+            <h3 class="image-label">LAB</h3>
+        </div>
+
+        <div class="image-container">
+            <a href="vsn.html"><img src="IMMAGINE/immagine2.jpg" alt="VSN" class="animated-image"></a>
             <h3 class="image-label">VSN</h3>
         </div>
     </div>
     <script>
-        document.getElementById('snd-link').addEventListener('click', function(event) {
-            event.preventDefault();
-            this.classList.add('zoom-in');
-            setTimeout(function() {
-                window.location.href = 'music.html';
-            }, 300);
-        });
-
-        document.getElementById('vsn-link').addEventListener('click', function(event) {
-            event.preventDefault();
-            this.classList.add('zoom-in');
-            setTimeout(function() {
-                window.location.href = 'vsn.html';
-            }, 300);
-        });
-
+        // Script rimasto SOLO per l'hamburger menu
         const menuToggle = document.getElementById('menu__toggle');
         const menuBox = document.querySelector('.menu__box');
 

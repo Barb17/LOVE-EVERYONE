@@ -1,26 +1,29 @@
-const CACHE_STATIC_NAME = 'snd-static-cache-v1';
-const CACHE_DYNAMIC_NAME = 'snd-dynamic-cache-v1';
+const CACHE_STATIC_NAME = 'snd-static-cache-v1'; // Per file statici che non cambiano spesso, raramente da aggiornare
+const CACHE_DYNAMIC_NAME = 'snd-dynamic-cache-v1'; // Per i file cachati dinamicamente, non da aggiornare manualmente
 
-// Lista di URL che verranno cachati all'installazione (SOLO file locali)
+// Lista di URL che verranno cachati all'installazione (principalmente assets statici di base)
+// Questi sono i file essenziali per il funzionamento offline della pagina iniziale
 const staticUrlsToCache = [
     '/',
     '/index.html',
     '/favicon.png',
+    // Le icone sono generalmente statiche e importanti per la PWA
     '/icons/icon-192x192.png',
-    '/icons/icon-512x512.png'
-    // RIMOSSO: I link a Google Fonts. Lasciamo che li gestisca il browser.
+    '/icons/icon-512x512.png',
+    // Font esterni, che sono statici e fondamentali per il design
+    'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap',
+    'https://fonts.gstatic.com/s/ibmplexmono/v19/-F63fjptAgt5VM-kVkqdyU8n1i8q131nj-o.woff2'
 ];
 
 // Installazione del Service Worker
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_STATIC_NAME)
+        caches.open(CACHE_STATIC_NAME) // Apriamo la cache statica
             .then(cache => {
-                console.log('Service Worker: Caching static assets');
-                // Ora questo è molto più affidabile
+                console.log('Service Worker: Caching static assets during installation');
                 return cache.addAll(staticUrlsToCache);
             })
-            .then(() => self.skipWaiting())
+            .then(() => self.skipWaiting()) // Forza l'attivazione del nuovo SW immediatamente
             .catch(error => console.error('Service Worker: Failed to cache static assets', error))
     );
 });
@@ -31,105 +34,85 @@ self.addEventListener('activate', event => {
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
+                    // Elimina tutte le cache che non sono quelle correnti (statica o dinamica)
                     if (cacheName !== CACHE_STATIC_NAME && cacheName !== CACHE_DYNAMIC_NAME) {
                         console.log('Service Worker: Deleting old cache', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => clients.claim())
+        }).then(() => clients.claim()) // Prende il controllo delle pagine esistenti
     );
 });
 
-
-// Intercettazione delle richieste
+// Strategia di cache: mista (Network First per HTML/CSS/JS, Cache First per media)
 self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
 
     // **********************************************
-    // AGGIUNTO: ESCAPE HATCH PER RICHIESTE CROSS-ORIGIN
-    // Se la richiesta non è per il nostro dominio (es. Google APIs, Fonts, model-viewer)
-    // la ignoriamo e lasciamo che sia il browser a gestirla.
-    // Questo risolve tutti gli errori net::ERR_FAILED e TypeError.
-    // **********************************************
-    if (requestUrl.origin !== self.location.origin) {
-        return; // Non chiamare event.respondWith()
-    }
-
-    // **********************************************
-    // Strategia per i file media (Cache First)
-    // (Ora si applica solo ai file locali, quindi è sicura)
+    // Strategia per i file media (MUSICA, VIDEO, Immagini Album/Immagine generica)
+    // Cache First, poi Network (per performance e offline)
     // **********************************************
     if (
         requestUrl.pathname.startsWith('/MUSICA/') ||
         requestUrl.pathname.startsWith('/VIDEO/') ||
-        requestUrl.pathname.startsWith('/album') && requestUrl.pathname.endsWith('.jpg') ||
-        requestUrl.pathname.startsWith('/IMMAGINE/') && requestUrl.pathname.endsWith('.jpg')
+        requestUrl.pathname.startsWith('/album') && requestUrl.pathname.endsWith('.jpg') || // Cattura album.jpg, album2.jpg, ecc.
+        requestUrl.pathname.startsWith('/IMMAGINE/') && requestUrl.pathname.endsWith('.jpg') // Cattura immagine.jpg, immagine2.jpg, ecc.
     ) {
         event.respondWith(
             caches.match(event.request).then(cachedResponse => {
+                // Se è in cache, la restituisce
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                
+                // Altrimenti, va alla rete e la mette in cache dinamica per la prossima volta
                 return fetch(event.request).then(
                     response => {
-                        // Il controllo 'basic' ora è corretto, dato che gestiamo solo file locali
+                        // Controlla se la risposta è valida prima di cachare
                         if (!response || response.status !== 200 || response.type !== 'basic') {
                             return response;
                         }
                         return caches.open(CACHE_DYNAMIC_NAME).then(cache => {
-                            cache.put(event.request, response.clone());
+                            cache.put(event.request, response.clone()); // Clona la risposta prima di metterla in cache
                             return response;
                         });
                     }
                 ).catch(error => {
                     console.warn('Service Worker: Fetch failed for media asset:', event.request.url, error);
-                    // MODIFICATO: Restituisci una Response valida in caso di errore
-                    return new Response('Media non disponibile offline', {
-                        status: 404,
-                        headers: { "Content-Type": "text/plain" }
-                    });
+                    // Potresti restituire un placeholder qui se vuoi in caso di errore di rete
+                    // return new Response('Offline: Media not available', { status: 503, statusText: 'Service Unavailable' });
                 });
             })
         );
-        return; 
+        return; // Termina la funzione fetch qui per i media
     }
 
     // **********************************************
-    // Strategia per HTML, CSS, JS (Network First)
-    // (Ora si applica solo ai file locali)
+    // Strategia per HTML, CSS, JS principali e altri file non media
+    // Network First, poi Cache (per assicurare l'ultimo aggiornamento)
     // **********************************************
     event.respondWith(
         fetch(event.request)
             .then(networkResponse => {
-                // Il controllo 'basic' ora è corretto
+                // Controlla se la risposta della rete è valida
                 if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                    // Tenta il fallback sulla cache se la rete dà una risposta non valida
+                    // Se la risposta non è valida, prova a recuperare dalla cache
                     return caches.match(event.request);
                 }
 
-                // Risposta valida, la mettiamo in cache e la restituiamo
+                // Se la risposta è valida, la mette in cache e la restituisce
                 const responseToCache = networkResponse.clone();
                 caches.open(CACHE_DYNAMIC_NAME)
                     .then(cache => {
                         cache.put(event.request, responseToCache);
                     });
+
                 return networkResponse;
             })
             .catch(() => {
-                // MODIFICATO: Se la rete fallisce (offline), gestiamo correttamente il fallback
+                // Se la rete fallisce (es. offline), prova a servire dalla cache
                 console.warn('Service Worker: Network failed, serving from cache for:', event.request.url);
-                return caches.match(event.request).then(cachedResponse => {
-                    if (cachedResponse) {
-                        return cachedResponse;
-                    }
-                    // Se non è nemmeno in cache, restituisci una Response di errore valida
-                    return new Response('Pagina non disponibile offline', {
-                        status: 404,
-                        headers: { "Content-Type": "text/plain" }
-                    });
-                });
+                return caches.match(event.request);
             })
     );
 });

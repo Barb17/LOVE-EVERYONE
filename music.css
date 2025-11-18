@@ -1,3 +1,12 @@
+/* --- RIMUOVE AURA BLU E FOCUS --- */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+button:focus, input:focus, a:focus {
+    outline: none;
+}
+/* ------------------------------- */
+
 body {
     margin: 0;
     background-color: #f0f0f0;
@@ -143,13 +152,21 @@ body {
     font-family: 'IBM Plex Mono', monospace;
 }
 
-/* Stili per l'hamburger menu */
+/* =========================================
+   STILI HAMBURGER MENU (CORRETTO)
+   ========================================= */
 .hamburger-menu {
     position: fixed;
     top: 20px;
     left: 20px;
     z-index: 1001;
     transition: visibility 0.2s, opacity 0.2s linear;
+}
+
+/* Nasconde il menu quando il player è aperto */
+.hamburger-menu.hidden-by-player {
+    visibility: hidden;
+    opacity: 0;
 }
 
 .menu__btn {
@@ -159,7 +176,8 @@ body {
     width: 26px;
     height: 26px;
     cursor: pointer;
-    z-index: 2;
+    /* MODIFICATO: Z-index aumentato a 1002 per stare sopra al box del menu (che è 1000) */
+    z-index: 1002; 
 }
 
 .menu__btn > span,
@@ -197,7 +215,7 @@ body {
     background-color: #ECEFF1;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
     transition-duration: .25s;
-    z-index: 1000;
+    z-index: 1000; /* Il box è 1000, quindi il bottone deve essere > 1000 */
 }
 
 .menu__item {
@@ -236,11 +254,7 @@ body {
     visibility: visible;
     left: 0;
 }
-
-.hamburger-menu.hidden-by-player {
-    visibility: hidden;
-    opacity: 0;
-}
+/* ========================================= */
 
 
 @media (max-width: 600px) {
@@ -532,15 +546,11 @@ body {
     border-bottom: none;
 }
 
-/* --- NUOVO STILE PER LE ICONE SVG --- */
+/* Stile icone SVG */
 .play-pause-btn svg {
-    /* Usa la dimensione del testo per scalare l'icona */
     width: 1em; 
     height: 1em;
-    /* Riempi l'icona con il colore del testo (nero) */
     fill: currentColor; 
-    /* Allinea l'icona al centro verticalmente */
     vertical-align: middle; 
-    /* Impedisce all'icona di "schiacciarsi" */
     flex-shrink: 0; 
 }

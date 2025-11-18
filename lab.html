@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* === 1. STILE BASE === */
+        
+        /* --- NUOVO: RIMUOVE AURA BLU --- */
+        * {
+            -webkit-tap-highlight-color: transparent; /* Rimuove flash blu su mobile */
+        }
+        button:focus, input:focus {
+            outline: none; /* Rimuove bordo blu/nero al clic */
+        }
+        /* ------------------------------- */
+
+        body {
+            margin: 0; background-color: #f0f0f0;
+            font-family: 'IBM Plex Mono', monospace; color: black;
+            display: flex; flex-direction: column; justify-content: flex-start;
+            align-items: center; min-height: 100vh;
+            overflow-x: hidden; 
+        }
+
+        /* === 2. HAMBURGER MENU === */
+        .hamburger-menu {
+            position: fixed; top: 20px; left: 20px; z-index: 1001;
+        }
+        .menu__btn {
+            position: relative; display: flex; align-items: center;
+            width: 26px; height: 26px; cursor: pointer; z-index: 2;
+        }
+        .menu__btn > span, .menu__btn > span::before, .menu__btn > span::after {
+            display: block; position: absolute; width: 100%; height: 2px;
+            background-color: black; transition-duration: .25s;
+        }
+        .menu__btn > span::before { content: ''; top: -8px; }
+        .menu__btn > span::after { content: ''; top: 8px; }
+        .menu__box {
+            display: block; position: fixed; visibility: hidden; top: 0; left: -100%;
+            width: 300px; height: 100vh; margin: 0; padding: 80px 0;
+            list-style: none; background-color: #ECEFF1;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+            transition-duration: .25s; z-index: 1;
+        }
+        .menu__item {
+            display: block; padding: 12px 24px; color: black;
+            font-family: 'IBM Plex Mono', monospace; font-size: 20px;
+            text-decoration: none; transition-duration: .25s;
+        }
+        .menu__item:hover { background-color: #CFD8DC; }
+        #menu__toggle { display: none; }
+        #menu__toggle:checked ~ .menu__btn > span { transform: rotate(45deg); }
+        #menu__toggle:checked ~ .menu__btn > span::before { top: 0; transform: rotate(0deg); }
+        #menu__toggle:checked ~ .menu__btn > span::after { top: 0; transform: rotate(90deg); }
+        #menu__toggle:checked ~ .menu__box { visibility: visible; left: 0; }
+        
+        /* Titolo Pagina */
+        #page-title {
+            margin-top: 10px;
+            text-align: center;
+            width: 100%;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* === 3. LAYOUT CONTENUTO === */
+        main {
+            display: flex; flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: center; width: 90%; max-width: 450px;
+            margin-top: 20px; 
+            padding-bottom: 40px;
+        }
+
+        /* === 4. VISUALIZZATORE A STELLA === */
+        #visualizer {
+            width: 250px;
+            height: 250px;
+            margin-top: 20px; 
+            margin-bottom: 20px;
+            position: relative;
+            background-image: url('stella-stem.png'); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        .stem-light {
+            position: absolute;
+            width: 24px; 
+            height: 24px; 
+            background-color: #fff; 
+            border-radius: 50%;
+            box-shadow: none; 
+            opacity: 0; 
+            transition: opacity 0.3s ease-in-out;
+            z-index: 10; 
+        }
+        
+        .stem-light.active {
+            opacity: 1; 
+            animation: blink-effect 1.5s infinite ease-in-out; 
+        }
+        
+        #light-vocals { top: 3%; left: 50%; transform: translate(-50%, -50%); }
+        #light-melody { top: 50%; right: 3%; transform: translate(50%, -50%); }
+        #light-bass { bottom: 3%; left: 50%; transform: translate(-50%, 50%); }
+        #light-drums { top: 50%; left: 3%; transform: translate(-50%, -50%); }
+
+        /* === 5. STEM PLAYER (Stile YZY) === */
+        #player-controls {
+            display: flex; align-items: center; width: 100%;
+            gap: 15px; margin-bottom: 25px;
+        }
+        #lab-play-pause-btn {
+            font-size: 1.8em; padding: 10px; background: none; border: none;
+            cursor: pointer; flex-shrink: 0; color: black; line-height: 1;
+        }
+        #lab-play-pause-btn svg {
+            width: 1em; height: 1em; fill: currentColor; vertical-align: middle;
+        }
+        #lab-play-pause-btn:disabled { color: #aaa; cursor: not-allowed; }
+
+        #progress-container {
+            flex-grow: 1; display: flex; flex-direction: column; gap: 5px;
+        }
+        #lab-progress-bar {
+            width: 100%; -webkit-appearance: none; appearance: none;
+            background: #ccc; height: 3px; cursor: pointer; border-radius: 2px;
+        }
+        #lab-progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            background: black; width: 8px; height: 8px;
+            border-radius: 50%; cursor: pointer;
+        }
+        #lab-progress-bar::-moz-range-thumb {
+            background: black; width: 8px; height: 8px;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+        #lab-progress-bar:disabled { opacity: 0.4; cursor: not-allowed; }
+        #lab-progress-bar:disabled::-webkit-slider-thumb { background: #ccc; }
+        #lab-progress-bar:disabled::-moz-range-thumb { background: #ccc; }
+
+        #time-container {
+            display: flex; justify-content: space-between;
+            width: 100%; font-size: 0.7em; color: #555;
+        }
+
+        #song-selector-box {
+            width: 100%; 
+            background-color: #ECEFF1; 
+            border-radius: 8px;
+            padding: 12px 15px; 
+            box-sizing: border-box; 
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: background-color 0.2s ease;
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        #song-selector-box:hover { background-color: #CFD8DC; }
+        
+        #selected-track-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0; 
+        }
+        
+        #selected-track-cover.hidden {
+            display: none; 
+        }
+        
+        #selected-track-info {
+            flex-grow: 1; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #selected-track-info p {
+            margin: 0; 
+            font-weight: bold; 
+            font-size: 1.1em;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #selected-track-info span {
+            font-size: 0.9em; 
+            color: #555; 
+            text-transform: uppercase;
+        }
+        
+        #mixer {
+            display: flex;
+            flex-direction: row; 
+            justify-content: space-around; 
+            align-items: flex-start; 
+            gap: 10px; 
+            width: 100%;
+            height: 250px; 
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+        
+        .stem-control {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px; 
+            flex-basis: 25%;
+            width: 25%;
+            height: 100%;
+        }
+        .stem-control label {
+            font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase;
+            white-space: nowrap; 
+        }
+        
+        .vertical-slider {
+            -webkit-appearance: slider-vertical; 
+            appearance: slider-vertical; 
+            width: 10px; 
+            height: 100%; 
+            background: transparent; 
+            cursor: pointer;
+        }
+        .vertical-slider::-webkit-slider-runnable-track {
+            width: 10px;
+            height: 100%;
+            background: #CFD8DC; 
+            border-radius: 5px;
+        }
+        .vertical-slider::-moz-range-track {
+            width: 10px;
+            height: 100%;
+            background: #CFD8DC;
+            border-radius: 5px;
+        }
+        .vertical-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px; 
+            height: 24px; 
+            background: #fff;
+            border-radius: 50%;
+            border: 1px solid #aaa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            margin-left: -7px; 
+        }
+        .vertical-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            border: 1px solid #aaa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .vertical-slider:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* === 6. MODAL POPUP === */
+        #modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001; visibility: hidden; opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #modal-backdrop.active { visibility: visible; opacity: 1; }
+
+        #tracklist-modal {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%; max-width: 400px; max-height: 80vh;
+            background-color: #ffffff; border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1002;
+            visibility: hidden; opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        #tracklist-modal.active {
+            visibility: visible; opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        #close-tracklist-btn {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 2em; color: #aaa; background: none;
+            border: none; cursor: pointer; line-height: 1; padding: 0;
+        }
+        #close-tracklist-btn:hover { color: #333; }
+
+        /* Stili per Accordion Modal */
+        #tracklist-content {
+            padding: 20px;
+            padding-top: 40px;
+            text-align: left;
+            overflow-y: auto;
+        }
+        .modal-album-header {
+            display: flex; align-items: center; gap: 15px;
+            padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;
+        }
+        .modal-album-header:hover { background-color: #f9f9f9; }
+        .modal-album-cover {
+            width: 60px; height: 60px;
+            border-radius: 4px; flex-shrink: 0;
+        }
+        .modal-album-title {
+            font-size: 1.1em; font-weight: bold;
+            margin: 0; text-transform: uppercase;
+        }
+        .modal-tracklist {
+            list-style-type: decimal; padding-left: 40px; margin: 0;
+            background-color: #fcfcfc; max-height: 0;
+            overflow: hidden; transition: max-height 0.3s ease-out;
+        }
+        .modal-tracklist.open {
+            max-height: 500px; padding-top: 10px;
+            padding-bottom: 10px; transition: max-height 0.5s ease-in;
+        }
+        .modal-track-item {
+            padding: 12px 10px; font-size: 0.9em;
+            border-bottom: 1px solid #eee; cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .modal-track-item:hover { background-color: #f0f0f0; }
+        .modal-track-item:last-child { border-bottom: none; }
+        
+        
+        /* Animazione "glow" */
+        @keyframes blink-effect {
+            0% {
+                box-shadow: 0 0 20px 8px #fff; /* Max glow */
+            }
+            50% {
+                box-shadow: 0 0 10px 4px #fff; /* Min glow */
+            }
+            100% {
+                box-shadow: 0 0 20px 8px #fff; /* Max glow */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="hamburger-menu">
+        <input id="menu__toggle" type="checkbox" />
+        <label class="menu__btn" for="menu__toggle"><span></span></label>
+        <ul class="menu__box">
+            <li><a class="menu__item" href="index.html">HOME</a></li>
+            <li><a class="menu__item" href="music.html">SND</a></li>
+            <li><a class="menu__item" href="lab.html">LAB</a></li>
+            <li><a class="menu__item" href="vsn.html">VSN</a></li>
+        </ul>
+    </div>
+
+    <h2 id="page-title">LAB</h2>
+
+    <main>
+        
+        <div id="visualizer">
+            <div id="light-vocals" class="stem-light"></div>
+            <div id="light-drums" class="stem-light"></div>
+            <div id="light-bass" class="stem-light"></div>
+            <div id="light-melody" class="stem-light"></div>
+        </div>
+
+        <div id="player-controls">
+            <button id="lab-play-pause-btn" disabled></button>
+            <div id="progress-container">
+                <input type="range" id="lab-progress-bar" class="progress-bar" value="0" step="0.1" disabled>
+                <div id="time-container">
+                    <span id="lab-current-time">0:00</span>
+                    <span id="lab-duration">0:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="song-selector-box">
+            <img id="selected-track-cover" src="" alt="Album Cover" class="hidden">
+            <div id="selected-track-info">
+                <p id="selected-track-title">LOAD STEMS</p>
+                <span id="selected-track-artist">SELECT A TRACK</span>
+            </div>
+        </div>
+        
+        <div id="stem-player-container">
+            <div id="mixer">
+                <div class="stem-control">
+                    <label for="stem-vocals">VOCALS</label>
+                    <input type="range" id="stem-vocals" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-drums">DRUMS</label>
+                    <input type="range" id="stem-drums" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-bass">BASS</label>
+                    <input type="range" id="stem-bass" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-melody">MELODY</label>
+                    <input type="range" id="stem-melody" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-backdrop"></div>
+    <div id="tracklist-modal">
+        <button id="close-tracklist-btn">&times;</button>
+        <div id="tracklist-content">
+            </div>
+    </div>
+
+
+    <script>
+        // === SCRIPT JAVASCRIPT (MODIFICATO PER STOP A FINE BRANO) ===
+        
+        // --- 1. LOGICA HAMBURGER MENU ---
+        const menuToggle = document.getElementById('menu__toggle');
+        const menuBox = document.querySelector('.menu__box');
+        menuToggle.addEventListener('change', () => {
+            if (menuToggle.checked) {
+                menuBox.style.visibility = 'visible';
+                menuBox.style.left = '0';
+            } else {
+                menuBox.style.visibility = 'hidden';
+                menuBox.style.left = '-100%';
+            }
+        });
+
+        // --- 2. LOGICA STEM PLAYER ---
+        
+        const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
+        const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
+
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        
+        const playButton = document.getElementById('lab-play-pause-btn');
+        const progressBar = document.getElementById('lab-progress-bar');
+        const currentTimeEl = document.getElementById('lab-current-time');
+        const durationEl = document.getElementById('lab-duration');
+        const songSelectorBox = document.getElementById('song-selector-box');
+        const selectedTrackTitleEl = document.getElementById('selected-track-title');
+        const selectedTrackArtistEl = document.getElementById('selected-track-artist');
+        const selectedTrackCoverEl = document.getElementById('selected-track-cover');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const tracklistModal = document.getElementById('tracklist-modal');
+        const closeTracklistBtn = document.getElementById('close-tracklist-btn');
+        const tracklistContent = document.getElementById('tracklist-content');
+        
+        const sliders = {
+            vocals: document.getElementById('stem-vocals'),
+            drums: document.getElementById('stem-drums'),
+            bass: document.getElementById('stem-bass'),
+            melody: document.getElementById('stem-melody'),
+        };
+
+        const lights = {
+            vocals: document.getElementById('light-vocals'),
+            drums: document.getElementById('light-drums'),
+            bass: document.getElementById('light-bass'),
+            melody: document.getElementById('light-melody'),
+        };
+
+        // --- DATABASE CANZONI (Compilato) ---
+        const songDatabase = {
+            "love-everyone": {
+                albumTitle: "LOVE EVERYONE",
+                albumCover: "album.jpg",
+                tracks: {
+                    "love": { title: "LOVE", stems: { vocals: 'stems/love-everyone/love/vocals.mp3', drums: 'stems/love-everyone/love/drums.mp3', bass: 'stems/love-everyone/love/bass.mp3', melody: 'stems/love-everyone/love/melody.mp3'} },
+                    "my-soul": { title: "MY SOUL", stems: { vocals: 'stems/love-everyone/my-soul/vocals.mp3', drums: 'stems/love-everyone/my-soul/drums.mp3', bass: 'stems/love-everyone/my-soul/bass.mp3', melody: 'stems/love-everyone/my-soul/melody.mp3'} },
+                    "buzz": { title: "BUZZ", stems: { vocals: 'stems/love-everyone/buzz/vocals.mp3', drums: 'stems/love-everyone/buzz/drums.mp3', bass: 'stems/love-everyone/buzz/bass.mp3', melody: 'stems/love-everyone/buzz/melody.mp3'} },
+                    "vsn": { title: "VSN", stems: { vocals: 'stems/love-everyone/vsn/vocals.mp3', drums: 'stems/love-everyone/vsn/drums.mp3', bass: 'stems/love-everyone/vsn/bass.mp3', melody: 'stems/love-everyone/vsn/melody.mp3'} },
+                    "i-will": { title: "I WILL", stems: { vocals: 'stems/love-everyone/i-will/vocals.mp3', drums: 'stems/love-everyone/i-will/drums.mp3', bass: 'stems/love-everyone/i-will/bass.mp3', melody: 'stems/love-everyone/i-will/melody.mp3'} },
+                    "stadium": { title: "STADIUM", stems: { vocals: 'stems/love-everyone/stadium/vocals.mp3', drums: 'stems/love-everyone/stadium/drums.mp3', bass: 'stems/love-everyone/stadium/bass.mp3', melody: 'stems/love-everyone/stadium/melody.mp3'} },
+                    "church": { title: "CHURCH", stems: { vocals: 'stems/love-everyone/church/vocals.mp3', drums: 'stems/love-everyone/church/drums.mp3', bass: 'stems/love-everyone/church/bass.mp3', melody: 'stems/love-everyone/church/melody.mp3'} },
+                    "wolves-cry": { title: "WOLVES CRY", stems: { vocals: 'stems/love-everyone/wolves-cry/vocals.mp3', drums: 'stems/love-everyone/wolves-cry/drums.mp3', bass: 'stems/love-everyone/wolves-cry/bass.mp3', melody: 'stems/love-everyone/wolves-cry/melody.mp3'} }
+                }
+            },
+            "hate-everyone": {
+                albumTitle: "HATE EVERYONE",
+                albumCover: "album2.jpg",
+                tracks: {
+                    "jews-hands": { title: "JEWS HANDS", stems: { vocals: 'stems/hate-everyone/jews-hands/vocals.mp3', drums: 'stems/hate-everyone/jews-hands/drums.mp3', bass: 'stems/hate-everyone/jews-hands/bass.mp3', melody: 'stems/hate-everyone/jews-hands/melody.mp3'} },
+                    "angel": { title: "ANGEL", stems: { vocals: 'stems/hate-everyone/angel/vocals.mp3', drums: 'stems/hate-everyone/angel/drums.mp3', bass: 'stems/hate-everyone/angel/bass.mp3', melody: 'stems/hate-everyone/angel/melody.mp3'} },
+                    "blind": { title: "BLIND", stems: { vocals: 'stems/hate-everyone/blind/vocals.mp3', drums: 'stems/hate-everyone/blind/drums.mp3', bass: 'stems/hate-everyone/blind/bass.mp3', melody: 'stems/hate-everyone/blind/melody.mp3'} },
+                    "bark": { title: "BARK", stems: { vocals: 'stems/hate-everyone/bark/vocals.mp3', drums: 'stems/hate-everyone/bark/drums.mp3', bass: 'stems/hate-everyone/bark/bass.mp3', melody: 'stems/hate-everyone/bark/melody.mp3'} },
+                    "ghost": { title: "GHOST", stems: { vocals: 'stems/hate-everyone/ghost/vocals.mp3', drums: 'stems/hate-everyone/ghost/drums.mp3', bass: 'stems/hate-everyone/ghost/bass.mp3', melody: 'stems/hate-everyone/ghost/melody.mp3'} },
+                    "fly": { title: "FLY", stems: { vocals: 'stems/hate-everyone/fly/vocals.mp3', drums: 'stems/hate-everyone/fly/drums.mp3', bass: 'stems/hate-everyone/fly/bass.mp3', melody: 'stems/hate-everyone/fly/melody.mp3'} },
+                    "maria": { title: "MARIA", stems: { vocals: 'stems/hate-everyone/maria/vocals.mp3', drums: 'stems/hate-everyone/maria/drums.mp3', bass: 'stems/hate-everyone/maria/bass.mp3', melody: 'stems/hate-everyone/maria/melody.mp3'} },
+                    "pope": { title: "POPE", stems: { vocals: 'stems/hate-everyone/pope/vocals.mp3', drums: 'stems/hate-everyone/pope/drums.mp3', bass: 'stems/hate-everyone/pope/bass.mp3', melody: 'stems/hate-everyone/pope/melody.mp3'} }
+                }
+            },
+            "laundry": {
+                albumTitle: "LAUNDRY",
+                albumCover: "album3.jpg",
+                tracks: {
+                    "oh-my": { title: "OH MY", stems: { vocals: 'stems/laundry/oh-my/vocals.mp3', drums: 'stems/laundry/oh-my/drums.mp3', bass: 'stems/laundry/oh-my/bass.mp3', melody: 'stems/laundry/oh-my/melody.mp3'} },
+                    "bell": { title: "BELL", stems: { vocals: 'stems/laundry/bell/vocals.mp3', drums: 'stems/laundry/bell/drums.mp3', bass: 'stems/laundry/bell/bass.mp3', melody: 'stems/laundry/bell/melody.mp3'} },
+                    "heaven": { title: "HEAVEN", stems: { vocals: 'stems/laundry/heaven/vocals.mp3', drums: 'stems/laundry/heaven/drums.mp3', bass: 'stems/laundry/heaven/bass.mp3', melody: 'stems/laundry/heaven/melody.mp3'} },
+                    "zz": { title: "ZZ", stems: { vocals: 'stems/laundry/zz/vocals.mp3', drums: 'stems/laundry/zz/drums.mp3', bass: 'stems/laundry/zz/bass.mp3', melody: 'stems/laundry/zz/melody.mp3'} },
+                    "rise": { title: "RISE", stems: { vocals: 'stems/laundry/rise/vocals.mp3', drums: 'stems/laundry/rise/drums.mp3', bass: 'stems/laundry/rise/bass.mp3', melody: 'stems/laundry/rise/melody.mp3'} },
+                    "ohh": { title: "OHH", stems: { vocals: 'stems/laundry/ohh/vocals.mp3', drums: 'stems/laundry/ohh/drums.mp3', bass: 'stems/laundry/ohh/bass.mp3', melody: 'stems/laundry/ohh/melody.mp3'} },
+                    "laundry": { title: "LAUNDRY", stems: { vocals: 'stems/laundry/laundry/vocals.mp3', drums: 'stems/laundry/laundry/drums.mp3', bass: 'stems/laundry/laundry/bass.mp3', melody: 'stems/laundry/laundry/melody.mp3'} },
+                    "end": { title: "END", stems: { vocals: 'stems/laundry/end/vocals.mp3', drums: 'stems/laundry/end/drums.mp3', bass: 'stems/laundry/end/bass.mp3', melody: 'stems/laundry/end/melody.mp3'} }
+                }
+            },
+            "echoes-of-nothing": {
+                albumTitle: "ECHOES OF NOTHING",
+                albumCover: "album4.jpg",
+                tracks: {
+                    "whispers": { title: "WHISPERS", stems: { vocals: 'stems/echoes-of-nothing/whispers/vocals.mp3', drums: 'stems/echoes-of-nothing/whispers/drums.mp3', bass: 'stems/echoes-of-nothing/whispers/bass.mp3', melody: 'stems/echoes-of-nothing/whispers/melody.mp3'} },
+                    "honey-light": { title: "HONEY LIGHT", stems: { vocals: 'stems/echoes-of-nothing/honey-light/vocals.mp3', drums: 'stems/echoes-of-nothing/honey-light/drums.mp3', bass: 'stems/echoes-of-nothing/honey-light/bass.mp3', melody: 'stems/echoes-of-nothing/honey-light/melody.mp3'} },
+                    "between-shadows": { title: "BETWEEN SHADOWS", stems: { vocals: 'stems/echoes-of-nothing/between-shadows/vocals.mp3', drums: 'stems/echoes-of-nothing/between-shadows/drums.mp3', bass: 'stems/echoes-of-nothing/between-shadows/bass.mp3', melody: 'stems/echoes-of-nothing/between-shadows/melody.mp3'} },
+                    "fields": { title: "FIELDS", stems: { vocals: 'stems/echoes-of-nothing/fields/vocals.mp3', drums: 'stems/echoes-of-nothing/fields/drums.mp3', bass: 'stems/echoes-of-nothing/fields/bass.mp3', melody: 'stems/echoes-of-nothing/fields/melody.mp3'} },
+                    "golden-hunger": { title: "GOLDEN HUNGER", stems: { vocals: 'stems/echoes-of-nothing/golden-hunger/vocals.mp3', drums: 'stems/echoes-of-nothing/golden-hunger/drums.mp3', bass: 'stems/echoes-of-nothing/golden-hunger/bass.mp3', melody: 'stems/echoes-of-nothing/golden-hunger/melody.mp3'} },
+                    "where-the-sky-melts": { title: "WHERE THE SKY MELTS", stems: { vocals: 'stems/echoes-of-nothing/where-the-sky-melts/vocals.mp3', drums: 'stems/echoes-of-nothing/where-the-sky-melts/drums.mp3', bass: 'stems/echoes-of-nothing/where-the-sky-melts/bass.mp3', melody: 'stems/echoes-of-nothing/where-the-sky-melts/melody.mp3'} },
+                    "lantern": { title: "LANTERN", stems: { vocals: 'stems/echoes-of-nothing/lantern/vocals.mp3', drums: 'stems/echoes-of-nothing/lantern/drums.mp3', bass: 'stems/echoes-of-nothing/lantern/bass.mp3', melody: 'stems/echoes-of-nothing/lantern/melody.mp3'} },
+                    "the-hours-that-flow": { title: "THE HOURS THAT FLOW", stems: { vocals: 'stems/echoes-of-nothing/the-hours-that-flow/vocals.mp3', drums: 'stems/echoes-of-nothing/the-hours-that-flow/drums.mp3', bass: 'stems/echoes-of-nothing/the-hours-that-flow/bass.mp3', melody: 'stems/echoes-of-nothing/the-hours-that-flow/melody.mp3'} }
+                }
+            },
+            "noise": {
+                albumTitle: "NOISE",
+                albumCover: "album5.jpg",
+                tracks: {
+                    "concrete": { title: "CONCRETE", stems: { vocals: 'stems/noise/concrete/vocals.mp3', drums: 'stems/noise/concrete/drums.mp3', bass: 'stems/noise/concrete/bass.mp3', melody: 'stems/noise/concrete/melody.mp3'} },
+                    "particles": { title: "PARTICLES", stems: { vocals: 'stems/noise/particles/vocals.mp3', drums: 'stems/noise/particles/drums.mp3', bass: 'stems/noise/particles/bass.mp3', melody: 'stems/noise/particles/melody.mp3'} },
+                    "trace": { title: "TRACE", stems: { vocals: 'stems/noise/trace/vocals.mp3', drums: 'stems/noise/trace/drums.mp3', bass: 'stems/noise/trace/bass.mp3', melody: 'stems/noise/trace/melody.mp3'} },
+                    "lurk": { title: "LURK", stems: { vocals: 'stems/noise/lurk/vocals.mp3', drums: 'stems/noise/lurk/drums.mp3', bass: 'stems/noise/lurk/bass.mp3', melody: 'stems/noise/lurk/melody.mp3'} },
+                    "breathe": { title: "BREATHE", stems: { vocals: 'stems/noise/breathe/vocals.mp3', drums: 'stems/noise/breathe/drums.mp3', bass: 'stems/noise/breathe/bass.mp3', melody: 'stems/noise/breathe/melody.mp3'} },
+                    "grid": { title: "GRID", stems: { vocals: 'stems/noise/grid/vocals.mp3', drums: 'stems/noise/grid/drums.mp3', bass: 'stems/noise/grid/bass.mp3', melody: 'stems/noise/grid/melody.mp3'} },
+                    "gear": { title: "GEAR", stems: { vocals: 'stems/noise/gear/vocals.mp3', drums: 'stems/noise/gear/drums.mp3', bass: 'stems/noise/gear/bass.mp3', melody: 'stems/noise/gear/melody.mp3'} },
+                    "noise": { title: "NOISE", stems: { vocals: 'stems/noise/noise/vocals.mp3', drums: 'stems/noise/noise/drums.mp3', bass: 'stems/noise/noise/bass.mp3', melody: 'stems/noise/noise/melody.mp3'} }
+                }
+            }
+        };
+
+        // Stato del Player
+        let audioBuffers = {};
+        let sourceNodes = {};
+        let gainNodes = {};
+        let isPlaying = false;
+        let currentTrackData = null; 
+        let isLoading = false;
+        let songDuration = 0;
+        let startTime = 0; 
+        let startOffset = 0; 
+        let animationFrameId = null; 
+
+        // --- FUNZIONI PRINCIPALI ---
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${remainingSeconds}`;
+        }
+
+        function setAllControlsDisabled(disabled) {
+            playButton.disabled = disabled;
+            progressBar.disabled = disabled;
+            Object.values(sliders).forEach(slider => slider.disabled = disabled);
+            
+            Object.values(lights).forEach(light => light.classList.remove('active'));
+            
+            if (disabled) {
+                progressBar.value = 0;
+                currentTimeEl.textContent = "0:00";
+                durationEl.textContent = "0:00";
+                playButton.innerHTML = playIconSVG;
+            }
+        }
+        
+        async function loadSong(albumKey, trackKey) {
+            const albumData = songDatabase[albumKey];
+            const trackData = albumData.tracks[trackKey];
+            if (!trackData || !trackData.stems || isLoading || currentTrackData === trackData) return;
+            
+            isLoading = true;
+            currentTrackData = trackData;
+            
+            if (isPlaying) stopAll();
+
+            setAllControlsDisabled(true);
+            playButton.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 1 0 12 22 10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" opacity=".3"/><path d="M12 4a8 8 0 0 1 8 8h-2a6 6 0 0 0-6-6V4Z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>';
+            
+            selectedTrackTitleEl.textContent = trackData.title;
+            selectedTrackArtistEl.textContent = albumData.albumTitle;
+            selectedTrackCoverEl.src = albumData.albumCover;
+            selectedTrackCoverEl.classList.remove('hidden');
+            
+            Object.values(sliders).forEach(slider => slider.value = 100);
+
+            audioBuffers = {};
+            songDuration = 0;
+            startOffset = 0; 
+            
+            const stemPaths = trackData.stems;
+            
+            console.log(`Caricamento di ${trackData.title}...`);
+            const promises = Object.keys(stemPaths).map(key => loadStem(key, stemPaths[key]));
+            await Promise.all(promises);
+            
+            const loadedKeys = Object.keys(audioBuffers);
+            const requiredKeys = Object.keys(stemPaths).filter(key => stemPaths[key]);
+            
+            if (loadedKeys.length === requiredKeys.length && loadedKeys.length > 0) {
+                console.log('Stems caricati con successo.');
+                playButton.disabled = false;
+                progressBar.disabled = false;
+                Object.values(sliders).forEach(slider => slider.disabled = false);
+                playButton.innerHTML = playIconSVG;
+                songDuration = audioBuffers[loadedKeys[0]].duration;
+                durationEl.textContent = formatTime(songDuration);
+                
+                Object.values(lights).forEach(light => light.classList.add('active'));
+                
+                setupGainNodes();
+            } else {
+                console.error('Alcuni stems non sono stati caricati.');
+                selectedTrackTitleEl.textContent = "LOAD ERROR";
+                selectedTrackArtistEl.textContent = "Mancano file stem";
+                selectedTrackCoverEl.classList.add('hidden');
+                currentTrackData = null; 
+            }
+            isLoading = false;
+        }
+
+        async function loadStem(key, url) {
+            if (!url) { 
+                console.warn(`Percorso non definito per lo stem: ${key}`);
+                return; 
+            }
+            try {
+                const response = await fetch(url);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                audioBuffers[key] = audioBuffer;
+            } catch (e) { console.error(`Errore nel caricamento di ${url}:`, e); }
+        }
+        
+        function setupGainNodes() {
+            Object.values(gainNodes).forEach(node => node.disconnect());
+            gainNodes = {};
+            for (const key in audioBuffers) {
+                const gainNode = audioContext.createGain();
+                gainNode.connect(audioContext.destination);
+                const initialVolume = sliders[key] ? sliders[key].value / 100 : 1.0;
+                gainNode.gain.value = initialVolume;
+                gainNodes[key] = gainNode;
+            }
+        }
+
+        function playAll(offset = startOffset) {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            sourceNodes = {};
+            startTime = audioContext.currentTime; 
+            startOffset = offset; 
+            
+            for (const key in audioBuffers) {
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffers[key];
+                
+                source.loop = false; // Non fa più il loop audio
+                
+                if (gainNodes[key]) {
+                    source.connect(gainNodes[key]);
+                    // Modificato per non fare il loop
+                    source.start(0, offset); 
+                    sourceNodes[key] = source;
+                }
+            }
+            isPlaying = true;
+            playButton.innerHTML = pauseIconSVG;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            updateProgress();
+        }
+
+        function stopAll() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            if (!isPlaying) return;
+            
+            for (const key in sourceNodes) {
+                try {
+                    sourceNodes[key].stop(0);
+                    sourceNodes[key].disconnect();
+                } catch(e) {}
+            }
+            
+            // Non aggiornare startOffset se stiamo fermando
+            if(isPlaying) { // Solo se era in play
+                 startOffset = (startOffset + (audioContext.currentTime - startTime));
+                 // Non fare il modulo, così ">= songDuration" funzionerà
+            }
+            
+            sourceNodes = {};
+            isPlaying = false;
+            playButton.innerHTML = playIconSVG;
+        }
+        
+        function togglePlayback() {
+            if (isPlaying) stopAll();
+            else playAll();
+        }
+        
+        function updateProgress() {
+            if (!isPlaying || !songDuration) return;
+            
+            const elapsed = audioContext.currentTime - startTime;
+            const currentPlaybackTime = (startOffset + elapsed); 
+
+            // CONTROLLO DI FINE BRANO
+            if (currentPlaybackTime >= songDuration) {
+                stopAll(); 
+                
+                startOffset = 0;
+                progressBar.value = 0;
+                currentTimeEl.textContent = formatTime(0);
+                
+                return; 
+            }
+
+            progressBar.value = (currentPlaybackTime / songDuration) * 100;
+            currentTimeEl.textContent = formatTime(currentPlaybackTime);
+            
+            animationFrameId = requestAnimationFrame(updateProgress);
+        }
+        
+        function handleScrubbing() {
+            if (!songDuration) return;
+            const wasPlaying = isPlaying;
+            if (wasPlaying) stopAll();
+            
+            const newOffset = (progressBar.value / 100) * songDuration;
+            startOffset = newOffset;
+            currentTimeEl.textContent = formatTime(newOffset);
+            
+            if (wasPlaying) playAll(newOffset);
+        }
+
+        // --- 3. MODAL POPUP (Logica Accordion) ---
+        function populateSongModal() {
+            tracklistContent.innerHTML = ''; 
+            
+            for (const albumKey in songDatabase) {
+                const album = songDatabase[albumKey];
+                
+                const header = document.createElement('div');
+                header.className = 'modal-album-header';
+                header.dataset.albumKey = albumKey;
+                
+                const cover = document.createElement('img');
+                cover.src = album.albumCover;
+                cover.className = 'modal-album-cover';
+                
+                const title = document.createElement('h3');
+                title.className = 'modal-album-title';
+                title.textContent = album.albumTitle;
+                
+                header.appendChild(cover);
+                header.appendChild(title);
+                tracklistContent.appendChild(header);
+                
+                const trackList = document.createElement('ol');
+                trackList.className = 'modal-tracklist'; 
+                trackList.id = `tracklist-for-${albumKey}`; 
+                
+                let hasTracks = false;
+                for (const trackKey in album.tracks) {
+                    const track = album.tracks[trackKey];
+                    if (!track.stems) continue; 
+                    hasTracks = true;
+                    
+                    const item = document.createElement('li');
+                    item.className = 'modal-track-item';
+                    item.textContent = track.title;
+                    item.dataset.albumKey = albumKey;
+                    item.dataset.trackKey = trackKey;
+                    trackList.appendChild(item);
+                }
+                
+                if(hasTracks) {
+                    tracklistContent.appendChild(trackList);
+                } else {
+                     header.style.display = 'none';
+                }
+            }
+        }
+
+        function openSongModal() {
+            populateSongModal();
+            modalBackdrop.classList.add('active');
+            tracklistModal.classList.add('active');
+        }
+
+        function closeSongModal() {
+            modalBackdrop.classList.remove('active');
+            tracklistModal.classList.remove('active');
+        }
+
+        // --- 4. EVENT LISTENERS ---
+        
+        playButton.addEventListener('click', () => { if (!isLoading && currentTrackData) togglePlayback(); });
+        progressBar.addEventListener('input', handleScrubbing);
+        
+        for (const key in sliders) {
+            sliders[key].addEventListener('input', (event) => {
+                const volume = event.target.value / 100;
+                
+                if (gainNodes[key]) {
+                     gainNodes[key].gain.setValueAtTime(volume, audioContext.currentTime);
+                }
+                
+                if (lights[key]) {
+                    if (volume > 0) {
+                        lights[key].classList.add('active');
+                    } else {
+                        lights[key].classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        songSelectorBox.addEventListener('click', openSongModal);
+        closeTracklistBtn.addEventListener('click', closeSongModal);
+        modalBackdrop.addEventListener('click', closeSongModal);
+        
+        tracklistContent.addEventListener('click', (e) => {
+            const header = e.target.closest('.modal-album-header');
+            const track = e.target.closest('.modal-track-item');
+
+            if (header) {
+                const albumKey = header.dataset.albumKey;
+                const tracklist = document.getElementById(`tracklist-for-${albumKey}`);
+                if (tracklist) tracklist.classList.toggle('open');
+            } else if (track) {
+                const albumKey = track.dataset.albumKey;
+                const trackKey = track.dataset.trackKey;
+                
+                const trackData = songDatabase[albumKey].tracks[trackKey];
+                if (!trackData.stems || Object.keys(trackData.stems).length === 0 || !trackData.stems.vocals) {
+                    alert('Stem per questa traccia non ancora disponibili.');
+                } else {
+                    loadSong(albumKey, trackKey);
+                    closeSongModal();
+                }
+            }
+        });
+
+        // Avvio
+        window.addEventListener('load', () => {
+            setAllControlsDisabled(true); 
+            playButton.innerHTML = playIconSVG;
+            selectedTrackCoverEl.classList.add('hidden');
+        });
+
+    </script>
+</body>
+</html>

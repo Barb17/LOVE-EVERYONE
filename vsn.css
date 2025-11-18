@@ -1,3 +1,12 @@
+/* --- RIMUOVE AURA BLU E FOCUS --- */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+button:focus, input:focus, a:focus {
+    outline: none;
+}
+/* ------------------------------- */
+
 body {
     margin: 0;
     background-color: white;
@@ -5,8 +14,8 @@ body {
     color: black;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centra verticalmente gli elementi figli */
-    align-items: center;   /* Centra orizzontalmente gli elementi figli */
+    justify-content: center; 
+    align-items: center; 
     min-height: 100vh;
 }
 
@@ -34,7 +43,6 @@ video {
     animation: pulse 2s infinite ease-in-out;
 }
 
-/* Definizione dell'animazione per il testo */
 @keyframes pulse {
     0% {
         opacity: 1;
@@ -42,7 +50,7 @@ video {
     }
     50% {
         opacity: 0.8;
-        transform: scale(1.02); /* Leggero ingrandimento */
+        transform: scale(1.02); 
     }
     100% {
         opacity: 1;
@@ -55,27 +63,24 @@ video {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px; /* Spazio tra gli elementi dell'immagine */
+    gap: 40px; 
     width: 100%;
-    max-width: 800px; /* Imposta una larghezza massima per la galleria */
+    max-width: 800px; 
     box-sizing: border-box;
 
-    /* Nascondi la galleria di default e fai in modo che non occupi spazio */
     opacity: 0;
     visibility: hidden;
-    max-height: 0; /* Utilizza max-height per un collasso effettivo dello spazio */
+    max-height: 0; 
     overflow: hidden;
-    padding: 0px 20px; /* Rimuovi il padding verticale quando nascosta */
+    padding: 0px 20px; 
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, visibility 0.5s ease-in-out, padding 0.5s ease-in-out;
 }
 
-/* Classe per rendere visibile la galleria */
 .image-gallery.visible {
     opacity: 1;
     visibility: visible;
-    /* Valore aumentato per fare spazio a tutti i modelli */
     max-height: 5000px; 
-    padding: 40px 20px; /* Ripristina il padding originale quando visibile */
+    padding: 40px 20px; 
 }
 
 .image-item {
@@ -108,14 +113,14 @@ video {
     width: 100%;
 }
 
-/* STILI PER IL MODELLO 3D (applicati a tutti i modelli) */
+/* STILI PER IL MODELLO 3D */
 .model-item {
     text-align: center;
-    width: 90%; /* Occupa più larghezza delle immagini */
-    max-width: 600px; /* Ma con un limite */
+    width: 90%; 
+    max-width: 600px; 
 }
 
-.model-item .image-title { /* Riusiamo lo stile del titolo */
+.model-item .image-title { 
     margin-top: 15px;
     font-size: 1.5em;
     font-family: 'IBM Plex Mono', monospace;
@@ -124,14 +129,12 @@ video {
 }
 
 model-viewer {
-    width: 100%; /* Occupa tutta la larghezza del .model-item */
-    height: 450px; /* Altezza fissa per il visualizzatore */
+    width: 100%; 
+    height: 450px; 
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f8f8f8; /* Sfondo leggero */
+    background-color: #f8f8f8; 
 }
-/* FINE STILI 3D */
-
 
 /* Stili per l'hamburger menu */
 .hamburger-menu {
@@ -192,8 +195,8 @@ model-viewer {
     display: block;
     padding: 12px 24px;
     color: black;
-    /* Ripristinato il font-family originale di vsn.css */
-    font-family: sans-serif; 
+    /* MODIFICATO: Font allineato con la Home */
+    font-family: 'IBM Plex Mono', monospace; 
     font-size: 20px;
     text-decoration: none;
     transition-duration: .25s;
@@ -207,7 +210,6 @@ model-viewer {
     display: none;
 }
 
-/* --- INIZIO BLOCCO CORRETTO (REPLICATO DA STYLE.CSS) --- */
 #menu__toggle:checked ~ .menu__btn > span {
     transform: rotate(45deg);
 }
@@ -221,15 +223,13 @@ model-viewer {
     top: 0;
     transform: rotate(90deg);
 }
-/* --- FINE BLOCCO CORRETTO --- */
-
 
 #menu__toggle:checked ~ .menu__box {
     visibility: visible;
     left: 0;
 }
 
-/* Media query per la responsività */
+/* Media query */
 @media (max-width: 600px) {
     .video-container {
         width: 95%;
@@ -259,12 +259,11 @@ model-viewer {
         font-size: 0.9em;
     }
 
-    /* Stili responsivi per il modello 3D */
     .model-item {
-        width: 95%; /* Occupa quasi tutta la larghezza */
+        width: 95%; 
     }
 
     model-viewer {
-        height: 300px; /* Più basso su schermi piccoli */
+        height: 300px; 
     }
 }
