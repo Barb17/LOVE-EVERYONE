@@ -5,19 +5,18 @@
 button:focus, input:focus, a:focus {
     outline: none;
 }
-/* ------------------------------- */
 
 body {
     margin: 0;
     background-color: white;
     font-family: 'IBM Plex Mono', monospace;
     display: flex;
-    flex-direction: column;
-    /* MODIFICATO: rimosso justify-content: center per evitare bug di scroll */
+    justify-content: center;
     align-items: center;
-    min-height: 100vh; 
+    min-height: 100vh; /* Permette alla pagina di espandersi se necessario */
+    flex-direction: column;
     overflow-x: hidden; 
-    overflow-y: auto; /* Garantisce lo scroll verticale */
+    overflow-y: auto; /* Consente lo scorrimento verticale per evitare tagli */
 }
 
 .content {
@@ -26,21 +25,18 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    /* MODIFICATO: margin auto centra verticalmente solo se c'è spazio */
-    margin: auto 0; 
-    padding: 60px 0; /* Spazio extra per non toccare i bordi durante lo scroll */
+    padding: 20px 0; /* Aggiunge respiro ai bordi superiore e inferiore */
 }
 
 .image-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 1.5vh 0; 
+    margin: 1vh 0; /* Margini ridotti per ospitare 4 elementi */
 }
 
 .animated-image {
-    /* Altezza ottimizzata per 4 elementi */
-    height: 17vh; 
+    height: 17vh; /* Altezza ridotta per far stare tutto in una schermata */
     width: auto; 
     max-height: 250px; 
     border-radius: 5px;
@@ -48,21 +44,19 @@ body {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Effetto Hover */
 .animated-image:hover {
     transform: scale(1.03);
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
 .image-label {
-    margin-top: 1vh; 
-    font-size: 1.5em;
-    font-size: min(1.5em, 4vh); 
+    margin-top: 0.5vh; 
+    font-size: min(1.3em, 3.5vh); /* Font fluido basato sull'altezza dello schermo */
 }
 
 /* --- STILI HAMBURGER MENU (FIX Z-INDEX) --- */
 .hamburger-menu {
-    position: fixed; /* Mantiene il menu in posizione anche scrollando */
+    position: fixed; /* Mantiene il menu fisso in alto a sinistra */
     top: 20px;
     left: 20px;
     z-index: 1001;
@@ -75,7 +69,7 @@ body {
     width: 26px;
     height: 26px;
     cursor: pointer;
-    z-index: 1002; /* Sopra il box grigio per mostrare la X */
+    z-index: 1002; /* Sopra il box del menu per mostrare la X */
 }
 
 .menu__btn > span,
@@ -119,18 +113,10 @@ body {
     transition-duration: .25s;
 }
 
-.menu__item:hover {
-    background-color: #CFD8DC;
-}
+.menu__item:hover { background-color: #CFD8DC; }
 
-#menu__toggle {
-    display: none;
-}
-
+#menu__toggle { display: none; }
 #menu__toggle:checked ~ .menu__btn > span { transform: rotate(45deg); }
 #menu__toggle:checked ~ .menu__btn > span::before { top: 0; transform: rotate(0deg); }
 #menu__toggle:checked ~ .menu__btn > span::after { top: 0; transform: rotate(90deg); }
-#menu__toggle:checked ~ .menu__box {
-    visibility: visible;
-    left: 0;
-}
+#menu__toggle:checked ~ .menu__box { visibility: visible; left: 0; }
