@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SND</title>
-    <link rel="stylesheet" href="music.css">
+    <title>RMX</title>
+    <link rel="stylesheet" href="rmx.css">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,45 +33,12 @@
         </ul>
     </div>
     
-    <h2 id="page-title">SND</h2>
+    <h2 id="page-title">RMX</h2>
 
     <div class="music-container">
         <div class="album">
-            <img src="album.jpg" alt="Copertina album" class="album-cover-clickable" data-album-index="0">
-            <h3 id="album-title">LOVE EVERYONE</h3>
-        </div>
-    </div>
-
-    <div class="music-container">
-        <div class="album">
-            <img id="album-cover-2" src="album2.jpg" alt="Copertina album secondo" class="album-cover-clickable" data-album-index="1">
-            <h3 id="album-title-2">HATE EVERYONE</h3>
-        </div>
-    </div>
-
-    <div class="music-container">
-        <div class="album">
-            <img id="album-cover-3" src="album3.jpg" alt="Copertina album terzo" class="album-cover-clickable" data-album-index="2">
-            <h3 id="album-title-3">LAUNDRY</h3>
-        </div>
-    </div>
-
-    <div class="music-container">
-        <div class="album">
-            <img id="album-cover-4" src="album4.jpg" alt="Copertina album quarto" class="album-cover-clickable" data-album-index="3">
-            <h3 id="album-title-4">ECHOES OF NOTHING</h3>
-        </div>
-    </div>
-    <div class="music-container">
-        <div class="album">
-            <img id="album-cover-5" src="album5.jpg" alt="Copertina album quinto" class="album-cover-clickable" data-album-index="4">
-            <h3 id="album-title-5">NOISE</h3>
-        </div>
-    </div>
-    <div class="music-container">
-        <div class="album">
-            <img id="album-cover-6" src="album6.jpg" alt="Copertina album sesto" class="album-cover-clickable" data-album-index="5">
-            <h3 id="album-title-6">LAND OF THE STONES</h3>
+            <img src="vulturesclubmix.png" alt="Copertina album" class="album-cover-clickable" data-album-index="0">
+            <h3 id="album-title">VULTURES CLUB MIX</h3>
         </div>
     </div>
 
@@ -85,7 +52,7 @@
         
         <div id="player-bar">
             <div class="player-bar-clickable" id="open-expanded-player">
-                <img src="album.jpg" alt="Copertina" id="bar-album-cover">
+                <img src="vulturesclubmix.png" alt="Copertina" id="bar-album-cover">
                 <div class="bar-track-info">
                     <span id="bar-track-title"></span>
                     <span id="bar-album-title"></span>
@@ -97,7 +64,7 @@
         <div id="player-expanded">
             <button id="close-expanded-btn">▼</button>
             <div class="expanded-content">
-                <img src="album.jpg" alt="Copertina album" id="expanded-album-cover">
+                <img src="vulturesclubmix.png" alt="Copertina album" id="expanded-album-cover">
                 <h3 id="expanded-album-title"></h3>
                 <h4 id="expanded-track-title"></h4>
                 
@@ -131,17 +98,22 @@
 
         const allAlbums = [
             {
-                albumTitle: "LOVE EVERYONE",
-                albumCover: "album.jpg",
+                albumTitle: "VULTURES CLUB MIX",
+                albumCover: "vulturesclubmix.png",
                 tracks: [
-                    { title: 'LOVE', src: 'MUSICA/1LOVE.mp3' },
-                    { title: 'MY SOUL', src: 'MUSICA/2MYSOUL.mp3' },
-                    { title: 'BUZZ', src: 'MUSICA/3BUZZ.mp3' },
-                    { title: 'VSN', src: 'MUSICA/4VSN.mp3' },
-                    { title: 'I WILL', src: 'MUSICA/5IWILL.mp3' },
-                    { title: 'STADIUM', src: 'MUSICA/6STADIUM.mp3' },
-                    { title: 'CHURCH', src: 'MUSICA/7CHURCH.mp3' },
-                    { title: 'WOLVES CRY', src: 'MUSICA/8WOLVESCRY.mp3' }
+                    { title: 'SLIDE', src: 'REMIX/VULTURESCLUBMIX/SLIDE.mp3' },
+                    { title: 'BURN', src: 'REMIX/VULTURESCLUBMIX/BURN.mp3' },
+                    { title: 'PAID', src: 'REMIX/VULTURESCLUBMIX/PAID.mp3' },
+                    { title: 'TIME MOVING SLOW', src: 'REMIX/VULTURESCLUBMIX/TIME MOVING SLOW.mp3' },
+                    { title: 'PAPERWORK', src: 'REMIX/VULTURESCLUBMIX/PAPERWORK.mp3' },
+                    { title: 'DO IT', src: 'REMIX/VULTURESCLUBMIX/DO IT.mp3' },
+                    { title: 'FOREVER', src: 'REMIX/VULTURESCLUBMIX/MAYBE.mp3' },
+                    { title: 'TAKE OFF YOUR DRESS', src: 'REMIX/VULTURESCLUBMIX/TAKE OFF YOUR DRESS.mp3' },
+                    { title: 'HOLY MOUNTAIN', src: 'REMIX/VULTURESCLUBMIX/HOLY MPUNTAIN.mp3' },
+                    { title: 'SO GOOD', src: 'REMIX/VULTURESCLUBMIX/SO GOOD.mp3' },
+                    { title: 'MOTION', src: 'REMIX/VULTURESCLUBMIX/MOTION (YE REMIX).mp3' },
+                    { title: 'NEW BODY', src: 'REMIX/VULTURESCLUBMIX/NEW BODY.mp3' },
+                    { title: 'DRUNK', src: 'REMIX/VULTURESCLUBMIX/DRUNK.mp3' },
                 ]
             },
             {
