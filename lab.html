@@ -12,12 +12,16 @@
     <style>
         /* === 1. STILE BASE === */
         
-        /* --- NUOVO: RIMUOVE AURA BLU --- */
+        /* --- ACCESSIBILITA' E FIX FOCUS --- */
         * {
             -webkit-tap-highlight-color: transparent; /* Rimuove flash blu su mobile */
         }
-        button:focus, input:focus {
-            outline: none; /* Rimuove bordo blu/nero al clic */
+        *:focus:not(:focus-visible) {
+            outline: none;
+        }
+        *:focus-visible {
+            outline: 2px solid black; 
+            outline-offset: 2px;
         }
         /* ------------------------------- */
 
@@ -29,46 +33,54 @@
             overflow-x: hidden; 
         }
 
-        /* === 2. HAMBURGER MENU === */
-        .hamburger-menu {
-            position: fixed; top: 20px; left: 20px; z-index: 1001;
-        }
-        .menu__btn {
-            position: relative; display: flex; align-items: center;
-            width: 26px; height: 26px; cursor: pointer; z-index: 2;
-        }
-        .menu__btn > span, .menu__btn > span::before, .menu__btn > span::after {
-            display: block; position: absolute; width: 100%; height: 2px;
-            background-color: black; transition-duration: .25s;
-        }
-        .menu__btn > span::before { content: ''; top: -8px; }
-        .menu__btn > span::after { content: ''; top: 8px; }
-        .menu__box {
-            display: block; position: fixed; visibility: hidden; top: 0; left: -100%;
-            width: 300px; height: 100vh; margin: 0; padding: 80px 0;
-            list-style: none; background-color: #ECEFF1;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
-            transition-duration: .25s; z-index: 1;
-        }
-        .menu__item {
-            display: block; padding: 12px 24px; color: black;
-            font-family: 'IBM Plex Mono', monospace; font-size: 20px;
-            text-decoration: none; transition-duration: .25s;
-        }
-        .menu__item:hover { background-color: #CFD8DC; }
-        #menu__toggle { display: none; }
-        #menu__toggle:checked ~ .menu__btn > span { transform: rotate(45deg); }
-        #menu__toggle:checked ~ .menu__btn > span::before { top: 0; transform: rotate(0deg); }
-        #menu__toggle:checked ~ .menu__btn > span::after { top: 0; transform: rotate(90deg); }
-        #menu__toggle:checked ~ .menu__box { visibility: visible; left: 0; }
-        
-        /* Titolo Pagina */
-        #page-title {
-            margin-top: 10px;
-            text-align: center;
+        /* =========================================
+           2. STILI MENU TESTUALE INLINE FISSO
+           ========================================= */
+        .text-menu {
             width: 100%;
-            font-family: 'IBM Plex Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            
+            position: sticky;
+            top: 0;
+            background-color: #f0f0f0; 
+            z-index: 1001; 
         }
+
+        .text-menu a {
+            text-decoration: none;
+            color: #ccc; 
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 5px; 
+            transition: color 0.3s ease;
+        }
+
+        .text-menu a.active {
+            color: black; 
+            font-weight: bold;
+        }
+
+        .text-menu a:hover {
+            color: #777;
+        }
+
+        @media (max-width: 400px) {
+            .text-menu {
+                gap: 8px; 
+            }
+            .text-menu a {
+                font-size: 0.95em; 
+                padding: 10px 2px;
+            }
+        }
+        /* ========================================= */
 
         /* === 3. LAYOUT CONTENUTO === */
         main {
@@ -337,38 +349,26 @@
         .modal-track-item:hover { background-color: #f0f0f0; }
         .modal-track-item:last-child { border-bottom: none; }
         
-        
         /* Animazione "glow" */
         @keyframes blink-effect {
-            0% {
-                box-shadow: 0 0 20px 8px #fff; /* Max glow */
-            }
-            50% {
-                box-shadow: 0 0 10px 4px #fff; /* Min glow */
-            }
-            100% {
-                box-shadow: 0 0 20px 8px #fff; /* Max glow */
-            }
+            0% { box-shadow: 0 0 20px 8px #fff; }
+            50% { box-shadow: 0 0 10px 4px #fff; }
+            100% { box-shadow: 0 0 20px 8px #fff; }
         }
 
     </style>
 </head>
 <body>
 
-    <div class="hamburger-menu">
-        <input id="menu__toggle" type="checkbox" />
-        <label class="menu__btn" for="menu__toggle"><span></span></label>
-        <ul class="menu__box">
-            <li><a class="menu__item" href="index.html">HOME</a></li>
-            <li><a class="menu__item" href="music.html">SND</a></li>
-            <li><a class="menu__item" href="rmx.html">RMX</a></li>
-            <li><a class="menu__item" href="lab.html">LAB</a></li>
-            <li><a class="menu__item" href="vsn.html">VSN</a></li>
-            <li><a class="menu__item" href="shop.html">SHOP</a></li>
-        </ul>
-    </div>
-
-    <h2 id="page-title">LAB</h2>
+    <!-- MENU TESTUALE FISSO -->
+    <nav class="text-menu">
+        <a href="index.html">HOME</a>
+        <a href="music.html">SND</a>
+        <a href="rmx.html">RMX</a>
+        <a href="lab.html" class="active">LAB</a>
+        <a href="vsn.html">VSN</a>
+        <a href="shop.html">SHOP</a>
+    </nav>
 
     <main>
         
@@ -427,24 +427,8 @@
             </div>
     </div>
 
-
     <script>
-        // === SCRIPT JAVASCRIPT (MODIFICATO PER STOP A FINE BRANO) ===
-        
-        // --- 1. LOGICA HAMBURGER MENU ---
-        const menuToggle = document.getElementById('menu__toggle');
-        const menuBox = document.querySelector('.menu__box');
-        menuToggle.addEventListener('change', () => {
-            if (menuToggle.checked) {
-                menuBox.style.visibility = 'visible';
-                menuBox.style.left = '0';
-            } else {
-                menuBox.style.visibility = 'hidden';
-                menuBox.style.left = '-100%';
-            }
-        });
-
-        // --- 2. LOGICA STEM PLAYER ---
+        // --- LOGICA STEM PLAYER ---
         
         const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
         const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
@@ -479,7 +463,7 @@
             melody: document.getElementById('light-melody'),
         };
 
-        // --- DATABASE CANZONI (Compilato) ---
+        // --- DATABASE CANZONI ---
         const songDatabase = {
             "love-everyone": {
                 albumTitle: "LOVE EVERYONE",
@@ -696,7 +680,6 @@
                 
                 if (gainNodes[key]) {
                     source.connect(gainNodes[key]);
-                    // Modificato per non fare il loop
                     source.start(0, offset); 
                     sourceNodes[key] = source;
                 }
@@ -718,10 +701,8 @@
                 } catch(e) {}
             }
             
-            // Non aggiornare startOffset se stiamo fermando
-            if(isPlaying) { // Solo se era in play
+            if(isPlaying) { 
                  startOffset = (startOffset + (audioContext.currentTime - startTime));
-                 // Non fare il modulo, così ">= songDuration" funzionerà
             }
             
             sourceNodes = {};

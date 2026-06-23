@@ -11,29 +11,23 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
 
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#f0f0f0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="SND-VSN">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 </head>
 <body>
-    <div class="hamburger-menu">
-        <input id="menu__toggle" type="checkbox" />
-        <label class="menu__btn" for="menu__toggle">
-            <span></span>
-        </label>
-        <ul class="menu__box">
-            <li><a class="menu__item" href="index.html">HOME</a></li>
-            <li><a class="menu__item" href="music.html">SND</a></li>
-            <li><a class="menu__item" href="rmx.html">RMX</a></li>
-            <li><a class="menu__item" href="lab.html">LAB</a></li>
-            <li><a class="menu__item" href="vsn.html">VSN</a></li>
-            <li><a class="menu__item" href="shop.html">SHOP</a></li>
-        </ul>
-    </div>
     
-    <h2 id="page-title">RMX</h2>
+    <!-- MENU TESTUALE FISSO -->
+    <nav class="text-menu">
+        <a href="index.html">HOME</a>
+        <a href="music.html">SND</a>
+        <a href="rmx.html" class="active">RMX</a>
+        <a href="lab.html">LAB</a>
+        <a href="vsn.html">VSN</a>
+        <a href="shop.html">SHOP</a>
+    </nav>
 
     <div class="music-container">
         <div class="album">
@@ -48,6 +42,7 @@
         <div id="tracklist-content">
             </div>
     </div>
+    
     <div id="global-player-container" class="hidden">
         
         <div id="player-bar">
@@ -83,6 +78,7 @@
         </div>
     
     </div>
+    
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -107,83 +103,13 @@
                     { title: 'TIME MOVING SLOW', src: 'REMIX/VULTURESCLUBMIX/TIME MOVING SLOW.mp3' },
                     { title: 'PAPERWORK', src: 'REMIX/VULTURESCLUBMIX/PAPERWORK.mp3' },
                     { title: 'DO IT', src: 'REMIX/VULTURESCLUBMIX/DO IT.mp3' },
-                    { title: 'FOREVER', src: 'REMIX/VULTURESCLUBMIX/MAYBE.mp3' },
+                    { title: 'MAYBE', src: 'REMIX/VULTURESCLUBMIX/MAYBE.mp3' },
                     { title: 'TAKE OFF YOUR DRESS', src: 'REMIX/VULTURESCLUBMIX/TAKE OFF YOUR DRESS.mp3' },
-                    { title: 'HOLY MOUNTAIN', src: 'REMIX/VULTURESCLUBMIX/HOLY MPUNTAIN.mp3' },
+                    { title: 'HOLY MOUNTAIN', src: 'REMIX/VULTURESCLUBMIX/HOLY MOUNTAIN.mp3' },
                     { title: 'SO GOOD', src: 'REMIX/VULTURESCLUBMIX/SO GOOD.mp3' },
                     { title: 'MOTION', src: 'REMIX/VULTURESCLUBMIX/MOTION (YE REMIX).mp3' },
                     { title: 'NEW BODY', src: 'REMIX/VULTURESCLUBMIX/NEW BODY.mp3' },
                     { title: 'DRUNK', src: 'REMIX/VULTURESCLUBMIX/DRUNK.mp3' },
-                ]
-            },
-            {
-                albumTitle: "HATE EVERYONE",
-                albumCover: "album2.jpg",
-                tracks: [
-                    { title: 'JEWS HANDS', src: 'MUSICA/1.1JEWSHANDS.mp3' },
-                    { title: 'ANGEL', src: 'MUSICA/1.2ANGEL.mp3' },
-                    { title: 'BLIND', src: 'MUSICA/1.3BLIND.mp3' },
-                    { title: 'BARK', src: 'MUSICA/1.4BARK.mp3' },
-                    { title: 'GHOST', src: 'MUSICA/1.5GHOST.mp3' },
-                    { title: 'FLY', src: 'MUSICA/1.6FLY.mp3' },
-                    { title: 'MARIA', src: 'MUSICA/1.7MARIA.mp3' },
-                    { title: 'POPE', src: 'MUSICA/1.8POPE.mp3' }
-                ]
-            },
-            {
-                albumTitle: "LAUNDRY",
-                albumCover: "album3.jpg",
-                tracks: [
-                    { title: 'OH MY', src: 'MUSICA/1.1.1OH MY.mp3' },
-                    { title: 'BELL', src: 'MUSICA/1.2.2BELL.mp3' },
-                    { title: 'HEAVEN', src: 'MUSICA/1.3.3HEAVEN.mp3' },
-                    { title: 'ZZ', src: 'MUSICA/1.4.4ZZ.mp3' },
-                    { title: 'RISE', src: 'MUSICA/1.5.5RISE.mp3' },
-                    { title: 'OHH', src: 'MUSICA/1.6.6OHH.mp3' },
-                    { title: 'LAUNDRY', src: 'MUSICA/1.7.7LAUNDRY.mp3' },
-                    { title: 'END', src: 'MUSICA/1.8.8END.mp3' }
-                ]
-            },
-            {
-                albumTitle: "ECHOES OF NOTHING",
-                albumCover: "album4.jpg",
-                tracks: [
-                    { title: 'WHISPERS', src: 'MUSICA/1.1.1.1WHISPERS.mp3' }, 
-                    { title: 'HONEY LIGHT', src: 'MUSICA/1.2.2.2HONEYLIGHT.mp3' },
-                    { title: 'BETWEEN SHADOWS', src: 'MUSICA/1.3.3.3BETWEEN SHADOWS.mp3' },
-                    { title: 'FIELDS', src: 'MUSICA/1.4.4.4FIELDS.mp3' },
-                    { title: 'GOLDEN HUNGER', src: 'MUSICA/1.5.5.5GOLDEN HUNGER.mp3' },
-                    { title: 'WHERE THE SKY MELTS', src: 'MUSICA/1.6.6.6WHERE THE SKY MELTS.mp3' },
-                    { title: 'LANTERN', src: 'MUSICA/1.7.7.7LANTERN.mp3' },
-                    { title: 'THE HOURS THAT FLOW', src: 'MUSICA/1.8.8.8THE HOURS THAT FLOW.mp3' }
-                ]
-            },
-            {
-                albumTitle: "NOISE",
-                albumCover: "album5.jpg",
-                tracks: [
-                    { title: 'CONCRETE', src: 'MUSICA/1.1.1.1.1CONCRETE.mp3' }, 
-                    { title: 'PARTICLES', src: 'MUSICA/1.2.2.2.2PARTICLES.mp3' },
-                    { title: 'TRACE', src: 'MUSICA/1.3.3.3.3TRACE.mp3' },
-                    { title: 'LURK', src: 'MUSICA/1.4.4.4.4LURK.mp3' },
-                    { title: 'BREATHE', src: 'MUSICA/1.5.5.5.5BREATHE.mp3' },
-                    { title: 'GRID', src: 'MUSICA/1.6.6.6.6GRID.mp3' },
-                    { title: 'GEAR', src: 'MUSICA/1.7.7.7.7GEAR.mp3' },
-                    { title: 'NOISE', src: 'MUSICA/1.8.8.8.8NOISE.mp3' }
-                ]
-            },
-            {
-                albumTitle: "LAND OF THE STONES",
-                albumCover: "album6.jpg",
-                tracks: [
-                    { title: 'WHITE', src: 'MUSICA/1.1.1.1.1.1WHITE.mp3' }, 
-                    { title: 'APART', src: 'MUSICA/1.2.2.2.2.2APART.mp3' },
-                    { title: 'DUST', src: 'MUSICA/1.3.3.3.3.3DUST.mp3' },
-                    { title: 'NECROMANCER', src: 'MUSICA/1.4.4.4.4.4NECROMANCER.mp3' },
-                    { title: 'HOLLOW', src: 'MUSICA/1.5.5.5.5.5HOLLOW.mp3' },
-                    { title: 'ALONE', src: 'MUSICA/1.6.6.6.6.6ALONE.mp3' },
-                    { title: 'CAVE', src: 'MUSICA/1.7.7.7.7.7CAVE.mp3' },
-                    { title: 'LOST IN THE LAND', src: 'MUSICA/1.8.8.8.8.8LOST IN THE LAND.mp3' }
                 ]
             },
         ];
@@ -216,7 +142,8 @@
         const tracklistModal = document.getElementById('tracklist-modal');
         const closeTracklistBtn = document.getElementById('close-tracklist-btn');
         const tracklistContent = document.getElementById('tracklist-content');
-        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        
+        const textMenu = document.querySelector('.text-menu');
 
         const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
         const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
@@ -232,6 +159,7 @@
             currentTrackIndex = trackIndex;
             const album = allAlbums[albumIndex];
             const track = album.tracks[trackIndex];
+            
             globalAudio.src = track.src;
             barAlbumCover.src = album.albumCover;
             barTrackTitle.textContent = track.title;
@@ -239,12 +167,27 @@
             expandedAlbumCover.src = album.albumCover;
             expandedTrackTitle.textContent = track.title;
             expandedAlbumTitle.textContent = album.albumTitle;
+            
             globalPlayerContainer.classList.remove('hidden');
             globalProgressBar.value = 0;
             globalCurrentTime.textContent = '0:00';
+            
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track.title,
+                    artist: 'VSN',
+                    album: album.albumTitle,
+                    artwork: [
+                        { src: album.albumCover, type: 'image/jpeg' },
+                        { src: album.albumCover, type: 'image/png' }
+                    ]
+                });
+            }
+
             globalAudio.addEventListener('loadedmetadata', () => {
                 globalDuration.textContent = formatTime(globalAudio.duration || 0);
             }, { once: true });
+            
             if (isPlaying) {
                 playAudio();
             }
@@ -303,15 +246,14 @@
             globalAudio.currentTime = duration * progress;
         }
 
-        // Funzioni per nascondere/mostrare il menu hamburger
         function openExpandedPlayer() {
             playerExpanded.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu
+            textMenu.classList.add('hidden-by-player'); 
         }
         
         function closeExpandedPlayer() {
             playerExpanded.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
+            textMenu.classList.remove('hidden-by-player'); 
         }
 
         function showTracklist(albumIndex) {
@@ -338,13 +280,13 @@
             tracklistContent.appendChild(trackListElement);
             modalBackdrop.classList.add('active');
             tracklistModal.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu anche qui
+            textMenu.classList.add('hidden-by-player'); 
         }
 
         function closeTracklistModal() {
             modalBackdrop.classList.remove('active');
             tracklistModal.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
+            textMenu.classList.remove('hidden-by-player'); 
         }
 
         albumCoverImages.forEach(image => {
@@ -382,18 +324,12 @@
         openExpandedPlayerBtn.addEventListener('click', openExpandedPlayer);
         closeExpandedPlayerBtn.addEventListener('click', closeExpandedPlayer);
 
-        const menuToggle = document.getElementById('menu__toggle');
-        const menuBox = document.querySelector('.menu__box');
-
-        menuToggle.addEventListener('change', () => {
-            if (menuToggle.checked) {
-                menuBox.style.visibility = 'visible';
-                menuBox.style.left = '0';
-            } else {
-                menuBox.style.visibility = 'hidden';
-                menuBox.style.left = '-100%';
-            }
-        });
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', playAudio);
+            navigator.mediaSession.setActionHandler('pause', pauseAudio);
+            navigator.mediaSession.setActionHandler('previoustrack', playPrevTrack);
+            navigator.mediaSession.setActionHandler('nexttrack', playNextTrack);
+        }
 
         loadTrack(0, 0);
         globalPlayerContainer.classList.add('hidden');

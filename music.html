@@ -18,22 +18,16 @@
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 </head>
 <body>
-    <div class="hamburger-menu">
-        <input id="menu__toggle" type="checkbox" />
-        <label class="menu__btn" for="menu__toggle">
-            <span></span>
-        </label>
-        <ul class="menu__box">
-            <li><a class="menu__item" href="index.html">HOME</a></li>
-            <li><a class="menu__item" href="music.html">SND</a></li>
-            <li><a class="menu__item" href="rmx.html">RMX</a></li>
-            <li><a class="menu__item" href="lab.html">LAB</a></li>
-            <li><a class="menu__item" href="vsn.html">VSN</a></li>
-            <li><a class="menu__item" href="shop.html">SHOP</a></li>
-        </ul>
-    </div>
     
-    <h2 id="page-title">SND</h2>
+    <!-- NUOVO MENU TESTUALE (Sostituisce Hamburger e Titolo H2) -->
+    <nav class="text-menu">
+        <a href="index.html">HOME</a>
+        <a href="music.html" class="active">SND</a>
+        <a href="rmx.html">RMX</a>
+        <a href="lab.html">LAB</a>
+        <a href="vsn.html">VSN</a>
+        <a href="shop.html">SHOP</a>
+    </nav>
 
     <div class="music-container">
         <div class="album">
@@ -244,7 +238,9 @@
         const tracklistModal = document.getElementById('tracklist-modal');
         const closeTracklistBtn = document.getElementById('close-tracklist-btn');
         const tracklistContent = document.getElementById('tracklist-content');
-        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        
+        // --- COLLEGAMENTO AL NUOVO MENU TESTUALE ---
+        const textMenu = document.querySelector('.text-menu');
 
         const playIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
         const pauseIconSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
@@ -260,6 +256,7 @@
             currentTrackIndex = trackIndex;
             const album = allAlbums[albumIndex];
             const track = album.tracks[trackIndex];
+            
             globalAudio.src = track.src;
             barAlbumCover.src = album.albumCover;
             barTrackTitle.textContent = track.title;
@@ -267,12 +264,29 @@
             expandedAlbumCover.src = album.albumCover;
             expandedTrackTitle.textContent = track.title;
             expandedAlbumTitle.textContent = album.albumTitle;
+            
             globalPlayerContainer.classList.remove('hidden');
             globalProgressBar.value = 0;
             globalCurrentTime.textContent = '0:00';
+            
+            // --- INTEGRAZIONE MEDIA SESSION API ---
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track.title,
+                    artist: 'VSN',
+                    album: album.albumTitle,
+                    artwork: [
+                        { src: album.albumCover, type: 'image/jpeg' },
+                        { src: album.albumCover, type: 'image/png' }
+                    ]
+                });
+            }
+            // --------------------------------------
+
             globalAudio.addEventListener('loadedmetadata', () => {
                 globalDuration.textContent = formatTime(globalAudio.duration || 0);
             }, { once: true });
+            
             if (isPlaying) {
                 playAudio();
             }
@@ -331,15 +345,15 @@
             globalAudio.currentTime = duration * progress;
         }
 
-        // Funzioni per nascondere/mostrare il menu hamburger
+        // Funzioni per nascondere/mostrare il menu
         function openExpandedPlayer() {
             playerExpanded.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu
+            textMenu.classList.add('hidden-by-player'); 
         }
         
         function closeExpandedPlayer() {
             playerExpanded.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
+            textMenu.classList.remove('hidden-by-player'); 
         }
 
         function showTracklist(albumIndex) {
@@ -366,13 +380,13 @@
             tracklistContent.appendChild(trackListElement);
             modalBackdrop.classList.add('active');
             tracklistModal.classList.add('active');
-            hamburgerMenu.classList.add('hidden-by-player'); // Nasconde il menu anche qui
+            textMenu.classList.add('hidden-by-player'); 
         }
 
         function closeTracklistModal() {
             modalBackdrop.classList.remove('active');
             tracklistModal.classList.remove('active');
-            hamburgerMenu.classList.remove('hidden-by-player'); // Mostra il menu
+            textMenu.classList.remove('hidden-by-player'); 
         }
 
         albumCoverImages.forEach(image => {
@@ -410,18 +424,14 @@
         openExpandedPlayerBtn.addEventListener('click', openExpandedPlayer);
         closeExpandedPlayerBtn.addEventListener('click', closeExpandedPlayer);
 
-        const menuToggle = document.getElementById('menu__toggle');
-        const menuBox = document.querySelector('.menu__box');
-
-        menuToggle.addEventListener('change', () => {
-            if (menuToggle.checked) {
-                menuBox.style.visibility = 'visible';
-                menuBox.style.left = '0';
-            } else {
-                menuBox.style.visibility = 'hidden';
-                menuBox.style.left = '-100%';
-            }
-        });
+        // --- COLLEGAMENTO TASTI NOTIFICHE E LOCK SCREEN ---
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', playAudio);
+            navigator.mediaSession.setActionHandler('pause', pauseAudio);
+            navigator.mediaSession.setActionHandler('previoustrack', playPrevTrack);
+            navigator.mediaSession.setActionHandler('nexttrack', playNextTrack);
+        }
+        // --------------------------------------------------
 
         loadTrack(0, 0);
         globalPlayerContainer.classList.add('hidden');

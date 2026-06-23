@@ -1,23 +1,78 @@
-/* --- RIMUOVE AURA BLU E FOCUS --- */
+/* --- RIMUOVE AURA BLU, MANTENENDO FOCUS ACCESSIBILE PER TASTIERA --- */
 * {
     -webkit-tap-highlight-color: transparent;
 }
-button:focus, input:focus, a:focus {
+*:focus:not(:focus-visible) {
     outline: none;
+}
+*:focus-visible {
+    outline: 2px solid black; 
+    outline-offset: 2px;
 }
 /* ------------------------------- */
 
 body {
     margin: 0;
-    background-color: white;
+    background-color: #f0f0f0; 
     font-family: 'IBM Plex Mono', monospace;
     color: black;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: flex-start;
     align-items: center; 
     min-height: 100vh;
 }
+
+/* =========================================
+   STILI MENU TESTUALE INLINE
+   ========================================= */
+.text-menu {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    
+    position: sticky;
+    top: 0;
+    background-color: #f0f0f0; 
+    z-index: 1001; 
+    
+    transition: visibility 0.2s, opacity 0.2s linear;
+}
+
+.text-menu a {
+    text-decoration: none;
+    color: #ccc; 
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 5px; 
+    transition: color 0.3s ease;
+}
+
+.text-menu a.active {
+    color: black; 
+    font-weight: bold;
+}
+
+.text-menu a:hover {
+    color: #777;
+}
+
+@media (max-width: 400px) {
+    .text-menu {
+        gap: 8px; 
+    }
+    .text-menu a {
+        font-size: 0.95em; 
+        padding: 10px 2px;
+    }
+}
+/* ========================================= */
 
 .video-container {
     padding: 20px;
@@ -25,21 +80,20 @@ body {
     width: 80%;
     max-width: 800px;
     position: relative;
-    cursor: pointer;
-    transition: opacity 0.3s ease-in-out;
+    /* Cursore rimosso perché non è più cliccabile */
 }
 
 video {
     width: 100%;
     max-height: 600px;
     object-fit: contain;
+    mix-blend-mode: multiply;
 }
 
 .video-text {
     margin-top: 10px;
     font-size: 2em;
     font-family: 'IBM Plex Mono', monospace;
-    /* Animazione per suggerire il click */
     animation: pulse 2s infinite ease-in-out;
 }
 
@@ -58,7 +112,7 @@ video {
     }
 }
 
-/* Stili per la galleria di immagini */
+/* Stili per la galleria di immagini (ORA VISIBILE DI DEFAULT) */
 .image-gallery {
     display: flex;
     flex-direction: column;
@@ -67,20 +121,7 @@ video {
     width: 100%;
     max-width: 800px; 
     box-sizing: border-box;
-
-    opacity: 0;
-    visibility: hidden;
-    max-height: 0; 
-    overflow: hidden;
-    padding: 0px 20px; 
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, visibility 0.5s ease-in-out, padding 0.5s ease-in-out;
-}
-
-.image-gallery.visible {
-    opacity: 1;
-    visibility: visible;
-    max-height: 5000px; 
-    padding: 40px 20px; 
+    padding: 40px 20px; /* Padding ripristinato e visibile di default */
 }
 
 .image-item {
@@ -134,99 +175,6 @@ model-viewer {
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #f8f8f8; 
-}
-
-/* Stili per l'hamburger menu */
-.hamburger-menu {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1;
-}
-
-.menu__btn {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    z-index: 2;
-}
-
-.menu__btn > span,
-.menu__btn > span::before,
-.menu__btn > span::after {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background-color: black;
-    transition-duration: .25s;
-}
-
-.menu__btn > span::before {
-    content: '';
-    top: -8px;
-}
-
-.menu__btn > span::after {
-    content: '';
-    top: 8px;
-}
-
-.menu__box {
-    display: block;
-    position: fixed;
-    visibility: hidden;
-    top: 0;
-    left: -100%;
-    width: 300px;
-    height: 100vh;
-    margin: 0;
-    padding: 80px 0;
-    list-style: none;
-    background-color: #ECEFF1;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
-    transition-duration: .25s;
-}
-
-.menu__item {
-    display: block;
-    padding: 12px 24px;
-    color: black;
-    /* MODIFICATO: Font allineato con la Home */
-    font-family: 'IBM Plex Mono', monospace; 
-    font-size: 20px;
-    text-decoration: none;
-    transition-duration: .25s;
-}
-
-.menu__item:hover {
-    background-color: #CFD8DC;
-}
-
-#menu__toggle {
-    display: none;
-}
-
-#menu__toggle:checked ~ .menu__btn > span {
-    transform: rotate(45deg);
-}
-
-#menu__toggle:checked ~ .menu__btn > span::before {
-    top: 0;
-    transform: rotate(0deg);
-}
-
-#menu__toggle:checked ~ .menu__btn > span::after {
-    top: 0;
-    transform: rotate(90deg);
-}
-
-#menu__toggle:checked ~ .menu__box {
-    visibility: visible;
-    left: 0;
 }
 
 /* Media query */
