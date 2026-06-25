@@ -1,0 +1,22 @@
+name: Pubblicazione Programmata
+
+on:
+  schedule:
+    # Esempio: "0 8 * * *" esegue la pubblicazione tutti i giorni alle 08:00 UTC (le 10:00 in Italia)
+    - cron: '0 8 * * *'
+  
+  workflow_dispatch: # Questo ci permette di testare il bottone manualmente
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copia i file dalla sala d'attesa (main)
+        uses: actions/checkout@v4
+
+      - name: Pubblica il sito sul branch live
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: live-site # Il nuovo branch dove andrà il sito pubblico
+          publish_dir: . # Prende tutti i file dalla tua cartella principale
