@@ -24,100 +24,199 @@
         <a href="shop.html">SHOP</a>
     </nav>
 
-    <div class="video-container" id="videoContainer">
-        <video id="loop-video" loop autoplay muted playsinline>
-            <source src="VIDEO/video2.mp4" type="video/mp4">
-        </video>
-        <p class="video-text">SCROLL TO VIEW VSN</p>
-    </div>
-
-    <div class="image-gallery">
+    <div class="solar-system-container">
+        <h2 id="center-text"></h2>
         
-        <div class="model-item">
-            <h3 class="image-title">LOVE EVERYONE</h3>
-            <model-viewer 
-                src="3D/loveveryone3d.glb" 
-                alt="Modello 3D Love Everyone"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/loveveryone3d.glb">
-            </model-viewer>
-        </div>
+        <div class="solar-system" id="solar-system">
+            
+            <div class="cd-wrapper cd-1">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="LOVE EVERYONE" data-src="3D/loveveryone3d.glb">
+                        <img src="album.jpg" alt="LOVE EVERYONE">
+                    </div>
+                </div>
+            </div>
 
-        <div class="model-item">
-            <h3 class="image-title">HATE EVERYONE</h3>
-            <model-viewer 
-                src="3D/hateveryone3d.glb" 
-                alt="Modello 3D Hate Everyone"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/hateveryone3d.glb">
-            </model-viewer>
-        </div>
+            <div class="cd-wrapper cd-2">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="HATE EVERYONE" data-src="3D/hateveryone3d.glb">
+                        <img src="album2.jpg" alt="HATE EVERYONE">
+                    </div>
+                </div>
+            </div>
 
-        <div class="model-item">
-            <h3 class="image-title">LAUNDRY</h3>
-            <model-viewer 
-                src="3D/laundry3d.glb" 
-                alt="Modello 3D Laundry"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/laundry3d.glb">
-            </model-viewer>
-        </div>
+            <div class="cd-wrapper cd-3">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="LAUNDRY" data-src="3D/laundry3d.glb">
+                        <img src="album3.jpg" alt="LAUNDRY">
+                    </div>
+                </div>
+            </div>
 
-        <div class="model-item">
-            <h3 class="image-title">ECHOES OF NOTHING</h3>
-            <model-viewer 
-                src="3D/echoesofnothing3d.glb" 
-                alt="Modello 3D Echoes of Nothing"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/echoesofnothing3d.glb">
-            </model-viewer>
-        </div>
+            <div class="cd-wrapper cd-4">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="ECHOES OF NOTHING" data-src="3D/echoesofnothing3d.glb">
+                        <img src="album4.jpg" alt="ECHOES OF NOTHING">
+                    </div>
+                </div>
+            </div>
 
-        <div class="model-item">
-            <h3 class="image-title">NOISE</h3>
-            <model-viewer 
-                src="3D/noise3d.glb" 
-                alt="Modello 3D Noise"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/noise3d.glb">
-            </model-viewer>
-        </div>
+            <div class="cd-wrapper cd-5">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="NOISE" data-src="3D/noise3d.glb">
+                        <img src="album5.jpg" alt="NOISE">
+                    </div>
+                </div>
+            </div>
 
-         <div class="model-item">
-            <h3 class="image-title">LAND OF THE STONES</h3>
-            <model-viewer 
-                src="3D/landofthestones3d.glb" 
-                alt="Modello 3D Land Of The Stones"
-                auto-rotate 
-                camera-controls
-                shadow-intensity="1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ios-src="3D/landofthestones3d.glb">
-            </model-viewer>
-        </div>
+            <div class="cd-wrapper cd-6">
+                <div class="cd-anti-spinner">
+                    <div class="cd-content" data-title="LAND OF THE STONES" data-src="3D/landofthestones3d.glb">
+                        <img src="album6.jpg" alt="LAND OF THE STONES">
+                    </div>
+                </div>
+            </div>
 
+        </div>
     </div>
 
+    <div id="modal-3d" class="hidden">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <h2 id="modal-title"></h2>
+        <div id="model-container"></div>
+    </div>
+
+    <script>
+        const centerText = document.getElementById('center-text');
+        const modal = document.getElementById('modal-3d');
+        const modelContainer = document.getElementById('model-container');
+        const modalTitle = document.getElementById('modal-title');
+        const solarSystem = document.getElementById('solar-system');
+        const antiSpinners = document.querySelectorAll('.cd-anti-spinner');
+        const cdContents = document.querySelectorAll('.cd-content');
+
+        // GESTIONE VELOCITÀ DINAMICA: Su PC ora è rallentata a 0.08
+        function getNormalSpeed() {
+            return window.innerWidth <= 600 ? 0.05 : 0.08;
+        }
+
+        let normalSpeed = getNormalSpeed();
+        let targetSpeed = normalSpeed;
+        let currentSpeed = normalSpeed;
+        let angle = 0;
+
+        window.addEventListener('resize', () => {
+            const newSpeed = getNormalSpeed();
+            if (targetSpeed === normalSpeed) {
+                targetSpeed = newSpeed; 
+            }
+            normalSpeed = newSpeed;
+        });
+
+        // MOTORE DI ROTAZIONE FLUIDA
+        function animateRotation() {
+            currentSpeed += (targetSpeed - currentSpeed) * 0.05; 
+            angle += currentSpeed;
+
+            solarSystem.style.transform = `rotate(${angle}deg)`;
+            antiSpinners.forEach(spinner => {
+                spinner.style.transform = `rotate(${-angle}deg)`;
+            });
+
+            requestAnimationFrame(animateRotation);
+        }
+        animateRotation(); 
+
+        // FUNZIONI VISIVE
+        function showTitle(title) {
+            centerText.textContent = title;
+            centerText.style.opacity = '1';
+            centerText.style.visibility = 'visible';
+            centerText.style.transform = 'translate(-50%, -50%) scale(1)';
+            
+            targetSpeed = 0; 
+            solarSystem.classList.add('hover-active'); 
+        }
+
+        function hideTitle() {
+            centerText.style.opacity = '0';
+            centerText.style.visibility = 'hidden';
+            centerText.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            
+            targetSpeed = normalSpeed; 
+            solarSystem.classList.remove('hover-active'); 
+        }
+
+        function openModal(modelSrc, title) {
+            modalTitle.textContent = title;
+            
+            // Ho rimosso "ios-src" e aggiunto "ar-scale" per una visualizzazione perfetta.
+            // In questo modo i telefoni Apple genereranno automaticamente l'AR dal file .glb
+            modelContainer.innerHTML = `
+                <model-viewer 
+                    src="${modelSrc}" 
+                    auto-rotate 
+                    camera-controls 
+                    shadow-intensity="1" 
+                    ar 
+                    ar-scale="auto"
+                    ar-modes="webxr scene-viewer quick-look">
+                </model-viewer>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modelContainer.innerHTML = ''; 
+        }
+
+        // LOGICA DI INTERAZIONE: MOUSE (PC) VS TOUCH (SMARTPHONE)
+        let currentFocusedCD = null;
+        const isTouchDevice = () => window.matchMedia("(hover: none)").matches;
+
+        cdContents.forEach(el => {
+            const title = el.dataset.title;
+            const src = el.dataset.src;
+
+            // 1. PC
+            el.addEventListener('mouseenter', () => {
+                if (!isTouchDevice()) showTitle(title);
+            });
+
+            el.addEventListener('mouseleave', () => {
+                if (!isTouchDevice()) hideTitle();
+            });
+
+            // 2. Click / Touch
+            el.addEventListener('click', (e) => {
+                if (isTouchDevice()) {
+                    if (currentFocusedCD !== el) {
+                        e.preventDefault();
+                        if (currentFocusedCD) currentFocusedCD.classList.remove('touch-focus');
+                        currentFocusedCD = el;
+                        el.classList.add('touch-focus');
+                        showTitle(title);
+                    } else {
+                        openModal(src, title);
+                    }
+                } else {
+                    openModal(src, title);
+                }
+            });
+        });
+
+        // 3. Smartphone: Rimuove focus toccando fuori
+        document.addEventListener('click', (e) => {
+            if (isTouchDevice() && currentFocusedCD) {
+                if (!e.target.closest('.cd-content')) {
+                    currentFocusedCD.classList.remove('touch-focus');
+                    currentFocusedCD = null;
+                    hideTitle();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
