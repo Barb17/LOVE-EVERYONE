@@ -2,7 +2,7 @@ name: Pubblicazione Programmata
 
 on:
   schedule:
-    # Esempio: "0 8 * * *" esegue la pubblicazione tutti i giorni alle 08:00 UTC (le 10:00 in Italia)
+    # Esempio: "0 22 * * *" esegue la pubblicazione tutti i giorni alle 08:00 UTC (le 10:00 in Italia)
     - cron: '0 8 * * *'
   
   workflow_dispatch: # Questo ci permette di testare il bottone manualmente
