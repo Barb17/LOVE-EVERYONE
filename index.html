@@ -1,52 +1,1706 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOME</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="favicon.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VSN</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f0f0f0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SND-VSN">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<script nomodule src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer-legacy.js"></script>
+<style>
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+*:focus:not(:focus-visible) { outline: none; }
+*:focus-visible { outline: 2px solid black; outline-offset: 2px; }
+html { overflow-y: scroll; }
+body {
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ================================================================
+   SPLASH SCREEN
+   ================================================================ */
+#splash {
+    position: fixed;
+    inset: 0;
+    background-color: #f0f0f0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* fade-out finale */
+    transition: opacity 0.5s ease;
+}
+#splash.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Video con sfondo già trasparente (webm con canale alpha) */
+#splash-video {
+    width: min(340px, 80vw);
+    height: auto;
+    display: block;
+}
+
+/* ================================================================
+   NAV
+   ================================================================ */
+.text-menu {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #f0f0f0;
+    z-index: 1001;
+    transition: visibility 0.2s, opacity 0.2s linear;
+}
+.text-menu.hidden-by-player { visibility: hidden; opacity: 0; }
+.text-menu a {
+    text-decoration: none;
+    color: #ccc;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 5px;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+.text-menu a.active { color: black; font-weight: bold; }
+.text-menu a:hover { color: #777; }
+@media (max-width: 400px) {
+    .text-menu { gap: 8px; }
+    .text-menu a { font-size: 0.95em; padding: 10px 2px; }
+}
+
+/* Tutte le pagine partono sotto il nav fisso */
+.page.active { padding-top: 80px; }
+
+/* ================================================================
+   PAGES
+   ================================================================ */
+.page { display: none; flex-direction: column; align-items: center; width: 100%; }
+.page.active { display: flex; }
+
+/* ================================================================
+   SND / RMX
+   ================================================================ */
+#page-snd, #page-rmx { padding-bottom: 80px; }
+.music-container {
+    padding: 20px; text-align: center;
+    width: 80%; max-width: 600px;
+    margin-top: 20px; margin-bottom: 20px;
+    display: flex; flex-direction: column; align-items: center;
+}
+.album { margin-bottom: 20px; }
+.album img { max-width: 200px; width: 200px; border-radius: 5px; }
+.album-cover-clickable { cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.album-cover-clickable:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+.album-section-title {
+    margin-top: 10px; font-size: 1.1em;
+    width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .music-container { width: 95%; padding: 10px; }
+    .album { margin-bottom: 15px; }
+    .album img { max-width: 150px; width: 150px; }
+}
+
+/* ================================================================
+   GLOBAL PLAYER BAR
+   ================================================================ */
+#global-player-container {
+    position: fixed; bottom: 0; left: 0;
+    width: 100%; z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+}
+#global-player-container.hidden { transform: translateY(100%); }
+#player-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background-color: #ffffff; border-top: 1px solid #ccc;
+    height: 60px; padding: 0 10px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+.player-bar-clickable {
+    display: flex; align-items: center;
+    flex-grow: 1; cursor: pointer;
+    width: calc(100% - 60px); overflow: hidden;
+}
+#bar-album-cover { width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px; }
+.bar-track-info {
+    display: flex; flex-direction: column;
+    font-size: 0.8em; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; text-align: left;
+}
+#bar-track-title { font-weight: bold; overflow: hidden; text-overflow: ellipsis; }
+#bar-album-title { color: #555; overflow: hidden; text-overflow: ellipsis; }
+#player-bar .play-pause-btn {
+    font-size: 1.5em; padding: 10px;
+    background: none; border: none; cursor: pointer; flex-shrink: 0;
+}
+
+/* ================================================================
+   EXPANDED PLAYER
+   ================================================================ */
+#player-expanded {
+    position: fixed; top: 100%; left: 0;
+    width: 100%; height: 100vh;
+    background-color: #f0f0f0; z-index: 1001;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.4s;
+    visibility: hidden;
+}
+#player-expanded.active {
+    top: 0; visibility: visible;
+    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s;
+}
+#close-expanded-btn {
+    position: absolute; top: 20px; left: 20px;
+    font-size: 1.5em; background: none; border: none;
+    cursor: pointer; z-index: 1002; color: #555; font-weight: bold;
+}
+.expanded-content {
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    width: 90%; max-width: 350px;
+}
+#expanded-album-cover {
+    width: 80vw; height: 80vw; max-width: 300px; max-height: 300px;
+    object-fit: cover; border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 20px;
+}
+#expanded-album-title { font-size: 1.2em; font-weight: bold; margin: 10px 0 5px 0; }
+#expanded-track-title { font-size: 1em; color: #333; margin-bottom: 20px; }
+
+/* ================================================================
+   PROGRESS / CONTROLS
+   ================================================================ */
+.controls {
+    display: flex; align-items: center; justify-content: center;
+    gap: 15px; margin-bottom: 10px; width: 100%;
+}
+.controls button {
+    padding: 15px 30px; font-family: 'IBM Plex Mono', monospace;
+    border: none; background-color: transparent;
+    font-size: 1.5em; outline: none; box-shadow: none;
+    cursor: pointer; border-radius: 3px;
+}
+.progress-bar {
+    width: 100%; margin-top: 5px;
+    -webkit-appearance: none; appearance: none;
+    background: #ccc; height: 3px; cursor: pointer; border-radius: 2px;
+}
+.progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    background: black; width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+}
+.progress-bar::-moz-range-thumb {
+    background: black; width: 8px; height: 8px;
+    border-radius: 50%; cursor: pointer; border: none;
+}
+.time-container {
+    display: flex; justify-content: space-between;
+    width: 100%; margin-top: 3px; font-size: 0.7em; color: #555;
+}
+.play-pause-btn svg { width: 1em; height: 1em; fill: currentColor; vertical-align: middle; flex-shrink: 0; }
+#player-expanded .controls { width: 100%; }
+#player-expanded .progress-bar { width: 100%; }
+#player-expanded .time-container { width: 100%; }
+
+/* ================================================================
+   TRACKLIST MODAL (SND/RMX)
+   ================================================================ */
+#modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); z-index: 1001;
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#modal-backdrop.active { visibility: visible; opacity: 1; }
+#tracklist-modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%; max-width: 400px; max-height: 80vh;
+    background-color: #ffffff; border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 1002;
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    display: flex; flex-direction: column;
+}
+#tracklist-modal.active { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#close-tracklist-btn {
+    position: absolute; top: 10px; right: 15px;
+    font-size: 2em; color: #aaa;
+    background: none; border: none; cursor: pointer; line-height: 1; padding: 0;
+}
+#close-tracklist-btn:hover { color: #333; }
+#tracklist-content { padding: 20px; text-align: center; overflow-y: auto; }
+.tracklist-cover { width: 150px; height: 150px; border-radius: 5px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.tracklist-album-title { font-size: 1.2em; font-weight: bold; margin: 0 0 20px 0; }
+.tracklist-ol { list-style-type: decimal; padding-left: 30px; margin: 0; text-align: left; }
+.tracklist-item {
+    padding: 12px 10px; font-size: 0.9em;
+    border-bottom: 1px solid #eee; cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.tracklist-item:hover { background-color: #f9f9f9; }
+.tracklist-item:last-child { border-bottom: none; }
+
+/* ================================================================
+   LAB
+   ================================================================ */
+#page-lab main {
+    display: flex; flex-direction: column;
+    justify-content: flex-start; align-items: center;
+    width: 90%; max-width: 450px;
+    margin-top: 20px; padding-bottom: 40px;
+}
+#visualizer {
+    width: 250px; height: 250px;
+    margin-top: 20px; margin-bottom: 20px;
+    position: relative;
+    background-image: url('stella-stem.png');
+    background-size: contain; background-repeat: no-repeat; background-position: center center;
+}
+.stem-light {
+    position: absolute; width: 24px; height: 24px;
+    background-color: #fff; border-radius: 50%;
+    box-shadow: none; opacity: 0;
+    transition: opacity 0.3s ease-in-out; z-index: 10;
+}
+.stem-light.active { opacity: 1; animation: blink-effect 1.5s infinite ease-in-out; }
+#light-vocals { top: 3%; left: 50%; transform: translate(-50%, -50%); }
+#light-melody { top: 50%; right: 3%; transform: translate(50%, -50%); }
+#light-bass   { bottom: 3%; left: 50%; transform: translate(-50%, 50%); }
+#light-drums  { top: 50%; left: 3%; transform: translate(-50%, -50%); }
+@keyframes blink-effect {
+    0%   { box-shadow: 0 0 20px 8px #fff; }
+    50%  { box-shadow: 0 0 10px 4px #fff; }
+    100% { box-shadow: 0 0 20px 8px #fff; }
+}
+#player-controls {
+    display: flex; align-items: center; width: 100%; gap: 15px; margin-bottom: 25px;
+}
+#lab-play-pause-btn {
+    font-size: 1.8em; padding: 10px; background: none; border: none;
+    cursor: pointer; flex-shrink: 0; color: black; line-height: 1;
+}
+#lab-play-pause-btn svg { width: 1em; height: 1em; fill: currentColor; vertical-align: middle; }
+#lab-play-pause-btn:disabled { color: #aaa; cursor: not-allowed; }
+#progress-container { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
+#lab-progress-bar {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    background: #ccc; height: 3px; cursor: pointer; border-radius: 2px;
+}
+#lab-progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    background: black; width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+}
+#lab-progress-bar::-moz-range-thumb {
+    background: black; width: 8px; height: 8px; border-radius: 50%; cursor: pointer; border: none;
+}
+#lab-progress-bar:disabled { opacity: 0.4; cursor: not-allowed; }
+#lab-progress-bar:disabled::-webkit-slider-thumb { background: #ccc; }
+#lab-progress-bar:disabled::-moz-range-thumb { background: #ccc; }
+#time-container { display: flex; justify-content: space-between; width: 100%; font-size: 0.7em; color: #555; }
+#song-selector-box {
+    width: 100%; background-color: #ECEFF1; border-radius: 8px;
+    padding: 12px 15px; box-sizing: border-box; cursor: pointer;
+    margin-bottom: 30px; transition: background-color 0.2s ease;
+    display: flex; align-items: center; gap: 15px;
+}
+#song-selector-box:hover { background-color: #CFD8DC; }
+#selected-track-cover { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+#selected-track-cover.hidden { display: none; }
+#selected-track-info { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#selected-track-info p {
+    margin: 0; font-weight: bold; font-size: 1.1em;
+    text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#selected-track-info span { font-size: 0.9em; color: #555; text-transform: uppercase; }
+#mixer {
+    display: flex; flex-direction: row;
+    justify-content: space-around; align-items: flex-start;
+    gap: 10px; width: 100%; height: 250px;
+    padding: 20px 0; box-sizing: border-box;
+}
+.stem-control {
+    display: flex; flex-direction: column-reverse;
+    align-items: center; gap: 15px;
+    flex-basis: 25%; width: 25%; height: 100%;
+}
+.stem-control label { font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+.vertical-slider { -webkit-appearance: slider-vertical; appearance: slider-vertical; width: 10px; height: 100%; background: transparent; cursor: pointer; }
+.vertical-slider::-webkit-slider-runnable-track { width: 10px; height: 100%; background: #CFD8DC; border-radius: 5px; }
+.vertical-slider::-moz-range-track { width: 10px; height: 100%; background: #CFD8DC; border-radius: 5px; }
+.vertical-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; background: #fff;
+    border-radius: 50%; border: 1px solid #aaa;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-left: -7px;
+}
+.vertical-slider::-moz-range-thumb {
+    width: 24px; height: 24px; background: #fff;
+    border-radius: 50%; border: 1px solid #aaa; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.vertical-slider:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* LAB modal */
+#lab-modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); z-index: 1001;
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#lab-modal-backdrop.active { visibility: visible; opacity: 1; }
+#lab-tracklist-modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%; max-width: 400px; max-height: 80vh;
+    background-color: #ffffff; border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 1002;
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    display: flex; flex-direction: column;
+}
+#lab-tracklist-modal.active { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#lab-close-tracklist-btn {
+    position: absolute; top: 10px; right: 15px;
+    font-size: 2em; color: #aaa;
+    background: none; border: none; cursor: pointer; line-height: 1; padding: 0;
+}
+#lab-close-tracklist-btn:hover { color: #333; }
+#lab-tracklist-content { padding: 20px; padding-top: 40px; text-align: left; overflow-y: auto; }
+.modal-album-header {
+    display: flex; align-items: center; gap: 15px;
+    padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;
+}
+.modal-album-header:hover { background-color: #f9f9f9; }
+.modal-album-cover { width: 60px; height: 60px; border-radius: 4px; flex-shrink: 0; }
+.modal-album-title { font-size: 1.1em; font-weight: bold; margin: 0; text-transform: uppercase; }
+.modal-tracklist {
+    list-style-type: decimal; padding-left: 40px; margin: 0;
+    background-color: #fcfcfc; max-height: 0;
+    overflow: hidden; transition: max-height 0.3s ease-out;
+}
+.modal-tracklist.open { max-height: 500px; padding-top: 10px; padding-bottom: 10px; transition: max-height 0.5s ease-in; }
+.modal-track-item {
+    padding: 12px 10px; font-size: 0.9em;
+    border-bottom: 1px solid #eee; cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.modal-track-item:hover { background-color: #f0f0f0; }
+.modal-track-item:last-child { border-bottom: none; }
+
+/* ================================================================
+   VSN
+   ================================================================ */
+#page-vsn { min-height: 100vh; }
+.solar-system-container {
+    position: relative; flex-grow: 1;
+    display: flex; justify-content: center; align-items: center;
+    width: 100%; min-height: 500px; overflow: hidden;
+}
+#center-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    margin: 0; font-size: 1.2em; font-weight: bold;
+    text-align: center; text-transform: uppercase; letter-spacing: 2px;
+    pointer-events: none; opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; z-index: 10;
+}
+.solar-system { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
+.cd-wrapper { position: absolute; top: 0; left: 0; }
+.cd-1 { transform: rotate(0deg)   translateY(-200px); }
+.cd-2 { transform: rotate(60deg)  translateY(-200px); }
+.cd-3 { transform: rotate(120deg) translateY(-200px); }
+.cd-4 { transform: rotate(180deg) translateY(-200px); }
+.cd-5 { transform: rotate(240deg) translateY(-200px); }
+.cd-6 { transform: rotate(300deg) translateY(-200px); }
+.cd-anti-spinner { position: absolute; top: 0; left: 0; }
+.cd-content {
+    position: absolute; top: -45px; left: -45px;
+    width: 90px; height: 90px; cursor: pointer; transition: filter 0.4s ease;
+}
+.cd-content img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.solar-system.hover-active .cd-content { filter: blur(4px) brightness(0.7); }
+.solar-system.hover-active .cd-content:hover,
+.solar-system.hover-active .cd-content.touch-focus { filter: blur(0px) brightness(1); z-index: 10; }
+.cd-content:hover img, .cd-content.touch-focus img { transform: scale(1.15); }
+.solar-system.hover-active .cd-content:not(:hover):not(.touch-focus) img { transform: scale(0.9); }
+.cd-1 .cd-content { transform: rotate(0deg); }
+.cd-2 .cd-content { transform: rotate(-60deg); }
+.cd-3 .cd-content { transform: rotate(-120deg); }
+.cd-4 .cd-content { transform: rotate(-180deg); }
+.cd-5 .cd-content { transform: rotate(-240deg); }
+.cd-6 .cd-content { transform: rotate(-300deg); }
+@media (max-width: 600px) {
+    .cd-1 { transform: rotate(0deg)   translateY(-140px); }
+    .cd-2 { transform: rotate(60deg)  translateY(-140px); }
+    .cd-3 { transform: rotate(120deg) translateY(-140px); }
+    .cd-4 { transform: rotate(180deg) translateY(-140px); }
+    .cd-5 { transform: rotate(240deg) translateY(-140px); }
+    .cd-6 { transform: rotate(300deg) translateY(-140px); }
+    .cd-content { top: -35px; left: -35px; width: 70px; height: 70px; }
+    #center-text { font-size: 0.9em; width: 120px; }
+}
+#modal-3d {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #f0f0f0; z-index: 2000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 1; visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#modal-3d.hidden { opacity: 0; visibility: hidden; }
+#modal-title {
+    margin-top: 20px; font-size: 1.5em;
+    text-transform: uppercase; letter-spacing: 2px;
+    text-align: center; width: 90%; font-family: 'IBM Plex Mono', monospace;
+}
+#model-container {
+    width: 100%; height: 70%; max-width: 800px;
+    display: flex; justify-content: center; align-items: center;
+}
+model-viewer { width: 100%; height: 100%; background-color: transparent; }
+.close-btn {
+    position: absolute; top: 20px; right: 20px;
+    font-size: 2em; cursor: pointer; border: none;
+    background: none; color: #333; transition: color 0.2s;
+    font-family: 'IBM Plex Mono', monospace;
+}
+.close-btn:hover { color: black; }
+
+/* ================================================================
+   SHOP
+   ================================================================ */
+#page-shop .shop-container { width: 90%; max-width: 600px; padding-bottom: 50px; text-align: center; }
+.shop-intro { font-size: 0.8em; color: #555; margin-bottom: 30px; text-transform: uppercase; }
+.album-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+.shop-item { position: relative; cursor: pointer; transition: transform 0.2s ease; }
+.shop-item img { width: 100%; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: opacity 0.3s; }
+.shop-item h3 { font-size: 0.8em; margin-top: 10px; text-transform: uppercase; }
+.selection-overlay {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: calc(100% - 30px);
+    background: rgba(0,0,0,0.7); color: white;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 5px; font-size: 0.8em;
+    opacity: 0; transition: opacity 0.3s;
+}
+.shop-item.selected .selection-overlay { opacity: 1; }
+.shop-item.selected img { transform: scale(0.95); }
+.order-form { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); text-align: left; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.7em; margin-bottom: 8px; color: #777; text-transform: uppercase; }
+.summary-box { padding: 12px; background: #f9f9f9; border: 1px solid #eee; border-radius: 4px; font-size: 0.85em; min-height: 20px; color: #aaa; }
+.form-group input[type="email"] {
+    width: 100%; padding: 12px; box-sizing: border-box;
+    border: 1px solid #ddd; border-radius: 4px; font-family: 'IBM Plex Mono', monospace;
+}
+.submit-btn {
+    width: 100%; padding: 15px; background: black; color: white;
+    border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9em; transition: opacity 0.2s;
+}
+.submit-btn:hover { opacity: 0.8; }
+@media (max-width: 600px) { .album-grid { gap: 15px; } }
+.hidden-el { display: none !important; }
+#success-message { padding: 60px 20px; animation: fadeIn 0.5s ease-out; text-align: center; }
+.success-icon { font-size: 4em; color: #4CAF50; margin-bottom: 20px; }
+#success-message h3 { letter-spacing: 2px; margin-bottom: 10px; }
+#success-message p { font-size: 0.85em; color: #555; line-height: 1.6; }
+.recap-box { margin: 25px auto; padding: 15px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; text-align: left; max-width: 280px; }
+.recap-title { font-size: 0.65em; color: #888; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+#recap-list { font-size: 0.85em; line-height: 1.5; color: black; text-transform: uppercase; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
-<body>
+<!-- SPLASH SCREEN -->
+<div id="splash">
+    <video id="splash-video" autoplay muted playsinline preload="auto">
+        <source src="videoland.webm" type="video/webm">
+    </video>
+</div>
 
-    <nav class="text-menu">
-        <a href="index.html" class="active">HOME</a>
-        <a href="music.html">SND</a>
-        <a href="rmx.html">RMX</a>
-        <a href="lab.html">LAB</a>
-        <a href="vsn.html">VSN</a>
-        <a href="shop.html">SHOP</a>
-    </nav>
+<!-- NAV -->
+<nav class="text-menu" id="main-nav">
+    <a href="#snd"  data-page="snd">SND</a>
+    <a href="#rmx"  data-page="rmx">RMX</a>
+    <a href="#lab"  data-page="lab">LAB</a>
+    <a href="#vsn"  data-page="vsn">VSN</a>
+    <a href="#shop" data-page="shop">SHOP</a>
+</nav>
 
-    <div class="content">
-        <div class="image-container">
-            <a href="music.html"><img src="IMMAGINE/immagine.jpg" alt="SND" class="animated-image"></a>
-            <h3 class="image-label">SND</h3>
+<!-- SND -->
+<div id="page-snd" class="page">
+    <div class="music-container"><div class="album">
+        <img src="album.jpg"  alt="LOVE EVERYONE"     class="album-cover-clickable snd-cover" data-album-index="0">
+        <h3 class="album-section-title">LOVE EVERYONE</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album2.jpg" alt="HATE EVERYONE"     class="album-cover-clickable snd-cover" data-album-index="1">
+        <h3 class="album-section-title">HATE EVERYONE</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album3.jpg" alt="LAUNDRY"           class="album-cover-clickable snd-cover" data-album-index="2">
+        <h3 class="album-section-title">LAUNDRY</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album4.jpg" alt="ECHOES OF NOTHING" class="album-cover-clickable snd-cover" data-album-index="3">
+        <h3 class="album-section-title">ECHOES OF NOTHING</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album5.jpg" alt="NOISE"             class="album-cover-clickable snd-cover" data-album-index="4">
+        <h3 class="album-section-title">NOISE</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album6.jpg" alt="LAND OF THE STONES" class="album-cover-clickable snd-cover" data-album-index="5">
+        <h3 class="album-section-title">LAND OF THE STONES</h3>
+    </div></div>
+</div>
+
+<!-- RMX -->
+<div id="page-rmx" class="page">
+    <div class="music-container"><div class="album">
+        <img src="vulturesclubmix.png" alt="VULTURES CLUB MIX" class="album-cover-clickable rmx-cover" data-album-index="0">
+        <h3 class="album-section-title">VULTURES CLUB MIX</h3>
+    </div></div>
+    <div class="music-container"><div class="album">
+        <img src="toldyou.png" alt="TOLD YOU" class="album-cover-clickable rmx-cover" data-album-index="1">
+        <h3 class="album-section-title">TOLD YOU</h3>
+    </div></div>
+</div>
+
+<!-- LAB -->
+<div id="page-lab" class="page">
+    <main>
+        <div id="visualizer">
+            <div id="light-vocals" class="stem-light"></div>
+            <div id="light-drums"  class="stem-light"></div>
+            <div id="light-bass"   class="stem-light"></div>
+            <div id="light-melody" class="stem-light"></div>
         </div>
-
-        <div class="image-container">
-            <a href="rmx.html"><img src="IMMAGINE/immagine4.png" alt="LAB" class="animated-image"></a>
-            <h3 class="image-label">RMX</h3>
+        <div id="player-controls">
+            <button id="lab-play-pause-btn" disabled></button>
+            <div id="progress-container">
+                <input type="range" id="lab-progress-bar" value="0" step="0.1" disabled>
+                <div id="time-container">
+                    <span id="lab-current-time">0:00</span>
+                    <span id="lab-duration">0:00</span>
+                </div>
+            </div>
         </div>
-
-        <div class="image-container">
-            <a href="lab.html"><img src="IMMAGINE/immagine3.png" alt="LAB" class="animated-image"></a>
-            <h3 class="image-label">LAB</h3>
+        <div id="song-selector-box">
+            <img id="selected-track-cover" src="" alt="Album Cover" class="hidden">
+            <div id="selected-track-info">
+                <p id="selected-track-title">LOAD STEMS</p>
+                <span id="selected-track-artist">SELECT A TRACK</span>
+            </div>
         </div>
-
-        <div class="image-container">
-            <a href="vsn.html"><img src="IMMAGINE/immagine2.jpg" alt="VSN" class="animated-image"></a>
-            <h3 class="image-label">VSN</h3>
+        <div id="stem-player-container">
+            <div id="mixer">
+                <div class="stem-control">
+                    <label for="stem-vocals">VOCALS</label>
+                    <input type="range" id="stem-vocals" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-drums">DRUMS</label>
+                    <input type="range" id="stem-drums" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-bass">BASS</label>
+                    <input type="range" id="stem-bass" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+                <div class="stem-control">
+                    <label for="stem-melody">MELODY</label>
+                    <input type="range" id="stem-melody" class="vertical-slider" min="0" max="100" value="100" step="1" disabled>
+                </div>
+            </div>
         </div>
+    </main>
+    <div id="lab-modal-backdrop"></div>
+    <div id="lab-tracklist-modal">
+        <button id="lab-close-tracklist-btn">&times;</button>
+        <div id="lab-tracklist-content"></div>
+    </div>
+</div>
 
-        <div class="image-container">
-            <a href="shop.html"><img src="IMMAGINE/immagine_shop.png" alt="SHOP" class="animated-image"></a>
-            <h3 class="image-label">SHOP</h3>
+<!-- VSN -->
+<div id="page-vsn" class="page">
+    <div class="solar-system-container">
+        <h2 id="center-text"></h2>
+        <div class="solar-system" id="solar-system">
+            <div class="cd-wrapper cd-1"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="LOVE EVERYONE" data-src="3D/loveveryone3d.glb">
+                    <img src="album.jpg" alt="LOVE EVERYONE"></div></div></div>
+            <div class="cd-wrapper cd-2"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="HATE EVERYONE" data-src="3D/hateveryone3d.glb">
+                    <img src="album2.jpg" alt="HATE EVERYONE"></div></div></div>
+            <div class="cd-wrapper cd-3"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="LAUNDRY" data-src="3D/laundry3d.glb">
+                    <img src="album3.jpg" alt="LAUNDRY"></div></div></div>
+            <div class="cd-wrapper cd-4"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="ECHOES OF NOTHING" data-src="3D/echoesofnothing3d.glb">
+                    <img src="album4.jpg" alt="ECHOES OF NOTHING"></div></div></div>
+            <div class="cd-wrapper cd-5"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="NOISE" data-src="3D/noise3d.glb">
+                    <img src="album5.jpg" alt="NOISE"></div></div></div>
+            <div class="cd-wrapper cd-6"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="LAND OF THE STONES" data-src="3D/landofthestones3d.glb">
+                    <img src="album6.jpg" alt="LAND OF THE STONES"></div></div></div>
         </div>
     </div>
-    
+    <div id="modal-3d" class="hidden">
+        <button class="close-btn" id="close-3d-btn">✕</button>
+        <h2 id="modal-title"></h2>
+        <div id="model-container"></div>
+    </div>
+</div>
+
+<!-- SHOP -->
+<div id="page-shop" class="page">
+    <div class="shop-container">
+        <div id="shop-content">
+            <p class="shop-intro">HANDCRAFTED CDs. SELECT THE ALBUMS YOU WANT TO ORDER. SCROLL TO THE BOTTOM OF THE PAGE TO SEND YOUR ORDER REQUEST. YOU WILL BE CONTACTED VIA E-MAIL ASAP.</p>
+            <div class="album-grid">
+                <div class="shop-item" data-album-name="LOVE EVERYONE">
+                    <img src="cdalbum1_cut.png" alt="LOVE EVERYONE"><h3>LOVE EVERYONE</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="HATE EVERYONE">
+                    <img src="cdalbum2_cut.png" alt="HATE EVERYONE"><h3>HATE EVERYONE</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="LAUNDRY">
+                    <img src="cdalbum3_cut.png" alt="LAUNDRY"><h3>LAUNDRY</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="ECHOES OF NOTHING">
+                    <img src="cdalbum4_cut.png" alt="ECHOES OF NOTHING"><h3>ECHOES OF NOTHING</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="NOISE">
+                    <img src="cdalbum5_cut.png" alt="NOISE"><h3>NOISE</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="LAND OF THE STONES">
+                    <img src="cdalbum6_cut.png" alt="LAND OF THE STONES"><h3>LAND OF THE STONES</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+            </div>
+            <section class="order-form">
+                <div class="form-group">
+                    <label>YOUR SELECTION</label>
+                    <div id="visual-summary" class="summary-box">No albums selected</div>
+                </div>
+                <div class="form-group">
+                    <label for="shop-email">YOUR EMAIL</label>
+                    <input type="email" id="shop-email" placeholder="email@example.com">
+                </div>
+                <button id="shop-submit-btn" class="submit-btn">SEND ORDER REQUEST</button>
+            </section>
+        </div>
+        <div id="success-message" class="hidden-el">
+            <div class="success-icon">✓</div>
+            <h3>ORDER SENT</h3>
+            <div class="recap-box">
+                <p class="recap-title">YOU ORDERED:</p>
+                <div id="recap-list"></div>
+            </div>
+            <p>WE HAVE RECEIVED YOUR REQUEST.<br>WE WILL CONTACT YOU VIA EMAIL SOON.</p>
+            <button id="shop-back-btn" class="submit-btn" style="margin-top:20px;width:auto;padding:10px 30px;">BACK TO SHOP</button>
+        </div>
+    </div>
+</div>
+
+<!-- GLOBAL PLAYER (sempre nel DOM, persiste tra le pagine) -->
+<div id="global-player-container" class="hidden">
+    <div id="player-bar">
+        <div class="player-bar-clickable" id="open-expanded-player">
+            <img src="" alt="Copertina" id="bar-album-cover">
+            <div class="bar-track-info">
+                <span id="bar-track-title"></span>
+                <span id="bar-album-title"></span>
+            </div>
+        </div>
+        <button id="bar-play-pause-btn" class="play-pause-btn"></button>
+    </div>
+    <div id="player-expanded">
+        <button id="close-expanded-btn">▼</button>
+        <div class="expanded-content">
+            <img src="" alt="Copertina album" id="expanded-album-cover">
+            <h3 id="expanded-album-title"></h3>
+            <h4 id="expanded-track-title"></h4>
+            <input type="range" id="global-progress-bar" class="progress-bar" value="0" step="0.01">
+            <div class="time-container">
+                <span id="global-current-time">0:00</span>
+                <span id="global-duration">0:00</span>
+            </div>
+            <div class="controls">
+                <button class="skip-btn" id="global-prev-btn">⏮</button>
+                <button id="global-play-pause-btn" class="play-pause-btn"></button>
+                <button class="skip-btn" id="global-next-btn">⏭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SND/RMX tracklist modal -->
+<div id="modal-backdrop"></div>
+<div id="tracklist-modal">
+    <button id="close-tracklist-btn">&times;</button>
+    <div id="tracklist-content"></div>
+</div>
+<script>
+'use strict';
+
+/* ── ICONS ─────────────────────────────────────────────── */
+const PLAY_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>';
+const PAUSE_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>';
+const LOAD_SVG  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 1 0 12 22 10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" opacity=".3"/><path d="M12 4a8 8 0 0 1 8 8h-2a6 6 0 0 0-6-6V4Z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>';
+
+function formatTime(s) {
+    const m = Math.floor(s / 60);
+    return m + ':' + Math.floor(s % 60).toString().padStart(2, '0');
+}
+
+/* ── DATI SND ───────────────────────────────────────────── */
+const sndAlbums = [
+    { albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:[
+        {title:'LOVE',src:'MUSICA/1LOVE.mp3'},{title:'MY SOUL',src:'MUSICA/2MYSOUL.mp3'},
+        {title:'BUZZ',src:'MUSICA/3BUZZ.mp3'},{title:'VSN',src:'MUSICA/4VSN.mp3'},
+        {title:'I WILL',src:'MUSICA/5IWILL.mp3'},{title:'STADIUM',src:'MUSICA/6STADIUM.mp3'},
+        {title:'CHURCH',src:'MUSICA/7CHURCH.mp3'},{title:'WOLVES CRY',src:'MUSICA/8WOLVESCRY.mp3'}
+    ]},
+    { albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:[
+        {title:'JEWS HANDS',src:'MUSICA/1.1JEWSHANDS.mp3'},{title:'ANGEL',src:'MUSICA/1.2ANGEL.mp3'},
+        {title:'BLIND',src:'MUSICA/1.3BLIND.mp3'},{title:'BARK',src:'MUSICA/1.4BARK.mp3'},
+        {title:'GHOST',src:'MUSICA/1.5GHOST.mp3'},{title:'FLY',src:'MUSICA/1.6FLY.mp3'},
+        {title:'MARIA',src:'MUSICA/1.7MARIA.mp3'},{title:'POPE',src:'MUSICA/1.8POPE.mp3'}
+    ]},
+    { albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:[
+        {title:'OH MY',src:'MUSICA/1.1.1OH MY.mp3'},{title:'BELL',src:'MUSICA/1.2.2BELL.mp3'},
+        {title:'HEAVEN',src:'MUSICA/1.3.3HEAVEN.mp3'},{title:'ZZ',src:'MUSICA/1.4.4ZZ.mp3'},
+        {title:'RISE',src:'MUSICA/1.5.5RISE.mp3'},{title:'OHH',src:'MUSICA/1.6.6OHH.mp3'},
+        {title:'LAUNDRY',src:'MUSICA/1.7.7LAUNDRY.mp3'},{title:'END',src:'MUSICA/1.8.8END.mp3'}
+    ]},
+    { albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:[
+        {title:'WHISPERS',src:'MUSICA/1.1.1.1WHISPERS.mp3'},{title:'HONEY LIGHT',src:'MUSICA/1.2.2.2HONEYLIGHT.mp3'},
+        {title:'BETWEEN SHADOWS',src:'MUSICA/1.3.3.3BETWEEN SHADOWS.mp3'},{title:'FIELDS',src:'MUSICA/1.4.4.4FIELDS.mp3'},
+        {title:'GOLDEN HUNGER',src:'MUSICA/1.5.5.5GOLDEN HUNGER.mp3'},{title:'WHERE THE SKY MELTS',src:'MUSICA/1.6.6.6WHERE THE SKY MELTS.mp3'},
+        {title:'LANTERN',src:'MUSICA/1.7.7.7LANTERN.mp3'},{title:'THE HOURS THAT FLOW',src:'MUSICA/1.8.8.8THE HOURS THAT FLOW.mp3'}
+    ]},
+    { albumTitle:"NOISE", albumCover:"album5.jpg", tracks:[
+        {title:'CONCRETE',src:'MUSICA/1.1.1.1.1CONCRETE.mp3'},{title:'PARTICLES',src:'MUSICA/1.2.2.2.2PARTICLES.mp3'},
+        {title:'TRACE',src:'MUSICA/1.3.3.3.3TRACE.mp3'},{title:'LURK',src:'MUSICA/1.4.4.4.4LURK.mp3'},
+        {title:'BREATHE',src:'MUSICA/1.5.5.5.5BREATHE.mp3'},{title:'GRID',src:'MUSICA/1.6.6.6.6GRID.mp3'},
+        {title:'GEAR',src:'MUSICA/1.7.7.7.7GEAR.mp3'},{title:'NOISE',src:'MUSICA/1.8.8.8.8NOISE.mp3'}
+    ]},
+    { albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:[
+        {title:'WHITE',src:'MUSICA/1.1.1.1.1.1WHITE.mp3'},{title:'APART',src:'MUSICA/1.2.2.2.2.2APART.mp3'},
+        {title:'DUST',src:'MUSICA/1.3.3.3.3.3DUST.mp3'},{title:'NECROMANCER',src:'MUSICA/1.4.4.4.4.4NECROMANCER.mp3'},
+        {title:'HOLLOW',src:'MUSICA/1.5.5.5.5.5HOLLOW.mp3'},{title:'ALONE',src:'MUSICA/1.6.6.6.6.6ALONE.mp3'},
+        {title:'CAVE',src:'MUSICA/1.7.7.7.7.7CAVE.mp3'},{title:'LOST IN THE LAND',src:'MUSICA/1.8.8.8.8.8LOST IN THE LAND.mp3'}
+    ]}
+];
+
+/* ── DATI RMX ───────────────────────────────────────────── */
+const rmxAlbums = [
+    { albumTitle:"VULTURES CLUB MIX", albumCover:"vulturesclubmix.png", tracks:[
+        {title:'SLIDE',src:'REMIX/VULTURESCLUBMIX/SLIDE.mp3'},
+        {title:'BURN',src:'REMIX/VULTURESCLUBMIX/BURN.mp3'},
+        {title:'PAID',src:'REMIX/VULTURESCLUBMIX/PAID.mp3'},
+        {title:'TIME MOVING SLOW',src:'REMIX/VULTURESCLUBMIX/TIME MOVING SLOW.mp3'},
+        {title:'PAPERWORK',src:'REMIX/VULTURESCLUBMIX/PAPERWORK.mp3'},
+        {title:'DO IT',src:'REMIX/VULTURESCLUBMIX/DO IT.mp3'},
+        {title:'MAYBE',src:'REMIX/VULTURESCLUBMIX/MAYBE.mp3'},
+        {title:'TAKE OFF YOUR DRESS',src:'REMIX/VULTURESCLUBMIX/TAKE OFF YOUR DRESS.mp3'},
+        {title:'HOLY MOUNTAIN',src:'REMIX/VULTURESCLUBMIX/HOLY MOUNTAIN.mp3'},
+        {title:'SO GOOD',src:'REMIX/VULTURESCLUBMIX/SO GOOD.mp3'},
+        {title:'MOTION',src:'REMIX/VULTURESCLUBMIX/MOTION (YE REMIX).mp3'},
+        {title:'NEW BODY',src:'REMIX/VULTURESCLUBMIX/NEW BODY.mp3'},
+        {title:'DRUNK',src:'REMIX/VULTURESCLUBMIX/DRUNK.mp3'}
+    ]},
+    { albumTitle:"TOLD YOU", albumCover:"toldyou.png", tracks:[
+        {title:'VAGABOND',src:'REMIX/TOLDYOU/1 - VAGABOND.mp3'},
+        {title:'MAKE ME A BELIEVER',src:'REMIX/TOLDYOU/2 - MAKE ME A BELIEVER.mp3'},
+        {title:'KING',src:'REMIX/TOLDYOU/3 - KING.mp3'},
+        {title:'SISTERS AND BROTHERS',src:'REMIX/TOLDYOU/4 - SISTERS AND BROTHERS.mp3'},
+        {title:'FATHER',src:'REMIX/TOLDYOU/5 - FATHER.mp3'},
+        {title:'FUCK SUMN',src:'REMIX/TOLDYOU/6 - FUK SUMN.mp3'},
+        {title:'THIS A MUST',src:'REMIX/TOLDYOU/7 - THIS A MUST.mp3'},
+        {title:'UNLOCK',src:'REMIX/TOLDYOU/8 - UNLOCK.mp3'},
+        {title:'FRIED',src:'REMIX/TOLDYOU/9 - FRIED.mp3'},
+        {title:'CARNIVAL',src:'REMIX/TOLDYOU/10 - CARNIVAL.mp3'},
+        {title:'HOODRAT',src:'REMIX/TOLDYOU/11 - HOODRAT.mp3'},
+        {title:'VULTURES',src:'REMIX/TOLDYOU/12 - VULTURES.mp3'},
+        {title:'SHE DEAD',src:'REMIX/TOLDYOU/13 - SHE DEAD.mp3'},
+        {title:'RIVER',src:'REMIX/TOLDYOU/14 - RIVER.mp3'},
+        {title:'MELROSE',src:'REMIX/TOLDYOU/15 - MELROSE.mp3'},
+        {title:'BEG FORGIVENESS',src:'REMIX/TOLDYOU/16 - BEG FORGIVENESS.mp3'},
+        {title:"DON'T DIE",src:"REMIX/TOLDYOU/17 - DON'T DIE.mp3"},
+        {title:'NOT INCLUSIVE',src:'REMIX/TOLDYOU/18 - NOT INCLUSIVE.mp3'},
+        {title:'PAPA WANNA SEE',src:'REMIX/TOLDYOU/19 - PAPA WANNA SEE.mp3'},
+        {title:'SECURITY',src:'REMIX/TOLDYOU/20 - SECURITY.mp3'},
+        {title:'SO SOON',src:'REMIX/TOLDYOU/21 - SO SOON.mp3'},
+        {title:'ALL THE LOVE',src:'REMIX/TOLDYOU/22 - ALL THE LOVE.mp3'},
+        {title:'DARK MATTER',src:'REMIX/TOLDYOU/23 - DARK MATTER.mp3'}
+    ]}
+];
+
+/* ── DATI LAB ───────────────────────────────────────────── */
+const songDatabase = {
+    "love-everyone":{ albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:{
+        "love":{title:"LOVE",stems:{vocals:'stems/love-everyone/love/vocals.mp3',drums:'stems/love-everyone/love/drums.mp3',bass:'stems/love-everyone/love/bass.mp3',melody:'stems/love-everyone/love/melody.mp3'}},
+        "my-soul":{title:"MY SOUL",stems:{vocals:'stems/love-everyone/my-soul/vocals.mp3',drums:'stems/love-everyone/my-soul/drums.mp3',bass:'stems/love-everyone/my-soul/bass.mp3',melody:'stems/love-everyone/my-soul/melody.mp3'}},
+        "buzz":{title:"BUZZ",stems:{vocals:'stems/love-everyone/buzz/vocals.mp3',drums:'stems/love-everyone/buzz/drums.mp3',bass:'stems/love-everyone/buzz/bass.mp3',melody:'stems/love-everyone/buzz/melody.mp3'}},
+        "vsn":{title:"VSN",stems:{vocals:'stems/love-everyone/vsn/vocals.mp3',drums:'stems/love-everyone/vsn/drums.mp3',bass:'stems/love-everyone/vsn/bass.mp3',melody:'stems/love-everyone/vsn/melody.mp3'}},
+        "i-will":{title:"I WILL",stems:{vocals:'stems/love-everyone/i-will/vocals.mp3',drums:'stems/love-everyone/i-will/drums.mp3',bass:'stems/love-everyone/i-will/bass.mp3',melody:'stems/love-everyone/i-will/melody.mp3'}},
+        "stadium":{title:"STADIUM",stems:{vocals:'stems/love-everyone/stadium/vocals.mp3',drums:'stems/love-everyone/stadium/drums.mp3',bass:'stems/love-everyone/stadium/bass.mp3',melody:'stems/love-everyone/stadium/melody.mp3'}},
+        "church":{title:"CHURCH",stems:{vocals:'stems/love-everyone/church/vocals.mp3',drums:'stems/love-everyone/church/drums.mp3',bass:'stems/love-everyone/church/bass.mp3',melody:'stems/love-everyone/church/melody.mp3'}},
+        "wolves-cry":{title:"WOLVES CRY",stems:{vocals:'stems/love-everyone/wolves-cry/vocals.mp3',drums:'stems/love-everyone/wolves-cry/drums.mp3',bass:'stems/love-everyone/wolves-cry/bass.mp3',melody:'stems/love-everyone/wolves-cry/melody.mp3'}}
+    }},
+    "hate-everyone":{ albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:{
+        "jews-hands":{title:"JEWS HANDS",stems:{vocals:'stems/hate-everyone/jews-hands/vocals.mp3',drums:'stems/hate-everyone/jews-hands/drums.mp3',bass:'stems/hate-everyone/jews-hands/bass.mp3',melody:'stems/hate-everyone/jews-hands/melody.mp3'}},
+        "angel":{title:"ANGEL",stems:{vocals:'stems/hate-everyone/angel/vocals.mp3',drums:'stems/hate-everyone/angel/drums.mp3',bass:'stems/hate-everyone/angel/bass.mp3',melody:'stems/hate-everyone/angel/melody.mp3'}},
+        "blind":{title:"BLIND",stems:{vocals:'stems/hate-everyone/blind/vocals.mp3',drums:'stems/hate-everyone/blind/drums.mp3',bass:'stems/hate-everyone/blind/bass.mp3',melody:'stems/hate-everyone/blind/melody.mp3'}},
+        "bark":{title:"BARK",stems:{vocals:'stems/hate-everyone/bark/vocals.mp3',drums:'stems/hate-everyone/bark/drums.mp3',bass:'stems/hate-everyone/bark/bass.mp3',melody:'stems/hate-everyone/bark/melody.mp3'}},
+        "ghost":{title:"GHOST",stems:{vocals:'stems/hate-everyone/ghost/vocals.mp3',drums:'stems/hate-everyone/ghost/drums.mp3',bass:'stems/hate-everyone/ghost/bass.mp3',melody:'stems/hate-everyone/ghost/melody.mp3'}},
+        "fly":{title:"FLY",stems:{vocals:'stems/hate-everyone/fly/vocals.mp3',drums:'stems/hate-everyone/fly/drums.mp3',bass:'stems/hate-everyone/fly/bass.mp3',melody:'stems/hate-everyone/fly/melody.mp3'}},
+        "maria":{title:"MARIA",stems:{vocals:'stems/hate-everyone/maria/vocals.mp3',drums:'stems/hate-everyone/maria/drums.mp3',bass:'stems/hate-everyone/maria/bass.mp3',melody:'stems/hate-everyone/maria/melody.mp3'}},
+        "pope":{title:"POPE",stems:{vocals:'stems/hate-everyone/pope/vocals.mp3',drums:'stems/hate-everyone/pope/drums.mp3',bass:'stems/hate-everyone/pope/bass.mp3',melody:'stems/hate-everyone/pope/melody.mp3'}}
+    }},
+    "laundry":{ albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:{
+        "oh-my":{title:"OH MY",stems:{vocals:'stems/laundry/oh-my/vocals.mp3',drums:'stems/laundry/oh-my/drums.mp3',bass:'stems/laundry/oh-my/bass.mp3',melody:'stems/laundry/oh-my/melody.mp3'}},
+        "bell":{title:"BELL",stems:{vocals:'stems/laundry/bell/vocals.mp3',drums:'stems/laundry/bell/drums.mp3',bass:'stems/laundry/bell/bass.mp3',melody:'stems/laundry/bell/melody.mp3'}},
+        "heaven":{title:"HEAVEN",stems:{vocals:'stems/laundry/heaven/vocals.mp3',drums:'stems/laundry/heaven/drums.mp3',bass:'stems/laundry/heaven/bass.mp3',melody:'stems/laundry/heaven/melody.mp3'}},
+        "zz":{title:"ZZ",stems:{vocals:'stems/laundry/zz/vocals.mp3',drums:'stems/laundry/zz/drums.mp3',bass:'stems/laundry/zz/bass.mp3',melody:'stems/laundry/zz/melody.mp3'}},
+        "rise":{title:"RISE",stems:{vocals:'stems/laundry/rise/vocals.mp3',drums:'stems/laundry/rise/drums.mp3',bass:'stems/laundry/rise/bass.mp3',melody:'stems/laundry/rise/melody.mp3'}},
+        "ohh":{title:"OHH",stems:{vocals:'stems/laundry/ohh/vocals.mp3',drums:'stems/laundry/ohh/drums.mp3',bass:'stems/laundry/ohh/bass.mp3',melody:'stems/laundry/ohh/melody.mp3'}},
+        "laundry":{title:"LAUNDRY",stems:{vocals:'stems/laundry/laundry/vocals.mp3',drums:'stems/laundry/laundry/drums.mp3',bass:'stems/laundry/laundry/bass.mp3',melody:'stems/laundry/laundry/melody.mp3'}},
+        "end":{title:"END",stems:{vocals:'stems/laundry/end/vocals.mp3',drums:'stems/laundry/end/drums.mp3',bass:'stems/laundry/end/bass.mp3',melody:'stems/laundry/end/melody.mp3'}}
+    }},
+    "echoes-of-nothing":{ albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:{
+        "whispers":{title:"WHISPERS",stems:{vocals:'stems/echoes-of-nothing/whispers/vocals.mp3',drums:'stems/echoes-of-nothing/whispers/drums.mp3',bass:'stems/echoes-of-nothing/whispers/bass.mp3',melody:'stems/echoes-of-nothing/whispers/melody.mp3'}},
+        "honey-light":{title:"HONEY LIGHT",stems:{vocals:'stems/echoes-of-nothing/honey-light/vocals.mp3',drums:'stems/echoes-of-nothing/honey-light/drums.mp3',bass:'stems/echoes-of-nothing/honey-light/bass.mp3',melody:'stems/echoes-of-nothing/honey-light/melody.mp3'}},
+        "between-shadows":{title:"BETWEEN SHADOWS",stems:{vocals:'stems/echoes-of-nothing/between-shadows/vocals.mp3',drums:'stems/echoes-of-nothing/between-shadows/drums.mp3',bass:'stems/echoes-of-nothing/between-shadows/bass.mp3',melody:'stems/echoes-of-nothing/between-shadows/melody.mp3'}},
+        "fields":{title:"FIELDS",stems:{vocals:'stems/echoes-of-nothing/fields/vocals.mp3',drums:'stems/echoes-of-nothing/fields/drums.mp3',bass:'stems/echoes-of-nothing/fields/bass.mp3',melody:'stems/echoes-of-nothing/fields/melody.mp3'}},
+        "golden-hunger":{title:"GOLDEN HUNGER",stems:{vocals:'stems/echoes-of-nothing/golden-hunger/vocals.mp3',drums:'stems/echoes-of-nothing/golden-hunger/drums.mp3',bass:'stems/echoes-of-nothing/golden-hunger/bass.mp3',melody:'stems/echoes-of-nothing/golden-hunger/melody.mp3'}},
+        "where-the-sky-melts":{title:"WHERE THE SKY MELTS",stems:{vocals:'stems/echoes-of-nothing/where-the-sky-melts/vocals.mp3',drums:'stems/echoes-of-nothing/where-the-sky-melts/drums.mp3',bass:'stems/echoes-of-nothing/where-the-sky-melts/bass.mp3',melody:'stems/echoes-of-nothing/where-the-sky-melts/melody.mp3'}},
+        "lantern":{title:"LANTERN",stems:{vocals:'stems/echoes-of-nothing/lantern/vocals.mp3',drums:'stems/echoes-of-nothing/lantern/drums.mp3',bass:'stems/echoes-of-nothing/lantern/bass.mp3',melody:'stems/echoes-of-nothing/lantern/melody.mp3'}},
+        "the-hours-that-flow":{title:"THE HOURS THAT FLOW",stems:{vocals:'stems/echoes-of-nothing/the-hours-that-flow/vocals.mp3',drums:'stems/echoes-of-nothing/the-hours-that-flow/drums.mp3',bass:'stems/echoes-of-nothing/the-hours-that-flow/bass.mp3',melody:'stems/echoes-of-nothing/the-hours-that-flow/melody.mp3'}}
+    }},
+    "noise":{ albumTitle:"NOISE", albumCover:"album5.jpg", tracks:{
+        "concrete":{title:"CONCRETE",stems:{vocals:'stems/noise/concrete/vocals.mp3',drums:'stems/noise/concrete/drums.mp3',bass:'stems/noise/concrete/bass.mp3',melody:'stems/noise/concrete/melody.mp3'}},
+        "particles":{title:"PARTICLES",stems:{vocals:'stems/noise/particles/vocals.mp3',drums:'stems/noise/particles/drums.mp3',bass:'stems/noise/particles/bass.mp3',melody:'stems/noise/particles/melody.mp3'}},
+        "trace":{title:"TRACE",stems:{vocals:'stems/noise/trace/vocals.mp3',drums:'stems/noise/trace/drums.mp3',bass:'stems/noise/trace/bass.mp3',melody:'stems/noise/trace/melody.mp3'}},
+        "lurk":{title:"LURK",stems:{vocals:'stems/noise/lurk/vocals.mp3',drums:'stems/noise/lurk/drums.mp3',bass:'stems/noise/lurk/bass.mp3',melody:'stems/noise/lurk/melody.mp3'}},
+        "breathe":{title:"BREATHE",stems:{vocals:'stems/noise/breathe/vocals.mp3',drums:'stems/noise/breathe/drums.mp3',bass:'stems/noise/breathe/bass.mp3',melody:'stems/noise/breathe/melody.mp3'}},
+        "grid":{title:"GRID",stems:{vocals:'stems/noise/grid/vocals.mp3',drums:'stems/noise/grid/drums.mp3',bass:'stems/noise/grid/bass.mp3',melody:'stems/noise/grid/melody.mp3'}},
+        "gear":{title:"GEAR",stems:{vocals:'stems/noise/gear/vocals.mp3',drums:'stems/noise/gear/drums.mp3',bass:'stems/noise/gear/bass.mp3',melody:'stems/noise/gear/melody.mp3'}},
+        "noise":{title:"NOISE",stems:{vocals:'stems/noise/noise/vocals.mp3',drums:'stems/noise/noise/drums.mp3',bass:'stems/noise/noise/bass.mp3',melody:'stems/noise/noise/melody.mp3'}}
+    }},
+    "land-of-the-stones":{ albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:{
+        "white":{title:"WHITE",stems:{vocals:'stems/land-of-the-stones/white/vocals.mp3',drums:'stems/land-of-the-stones/white/drums.mp3',bass:'stems/land-of-the-stones/white/bass.mp3',melody:'stems/land-of-the-stones/white/melody.mp3'}},
+        "apart":{title:"APART",stems:{vocals:'stems/land-of-the-stones/apart/vocals.mp3',drums:'stems/land-of-the-stones/apart/drums.mp3',bass:'stems/land-of-the-stones/apart/bass.mp3',melody:'stems/land-of-the-stones/apart/melody.mp3'}},
+        "dust":{title:"DUST",stems:{vocals:'stems/land-of-the-stones/dust/vocals.mp3',drums:'stems/land-of-the-stones/dust/drums.mp3',bass:'stems/land-of-the-stones/dust/bass.mp3',melody:'stems/land-of-the-stones/dust/melody.mp3'}},
+        "necromancer":{title:"NECROMANCER",stems:{vocals:'stems/land-of-the-stones/necromancer/vocals.mp3',drums:'stems/land-of-the-stones/necromancer/drums.mp3',bass:'stems/land-of-the-stones/necromancer/bass.mp3',melody:'stems/land-of-the-stones/necromancer/melody.mp3'}},
+        "hollow":{title:"HOLLOW",stems:{vocals:'stems/land-of-the-stones/hollow/vocals.mp3',drums:'stems/land-of-the-stones/hollow/drums.mp3',bass:'stems/land-of-the-stones/hollow/bass.mp3',melody:'stems/land-of-the-stones/hollow/melody.mp3'}},
+        "alone":{title:"ALONE",stems:{vocals:'stems/land-of-the-stones/alone/vocals.mp3',drums:'stems/land-of-the-stones/alone/drums.mp3',bass:'stems/land-of-the-stones/alone/bass.mp3',melody:'stems/land-of-the-stones/alone/melody.mp3'}},
+        "cave":{title:"CAVE",stems:{vocals:'stems/land-of-the-stones/cave/vocals.mp3',drums:'stems/land-of-the-stones/cave/drums.mp3',bass:'stems/land-of-the-stones/cave/bass.mp3',melody:'stems/land-of-the-stones/cave/melody.mp3'}},
+        "lost-in-the-land":{title:"LOST IN THE LAND",stems:{vocals:'stems/land-of-the-stones/lost-in-the-land/vocals.mp3',drums:'stems/land-of-the-stones/lost-in-the-land/drums.mp3',bass:'stems/land-of-the-stones/lost-in-the-land/bass.mp3',melody:'stems/land-of-the-stones/lost-in-the-land/melody.mp3'}}
+    }}
+};
+
+/* ══════════════════════════════════════════════════════════
+   SPLASH SCREEN
+   ══════════════════════════════════════════════════════════ */
+(function() {
+    const splash     = document.getElementById('splash');
+    const splashVideo= document.getElementById('splash-video');
+    let dismissed    = false;
+
+    function dismissSplash() {
+        if (dismissed) return;
+        dismissed = true;
+        splashVideo.pause();
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 500);
+    }
+
+    // Fine video (2 secondi) → dismiss automatico
+    splashVideo.addEventListener('ended', dismissSplash);
+    // Sicurezza: dopo 2.5s dismiss comunque
+    setTimeout(dismissSplash, 2500);
+
+    // Click / tap → skip immediato
+    splash.addEventListener('click', dismissSplash);
+})();
+
+/* ══════════════════════════════════════════════════════════
+   ROUTING SPA
+   ══════════════════════════════════════════════════════════ */
+const ALL_PAGES = ['snd','rmx','lab','vsn','shop'];
+let currentPage = null;
+
+function navigateTo(page) {
+    if (!ALL_PAGES.includes(page)) page = 'snd';
+    if (page === currentPage) return;
+    if (currentPage) {
+        document.getElementById('page-' + currentPage).classList.remove('active');
+        if (currentPage === 'vsn') vsnPause();
+    }
+    currentPage = page;
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.text-menu a').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === page);
+    });
+    history.pushState({ page }, '', '#' + page);
+    const titles = { snd:'SND', rmx:'RMX', lab:'LAB', vsn:'VSN', shop:'SHOP' };
+    document.title = titles[page] || 'VSN';
+    if (page === 'vsn') vsnResume();
+    window.scrollTo(0, 0);
+}
+
+document.querySelectorAll('.text-menu a[data-page]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); navigateTo(a.dataset.page); });
+});
+window.addEventListener('popstate', e => {
+    const page = (e.state && e.state.page) || location.hash.replace('#','') || 'snd';
+    navigateTo(page);
+});
+(function() {
+    const hash = location.hash.replace('#','');
+    navigateTo(ALL_PAGES.includes(hash) ? hash : 'snd');
+})();
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL AUDIO PLAYER (SND / RMX)
+   + LOGICA SORGENTE ATTIVA (snd | lab)
+   ══════════════════════════════════════════════════════════ */
+const globalAudio = new Audio();
+let gAlbumList  = sndAlbums;
+let gAlbumIndex = 0;
+let gTrackIndex = 0;
+let gIsPlaying  = false;
+
+// 'snd' = player SND/RMX attivo, 'lab' = stem LAB attivi
+let activeSource = 'snd';
+
+const gPC    = document.getElementById('global-player-container');
+const barCov = document.getElementById('bar-album-cover');
+const barTrk = document.getElementById('bar-track-title');
+const barAlb = document.getElementById('bar-album-title');
+const barPP  = document.getElementById('bar-play-pause-btn');
+const expPl  = document.getElementById('player-expanded');
+const expCov = document.getElementById('expanded-album-cover');
+const expAlb = document.getElementById('expanded-album-title');
+const expTrk = document.getElementById('expanded-track-title');
+const gProg  = document.getElementById('global-progress-bar');
+const gCurT  = document.getElementById('global-current-time');
+const gDur   = document.getElementById('global-duration');
+const gPrevB = document.getElementById('global-prev-btn');
+const gPlayB = document.getElementById('global-play-pause-btn');
+const gNextB = document.getElementById('global-next-btn');
+const mainNav        = document.getElementById('main-nav');
+const modalBackdrop  = document.getElementById('modal-backdrop');
+const tracklistModal = document.getElementById('tracklist-modal');
+const closeTlBtn     = document.getElementById('close-tracklist-btn');
+const tlContent      = document.getElementById('tracklist-content');
+const barClickable   = document.getElementById('open-expanded-player');
+
+/* ── Aggiorna icone play/pause in base alla sorgente attiva ── */
+function gUpdateUI() {
+    const playing = activeSource === 'lab' ? isPlaying : gIsPlaying;
+    barPP.innerHTML  = playing ? PAUSE_SVG : PLAY_SVG;
+    gPlayB.innerHTML = playing ? PAUSE_SVG : PLAY_SVG;
+}
+
+/* ── Mostra nel miniplayer una traccia SND/RMX ── */
+function gLoadTrack(albumIndex, trackIndex, autoPlay) {
+    gAlbumIndex = albumIndex;
+    gTrackIndex = trackIndex;
+    const album = gAlbumList[albumIndex];
+    const track = album.tracks[trackIndex];
+    globalAudio.src    = track.src;
+    activeSource       = 'snd';
+    // miniplayer
+    barCov.src         = album.albumCover;
+    barTrk.textContent = track.title;
+    barAlb.textContent = album.albumTitle;
+    barAlb.style.color = '#555';
+    // ripristina click → expanded player
+    barClickable.dataset.labMode = '';
+    // expanded player
+    expCov.src         = album.albumCover;
+    expTrk.textContent = track.title;
+    expAlb.textContent = album.albumTitle;
+    gPC.classList.remove('hidden');
+    gPrevB.style.visibility = '';
+    gNextB.style.visibility = '';
+    gProg.style.display     = '';
+    gCurT.parentElement.style.display = '';
+    gProg.value        = 0;
+    gCurT.textContent  = '0:00';
+    globalAudio.addEventListener('loadedmetadata', () => {
+        gDur.textContent = formatTime(globalAudio.duration || 0);
+    }, { once: true });
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title, artist: 'VSN', album: album.albumTitle,
+            artwork: [{ src: album.albumCover, type: 'image/jpeg' }]
+        });
+    }
+    if (autoPlay) gPlayAudio();
+    else gUpdateUI();
+}
+
+/* ── Mostra nel miniplayer la traccia LAB (stem) ── */
+function labUpdateMiniplayer(cover, title, albumTitle, labIsCurrentlyPlaying) {
+    activeSource = 'lab';
+    barCov.src         = cover;
+    barTrk.textContent = title;
+    barAlb.textContent = 'LAB — ' + albumTitle;
+    barAlb.style.color = '#888';
+    // click sulla barra → vai al LAB
+    barClickable.dataset.labMode = 'true';
+    gPC.classList.remove('hidden');
+    gUpdateUI();
+}
+
+function gPlayAudio() {
+    globalAudio.play().catch(() => {});
+    gIsPlaying = true;
+    gUpdateUI();
+}
+function gPauseAudio() {
+    globalAudio.pause();
+    gIsPlaying = false;
+    gUpdateUI();
+}
+
+/* ── Toggle unificato: agisce su chi è attivo ── */
+function gToggle() {
+    if (activeSource === 'lab') {
+        togglePlayback(); // funzione del LAB
+    } else {
+        if (gIsPlaying) gPauseAudio(); else gPlayAudio();
+    }
+}
+
+function gNextFn() {
+    if (activeSource === 'lab') return; // nessun next per il LAB
+    gTrackIndex = (gTrackIndex + 1) % gAlbumList[gAlbumIndex].tracks.length;
+    gLoadTrack(gAlbumIndex, gTrackIndex, gIsPlaying);
+}
+function gPrevFn() {
+    if (activeSource === 'lab') return;
+    const len = gAlbumList[gAlbumIndex].tracks.length;
+    gTrackIndex = (gTrackIndex - 1 + len) % len;
+    gLoadTrack(gAlbumIndex, gTrackIndex, gIsPlaying);
+}
+
+globalAudio.addEventListener('timeupdate', () => {
+    if (activeSource !== 'snd') return;
+    const d = globalAudio.duration || 0;
+    gProg.value       = d ? (globalAudio.currentTime / d) * 100 : 0;
+    gCurT.textContent = formatTime(globalAudio.currentTime);
+});
+globalAudio.addEventListener('ended', gNextFn);
+gProg.addEventListener('input', () => {
+    if (activeSource !== 'snd') return;
+    globalAudio.currentTime = (gProg.value / 100) * (globalAudio.duration || 0);
+});
+barPP.addEventListener('click', gToggle);
+gPlayB.addEventListener('click', gToggle);
+gNextB.addEventListener('click', gNextFn);
+gPrevB.addEventListener('click', gPrevFn);
+
+/* ── Click sulla barra: LAB → vai al LAB; SND → apri expanded ── */
+barClickable.addEventListener('click', () => {
+    if (barClickable.dataset.labMode === 'true') {
+        navigateTo('lab');
+    } else {
+        expPl.classList.add('active');
+        mainNav.classList.add('hidden-by-player');
+    }
+});
+document.getElementById('close-expanded-btn').addEventListener('click', () => {
+    expPl.classList.remove('active');
+    mainNav.classList.remove('hidden-by-player');
+});
+if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('play', () => {
+        if (activeSource === 'lab') { if (!isPlaying) playAll(); }
+        else gPlayAudio();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+        if (activeSource === 'lab') { if (isPlaying) stopAll(); }
+        else gPauseAudio();
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', gPrevFn);
+    navigator.mediaSession.setActionHandler('nexttrack', gNextFn);
+}
+
+/* ── TRACKLIST MODAL (SND/RMX) ─────────────────────────── */
+function showTracklist(albumIndex) {
+    const album = gAlbumList[albumIndex];
+    tlContent.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = album.albumCover; img.className = 'tracklist-cover';
+    tlContent.appendChild(img);
+    const h3 = document.createElement('h3');
+    h3.textContent = album.albumTitle; h3.className = 'tracklist-album-title';
+    tlContent.appendChild(h3);
+    const ol = document.createElement('ol');
+    ol.className = 'tracklist-ol';
+    album.tracks.forEach((t, ti) => {
+        const li = document.createElement('li');
+        li.textContent = t.title; li.className = 'tracklist-item';
+        li.dataset.albumIndex = albumIndex; li.dataset.trackIndex = ti;
+        ol.appendChild(li);
+    });
+    tlContent.appendChild(ol);
+    modalBackdrop.classList.add('active');
+    tracklistModal.classList.add('active');
+    mainNav.classList.add('hidden-by-player');
+}
+function closeTracklist() {
+    modalBackdrop.classList.remove('active');
+    tracklistModal.classList.remove('active');
+    mainNav.classList.remove('hidden-by-player');
+}
+closeTlBtn.addEventListener('click', closeTracklist);
+modalBackdrop.addEventListener('click', closeTracklist);
+tlContent.addEventListener('click', e => {
+    const li = e.target.closest('.tracklist-item');
+    if (!li) return;
+    // Avvio SND/RMX → ferma e resetta completamente il LAB
+    labStopAndReset();
+    gLoadTrack(parseInt(li.dataset.albumIndex), parseInt(li.dataset.trackIndex), true);
+    closeTracklist();
+});
+document.querySelectorAll('.snd-cover').forEach(img => {
+    img.addEventListener('click', e => {
+        gAlbumList = sndAlbums;
+        showTracklist(parseInt(e.currentTarget.dataset.albumIndex));
+    });
+});
+document.querySelectorAll('.rmx-cover').forEach(img => {
+    img.addEventListener('click', e => {
+        gAlbumList = rmxAlbums;
+        showTracklist(parseInt(e.currentTarget.dataset.albumIndex));
+    });
+});
+
+/* ══════════════════════════════════════════════════════════
+   LAB — STEM PLAYER
+   ══════════════════════════════════════════════════════════ */
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioContext    = null;
+let audioBuffers    = {};
+let sourceNodes     = {};
+let gainNodes       = {};
+let isPlaying       = false;
+let currentTrackData= null;
+let isLoading       = false;
+let songDuration    = 0;
+let startTime       = 0;
+let startOffset     = 0;
+let animationFrameId= null;
+
+const playButton           = document.getElementById('lab-play-pause-btn');
+const progressBar          = document.getElementById('lab-progress-bar');
+const currentTimeEl        = document.getElementById('lab-current-time');
+const durationEl           = document.getElementById('lab-duration');
+const songSelectorBox      = document.getElementById('song-selector-box');
+const selectedTrackTitleEl = document.getElementById('selected-track-title');
+const selectedTrackArtistEl= document.getElementById('selected-track-artist');
+const selectedTrackCoverEl = document.getElementById('selected-track-cover');
+const labModalBackdrop     = document.getElementById('lab-modal-backdrop');
+const labTracklistModal    = document.getElementById('lab-tracklist-modal');
+const labCloseTlBtn        = document.getElementById('lab-close-tracklist-btn');
+const labTlContent         = document.getElementById('lab-tracklist-content');
+const sliders = {
+    vocals: document.getElementById('stem-vocals'),
+    drums:  document.getElementById('stem-drums'),
+    bass:   document.getElementById('stem-bass'),
+    melody: document.getElementById('stem-melody')
+};
+const lights = {
+    vocals: document.getElementById('light-vocals'),
+    drums:  document.getElementById('light-drums'),
+    bass:   document.getElementById('light-bass'),
+    melody: document.getElementById('light-melody')
+};
+
+function ensureAudioContext() {
+    if (!audioContext) audioContext = new AudioContext();
+    if (audioContext.state === 'suspended') audioContext.resume();
+}
+
+function setAllControlsDisabled(disabled) {
+    playButton.disabled  = disabled;
+    progressBar.disabled = disabled;
+    Object.values(sliders).forEach(s => s.disabled = disabled);
+    Object.values(lights).forEach(l => l.classList.remove('active'));
+    if (disabled) {
+        progressBar.value         = 0;
+        currentTimeEl.textContent = '0:00';
+        durationEl.textContent    = '0:00';
+        playButton.innerHTML      = PLAY_SVG;
+    }
+}
+
+async function loadSong(albumKey, trackKey) {
+    const albumData = songDatabase[albumKey];
+    const trackData = albumData.tracks[trackKey];
+    if (!trackData || !trackData.stems || isLoading || currentTrackData === trackData) return;
+
+    // Avvio caricamento stem → ferma SND/RMX
+    if (gIsPlaying) gPauseAudio();
+
+    isLoading = true;
+    currentTrackData = trackData;
+    if (isPlaying) stopAll();
+
+    setAllControlsDisabled(true);
+    playButton.innerHTML = LOAD_SVG;
+
+    selectedTrackTitleEl.textContent  = trackData.title;
+    selectedTrackArtistEl.textContent = albumData.albumTitle;
+    selectedTrackCoverEl.src          = albumData.albumCover;
+    selectedTrackCoverEl.classList.remove('hidden');
+
+    // Reset slider a 100 per ogni nuova traccia
+    Object.values(sliders).forEach(s => s.value = 100);
+
+    audioBuffers = {};
+    songDuration = 0;
+    startOffset  = 0;
+
+    ensureAudioContext();
+
+    const stemPaths = trackData.stems;
+    await Promise.all(Object.keys(stemPaths).map(k => loadStem(k, stemPaths[k])));
+
+    const loadedKeys   = Object.keys(audioBuffers);
+    const requiredKeys = Object.keys(stemPaths).filter(k => stemPaths[k]);
+
+    if (loadedKeys.length === requiredKeys.length && loadedKeys.length > 0) {
+        playButton.disabled  = false;
+        progressBar.disabled = false;
+        Object.values(sliders).forEach(s => s.disabled = false);
+        playButton.innerHTML   = PLAY_SVG;
+        songDuration           = audioBuffers[loadedKeys[0]].duration;
+        durationEl.textContent = formatTime(songDuration);
+        Object.values(lights).forEach(l => l.classList.add('active'));
+        setupGainNodes();
+        // Aggiorna il miniplayer globale con i dati della traccia LAB
+        labUpdateMiniplayer(albumData.albumCover, trackData.title, albumData.albumTitle, false);
+    } else {
+        selectedTrackTitleEl.textContent  = 'LOAD ERROR';
+        selectedTrackArtistEl.textContent = 'Mancano file stem';
+        selectedTrackCoverEl.classList.add('hidden');
+        currentTrackData = null;
+        playButton.innerHTML = PLAY_SVG;
+    }
+    isLoading = false;
+}
+
+async function loadStem(key, url) {
+    if (!url) return;
+    try {
+        const resp = await fetch(url);
+        const ab   = await resp.arrayBuffer();
+        audioBuffers[key] = await audioContext.decodeAudioData(ab);
+    } catch(e) { console.error('Stem load error:', key, e); }
+}
+
+function setupGainNodes() {
+    Object.values(gainNodes).forEach(n => n.disconnect());
+    gainNodes = {};
+    for (const key in audioBuffers) {
+        const g = audioContext.createGain();
+        g.connect(audioContext.destination);
+        g.gain.value = sliders[key] ? sliders[key].value / 100 : 1;
+        gainNodes[key] = g;
+    }
+}
+
+function playAll(offset) {
+    if (typeof offset === 'undefined') offset = startOffset;
+    ensureAudioContext();
+    sourceNodes = {};
+    startTime   = audioContext.currentTime;
+    startOffset = offset;
+    for (const key in audioBuffers) {
+        const src = audioContext.createBufferSource();
+        src.buffer = audioBuffers[key];
+        src.loop   = false;
+        if (gainNodes[key]) {
+            src.connect(gainNodes[key]);
+            src.start(0, offset);
+            sourceNodes[key] = src;
+        }
+    }
+    isPlaying = true;
+    playButton.innerHTML = PAUSE_SVG;
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    updateLabProgress();
+    // Sincronizza icona miniplayer globale
+    if (activeSource === 'lab') gUpdateUI();
+}
+
+function stopAll() {
+    if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+    if (!isPlaying) return;
+    startOffset = startOffset + (audioContext.currentTime - startTime);
+    for (const key in sourceNodes) {
+        try { sourceNodes[key].stop(0); sourceNodes[key].disconnect(); } catch(e) {}
+    }
+    sourceNodes = {};
+    isPlaying   = false;
+    playButton.innerHTML = PLAY_SVG;
+    // Sincronizza icona miniplayer globale
+    if (activeSource === 'lab') gUpdateUI();
+}
+
+function togglePlayback() {
+    if (!currentTrackData || isLoading) return;
+    if (isPlaying) {
+        stopAll();
+    } else {
+        // Avvio riproduzione stem → ferma SND/RMX
+        if (gIsPlaying) gPauseAudio();
+        playAll();
+    }
+}
+
+function updateLabProgress() {
+    if (!isPlaying || !songDuration || !audioContext) return;
+    const elapsed = audioContext.currentTime - startTime;
+    const pos     = startOffset + elapsed;
+    if (pos >= songDuration) {
+        stopAll();
+        startOffset               = 0;
+        progressBar.value         = 0;
+        currentTimeEl.textContent = formatTime(0);
+        return;
+    }
+    progressBar.value         = (pos / songDuration) * 100;
+    currentTimeEl.textContent = formatTime(pos);
+    animationFrameId = requestAnimationFrame(updateLabProgress);
+}
+
+function handleScrubbing() {
+    if (!songDuration) return;
+    const wasPlaying = isPlaying;
+    if (wasPlaying) stopAll();
+    const newOffset = (progressBar.value / 100) * songDuration;
+    startOffset     = newOffset;
+    currentTimeEl.textContent = formatTime(newOffset);
+    if (wasPlaying) playAll(newOffset);
+}
+
+// Ferma e resetta tutto il LAB (chiamato quando SND/RMX avvia una traccia)
+function labStopAndReset() {
+    if (isPlaying) stopAll();
+    currentTrackData = null;
+    isLoading        = false;
+    audioBuffers     = {};
+    sourceNodes      = {};
+    gainNodes        = {};
+    startOffset      = 0;
+    songDuration     = 0;
+    setAllControlsDisabled(true);
+    selectedTrackTitleEl.textContent  = 'LOAD STEMS';
+    selectedTrackArtistEl.textContent = 'SELECT A TRACK';
+    selectedTrackCoverEl.classList.add('hidden');
+    Object.values(sliders).forEach(s => s.value = 100);
+    // Ripristina il miniplayer alla modalità SND/RMX
+    activeSource = 'snd';
+    barClickable.dataset.labMode = '';
+    barAlb.style.color = '#555';
+}
+
+// Slider
+for (const key in sliders) {
+    sliders[key].addEventListener('input', e => {
+        const vol = e.target.value / 100;
+        if (gainNodes[key]) gainNodes[key].gain.setValueAtTime(vol, audioContext ? audioContext.currentTime : 0);
+        if (lights[key]) lights[key].classList.toggle('active', vol > 0);
+    });
+}
+playButton.addEventListener('click', togglePlayback);
+progressBar.addEventListener('input', handleScrubbing);
+
+/* ── LAB MODAL ─────────────────────────────────────────── */
+function openLabModal() {
+    labTlContent.innerHTML = '';
+    for (const albumKey in songDatabase) {
+        const album  = songDatabase[albumKey];
+        const header = document.createElement('div');
+        header.className = 'modal-album-header'; header.dataset.albumKey = albumKey;
+        const cover = document.createElement('img');
+        cover.src = album.albumCover; cover.className = 'modal-album-cover';
+        const title = document.createElement('h3');
+        title.className = 'modal-album-title'; title.textContent = album.albumTitle;
+        header.appendChild(cover); header.appendChild(title);
+        labTlContent.appendChild(header);
+        const ol = document.createElement('ol');
+        ol.className = 'modal-tracklist'; ol.id = 'lab-tl-' + albumKey;
+        let hasTracks = false;
+        for (const trackKey in album.tracks) {
+            const track = album.tracks[trackKey];
+            if (!track.stems) continue;
+            hasTracks = true;
+            const li = document.createElement('li');
+            li.className = 'modal-track-item'; li.textContent = track.title;
+            li.dataset.albumKey = albumKey; li.dataset.trackKey = trackKey;
+            ol.appendChild(li);
+        }
+        if (hasTracks) labTlContent.appendChild(ol);
+        else header.style.display = 'none';
+    }
+    labModalBackdrop.classList.add('active');
+    labTracklistModal.classList.add('active');
+}
+function closeLabModal() {
+    labModalBackdrop.classList.remove('active');
+    labTracklistModal.classList.remove('active');
+}
+songSelectorBox.addEventListener('click', openLabModal);
+labCloseTlBtn.addEventListener('click', closeLabModal);
+labModalBackdrop.addEventListener('click', closeLabModal);
+labTlContent.addEventListener('click', e => {
+    const header = e.target.closest('.modal-album-header');
+    const track  = e.target.closest('.modal-track-item');
+    if (header) {
+        const ol = document.getElementById('lab-tl-' + header.dataset.albumKey);
+        if (ol) ol.classList.toggle('open');
+    } else if (track) {
+        const td = songDatabase[track.dataset.albumKey].tracks[track.dataset.trackKey];
+        if (!td.stems || !td.stems.vocals) {
+            alert('Stem per questa traccia non ancora disponibili.');
+        } else {
+            loadSong(track.dataset.albumKey, track.dataset.trackKey);
+            closeLabModal();
+        }
+    }
+});
+
+// Init LAB
+setAllControlsDisabled(true);
+playButton.innerHTML = PLAY_SVG;
+selectedTrackCoverEl.classList.add('hidden');
+
+/* ══════════════════════════════════════════════════════════
+   VSN — SOLAR SYSTEM
+   ══════════════════════════════════════════════════════════ */
+let vsnAngle         = 0;
+let vsnCurrentSpeed  = 0;
+let vsnTargetSpeed   = 0;
+let vsnNormalSpeed   = 0;
+let vsnRafId         = null;
+let vsnInited        = false;
+
+function getVsnNormal() { return window.innerWidth <= 600 ? 0.05 : 0.08; }
+
+function vsnResume() {
+    if (!vsnInited) {
+        vsnInited       = true;
+        vsnNormalSpeed  = getVsnNormal();
+        vsnTargetSpeed  = vsnNormalSpeed;
+        vsnCurrentSpeed = vsnNormalSpeed;
+
+        window.addEventListener('resize', () => {
+            const ns = getVsnNormal();
+            if (Math.abs(vsnTargetSpeed - vsnNormalSpeed) < 0.001) vsnTargetSpeed = ns;
+            vsnNormalSpeed = ns;
+        });
+
+        const solarSystem  = document.getElementById('solar-system');
+        const antiSpinners = document.querySelectorAll('.cd-anti-spinner');
+        const cdContents   = document.querySelectorAll('.cd-content');
+        const centerText   = document.getElementById('center-text');
+        let currentFocused = null;
+        const isTouch = () => window.matchMedia('(hover: none)').matches;
+
+        function showCenterText(title) {
+            centerText.textContent          = title;
+            centerText.style.opacity        = '1';
+            centerText.style.visibility     = 'visible';
+            centerText.style.transform      = 'translate(-50%, -50%) scale(1)';
+            vsnTargetSpeed = 0;
+            solarSystem.classList.add('hover-active');
+        }
+        function hideCenterText() {
+            centerText.style.opacity    = '0';
+            centerText.style.visibility = 'hidden';
+            centerText.style.transform  = 'translate(-50%, -50%) scale(0.9)';
+            vsnTargetSpeed = vsnNormalSpeed;
+            solarSystem.classList.remove('hover-active');
+        }
+
+        cdContents.forEach(el => {
+            const title = el.dataset.title;
+            const src   = el.dataset.src;
+            el.addEventListener('mouseenter', () => { if (!isTouch()) showCenterText(title); });
+            el.addEventListener('mouseleave', () => { if (!isTouch()) hideCenterText(); });
+            el.addEventListener('click', e => {
+                if (isTouch()) {
+                    if (currentFocused !== el) {
+                        e.preventDefault();
+                        if (currentFocused) currentFocused.classList.remove('touch-focus');
+                        currentFocused = el;
+                        el.classList.add('touch-focus');
+                        showCenterText(title);
+                    } else {
+                        vsnOpenModal(src, title);
+                    }
+                } else {
+                    vsnOpenModal(src, title);
+                }
+            });
+        });
+
+        document.addEventListener('click', e => {
+            if (isTouch() && currentFocused && !e.target.closest('.cd-content')) {
+                currentFocused.classList.remove('touch-focus');
+                currentFocused = null;
+                hideCenterText();
+            }
+        });
+
+        document.getElementById('close-3d-btn').addEventListener('click', vsnCloseModal);
+    }
+
+    // (Re)avvia il RAF se non è in esecuzione
+    if (!vsnRafId) {
+        const solarSystem  = document.getElementById('solar-system');
+        const antiSpinners = document.querySelectorAll('.cd-anti-spinner');
+        function frame() {
+            vsnCurrentSpeed += (vsnTargetSpeed - vsnCurrentSpeed) * 0.05;
+            vsnAngle        += vsnCurrentSpeed;
+            solarSystem.style.transform = `rotate(${vsnAngle}deg)`;
+            antiSpinners.forEach(s => s.style.transform = `rotate(${-vsnAngle}deg)`);
+            vsnRafId = requestAnimationFrame(frame);
+        }
+        vsnRafId = requestAnimationFrame(frame);
+    }
+}
+
+function vsnPause() {
+    if (vsnRafId) { cancelAnimationFrame(vsnRafId); vsnRafId = null; }
+}
+
+function vsnOpenModal(src, title) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('model-container').innerHTML =
+        `<model-viewer src="${src}" auto-rotate camera-controls shadow-intensity="1" ar ar-scale="auto" ar-modes="webxr scene-viewer quick-look"></model-viewer>`;
+    document.getElementById('modal-3d').classList.remove('hidden');
+}
+function vsnCloseModal() {
+    document.getElementById('modal-3d').classList.add('hidden');
+    document.getElementById('model-container').innerHTML = '';
+}
+
+/* ══════════════════════════════════════════════════════════
+   SHOP
+   ══════════════════════════════════════════════════════════ */
+let selectedAlbums = [];
+
+document.querySelectorAll('.shop-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const name = item.dataset.albumName;
+        const idx  = selectedAlbums.indexOf(name);
+        if (idx > -1) { selectedAlbums.splice(idx, 1); item.classList.remove('selected'); }
+        else          { selectedAlbums.push(name);     item.classList.add('selected');    }
+        updateShopSummary();
+    });
+});
+
+function updateShopSummary() {
+    const summary = document.getElementById('visual-summary');
+    if (selectedAlbums.length > 0) {
+        summary.innerHTML   = selectedAlbums.map(a => `<div>• ${a}</div>`).join('');
+        summary.style.color = 'black';
+    } else {
+        summary.textContent = 'No albums selected';
+        summary.style.color = '#aaa';
+    }
+}
+
+document.getElementById('shop-submit-btn').addEventListener('click', async () => {
+    if (selectedAlbums.length === 0) { alert('Please select at least one album.'); return; }
+    const email = document.getElementById('shop-email').value.trim();
+    if (!email) { alert('Please enter your email.'); return; }
+    const btn = document.getElementById('shop-submit-btn');
+    btn.disabled = true; btn.textContent = 'SENDING...';
+    try {
+        const resp = await fetch('https://formspree.io/f/xgoovval', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ albums: selectedAlbums.join(', '), email })
+        });
+        if (resp.ok) {
+            document.getElementById('recap-list').innerHTML = selectedAlbums.map(a => `<div>• ${a}</div>`).join('');
+            document.getElementById('shop-content').classList.add('hidden-el');
+            document.getElementById('success-message').classList.remove('hidden-el');
+        } else {
+            alert('Error. Please try again.');
+            btn.disabled = false; btn.textContent = 'SEND ORDER REQUEST';
+        }
+    } catch(e) {
+        alert('Error. Connection issue.');
+        btn.disabled = false; btn.textContent = 'SEND ORDER REQUEST';
+    }
+});
+
+document.getElementById('shop-back-btn').addEventListener('click', () => {
+    selectedAlbums = [];
+    document.querySelectorAll('.shop-item').forEach(i => i.classList.remove('selected'));
+    updateShopSummary();
+    document.getElementById('shop-email').value = '';
+    document.getElementById('success-message').classList.add('hidden-el');
+    document.getElementById('shop-content').classList.remove('hidden-el');
+    const btn = document.getElementById('shop-submit-btn');
+    btn.disabled = false; btn.textContent = 'SEND ORDER REQUEST';
+});
+
+</script>
 </body>
 </html>
