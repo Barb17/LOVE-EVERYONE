@@ -1701,6 +1701,50 @@ document.getElementById('shop-back-btn').addEventListener('click', () => {
     btn.disabled = false; btn.textContent = 'SEND ORDER REQUEST';
 });
 
+/* ══════════════════════════════════════════════════════════
+   PWA — Service Worker Registration
+   ══════════════════════════════════════════════════════════
+   Registra il Service Worker che rende il sito installabile
+   come Web App e mantiene il contenuto sempre aggiornato
+   (strategia Network First: carica sempre dalla rete se
+   disponibile, usa la cache solo offline).
+   ══════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+
+            // Controlla periodicamente se è disponibile un aggiornamento del SW
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (!newWorker) return;
+
+                newWorker.addEventListener('statechange', () => {
+                    // Nuovo SW installato e pronto ad attivarsi
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Attiva subito il nuovo SW senza aspettare la chiusura della scheda
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                });
+            });
+
+            // Ricarica la pagina quando un nuovo SW prende il controllo,
+            // così l'utente vede sempre la versione più recente del sito.
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+
+            console.log('[PWA] Service Worker registrato con successo:', registration.scope);
+        } catch (err) {
+            console.warn('[PWA] Registrazione Service Worker fallita:', err);
+        }
+    });
+}
+
 </script>
 </body>
 </html>
