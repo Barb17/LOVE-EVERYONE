@@ -1,0 +1,44 @@
+{
+  "name": "LVEVR",
+  "short_name": "LVEVR",
+  "description": "LVEVR — web app ufficiale",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f0f0f0",
+  "theme_color": "#f0f0f0",
+  "icons": [
+  {
+    "src": "icons/icona.svg",
+    "sizes": "any",
+    "type": "image/svg+xml",
+    "purpose": "any"
+  },
+  {
+    "src": "icons/icona192.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "icons/icona192.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "maskable"
+  },
+  {
+    "src": "icons/icona512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "icons/icona512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "maskable"
+  }
+]
+}
