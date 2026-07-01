@@ -17,7 +17,7 @@
    ================================================================ */
 
 // La cache è stata aggiornata alla v2 per forzare il download dei nuovi file
-const CACHE_NAME = 'lvevr-cache-v2';
+const CACHE_NAME = 'lvevr-cache-v3';
 
 const PRECACHE_URLS = [
     './index.html',
