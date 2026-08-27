@@ -439,12 +439,16 @@ body {
 }
 .solar-system { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
 .cd-wrapper { position: absolute; top: 0; left: 0; }
+
+/* Calcolo 360 / 7 = 51.43 gradi di distanza */
 .cd-1 { transform: rotate(0deg)   translateY(-200px); }
-.cd-2 { transform: rotate(60deg)  translateY(-200px); }
-.cd-3 { transform: rotate(120deg) translateY(-200px); }
-.cd-4 { transform: rotate(180deg) translateY(-200px); }
-.cd-5 { transform: rotate(240deg) translateY(-200px); }
-.cd-6 { transform: rotate(300deg) translateY(-200px); }
+.cd-2 { transform: rotate(51.43deg)  translateY(-200px); }
+.cd-3 { transform: rotate(102.86deg) translateY(-200px); }
+.cd-4 { transform: rotate(154.29deg) translateY(-200px); }
+.cd-5 { transform: rotate(205.71deg) translateY(-200px); }
+.cd-6 { transform: rotate(257.14deg) translateY(-200px); }
+.cd-7 { transform: rotate(308.57deg) translateY(-200px); }
+
 .cd-anti-spinner { position: absolute; top: 0; left: 0; }
 .cd-content {
     position: absolute; top: -45px; left: -45px;
@@ -460,19 +464,24 @@ body {
 .solar-system.hover-active .cd-content.touch-focus { filter: blur(0px) brightness(1); z-index: 10; }
 .cd-content:hover img, .cd-content.touch-focus img { transform: scale(1.15); }
 .solar-system.hover-active .cd-content:not(:hover):not(.touch-focus) img { transform: scale(0.9); }
+
+/* Anti-rotazione per tenere le immagini dritte */
 .cd-1 .cd-content { transform: rotate(0deg); }
-.cd-2 .cd-content { transform: rotate(-60deg); }
-.cd-3 .cd-content { transform: rotate(-120deg); }
-.cd-4 .cd-content { transform: rotate(-180deg); }
-.cd-5 .cd-content { transform: rotate(-240deg); }
-.cd-6 .cd-content { transform: rotate(-300deg); }
+.cd-2 .cd-content { transform: rotate(-51.43deg); }
+.cd-3 .cd-content { transform: rotate(-102.86deg); }
+.cd-4 .cd-content { transform: rotate(-154.29deg); }
+.cd-5 .cd-content { transform: rotate(-205.71deg); }
+.cd-6 .cd-content { transform: rotate(-257.14deg); }
+.cd-7 .cd-content { transform: rotate(-308.57deg); }
+
 @media (max-width: 600px) {
     .cd-1 { transform: rotate(0deg)   translateY(-140px); }
-    .cd-2 { transform: rotate(60deg)  translateY(-140px); }
-    .cd-3 { transform: rotate(120deg) translateY(-140px); }
-    .cd-4 { transform: rotate(180deg) translateY(-140px); }
-    .cd-5 { transform: rotate(240deg) translateY(-140px); }
-    .cd-6 { transform: rotate(300deg) translateY(-140px); }
+    .cd-2 { transform: rotate(51.43deg)  translateY(-140px); }
+    .cd-3 { transform: rotate(102.86deg) translateY(-140px); }
+    .cd-4 { transform: rotate(154.29deg) translateY(-140px); }
+    .cd-5 { transform: rotate(205.71deg) translateY(-140px); }
+    .cd-6 { transform: rotate(257.14deg) translateY(-140px); }
+    .cd-7 { transform: rotate(308.57deg) translateY(-140px); }
     .cd-content { top: -35px; left: -35px; width: 70px; height: 70px; }
     #center-text { font-size: 0.9em; width: 120px; }
 }
@@ -589,6 +598,10 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
         <img src="album6.jpg" alt="LAND OF THE STONES" class="album-cover-clickable snd-cover" data-album-index="5">
         <h3 class="album-section-title">LAND OF THE STONES</h3>
     </div></div>
+    <div class="music-container"><div class="album">
+        <img src="album7.jpg" alt="LOVE IS BLIND" class="album-cover-clickable snd-cover" data-album-index="6">
+        <h3 class="album-section-title" aria-label="LOVE IS BLIND">⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙</h3>
+    </div></div>
 </div>
 
 <!-- RMX -->
@@ -680,6 +693,9 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
             <div class="cd-wrapper cd-6"><div class="cd-anti-spinner">
                 <div class="cd-content" data-title="LAND OF THE STONES" data-src="3D/landofthestones3d.glb">
                     <img src="album6.jpg" alt="LAND OF THE STONES"></div></div></div>
+            <div class="cd-wrapper cd-7"><div class="cd-anti-spinner">
+                <div class="cd-content" data-title="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙" data-src="3D/loveisblind3d.glb">
+                    <img src="album7.jpg" alt="LOVE IS BLIND"></div></div></div>
         </div>
     </div>
     <div id="modal-3d" class="hidden">
@@ -717,6 +733,10 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
                 </div>
                 <div class="shop-item" data-album-name="LAND OF THE STONES">
                     <img src="cdalbum6_cut.png" alt="LAND OF THE STONES"><h3>LAND OF THE STONES</h3>
+                    <div class="selection-overlay">SELECTED</div>
+                </div>
+                <div class="shop-item" data-album-name="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙">
+                    <img src="cdalbum7_cut.png" alt="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙"><h3>⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙</h3>
                     <div class="selection-overlay">SELECTED</div>
                 </div>
             </div>
@@ -833,6 +853,16 @@ const sndAlbums = [
         {title:'DUST',src:'MUSICA/1.3.3.3.3.3DUST.mp3'},{title:'NECROMANCER',src:'MUSICA/1.4.4.4.4.4NECROMANCER.mp3'},
         {title:'HOLLOW',src:'MUSICA/1.5.5.5.5.5HOLLOW.mp3'},{title:'ALONE',src:'MUSICA/1.6.6.6.6.6ALONE.mp3'},
         {title:'CAVE',src:'MUSICA/1.7.7.7.7.7CAVE.mp3'},{title:'LOST IN THE LAND',src:'MUSICA/1.8.8.8.8.8LOST IN THE LAND.mp3'}
+    ]},
+    { albumTitle:"⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙", albumCover:"album7.jpg", tracks:[
+        {title:'⠃⠇⠊⠝⠙',src:'MUSICA/LOVEISBLIND/1BLIND.mp3'},
+        {title:'⠞⠕⠥⠉⠓',src:'MUSICA/LOVEISBLIND/2TOUCH.mp3'},
+        {title:'⠞⠑⠁⠗⠎',src:'MUSICA/LOVEISBLIND/3TEARS.mp3'},
+        {title:'⠑⠙⠍',src:'MUSICA/LOVEISBLIND/4EDM.mp3'},
+        {title:'⠙⠁⠝⠉⠑',src:'MUSICA/LOVEISBLIND/5DANCE.mp3'},
+        {title:'⠗⠓⠽⠞⠓⠍',src:'MUSICA/LOVEISBLIND/6RHYTHM.mp3'},
+        {title:'⠇⠁⠞⠑',src:'MUSICA/LOVEISBLIND/7LATE.mp3'},
+        {title:'⠎⠥⠝⠎⠓⠊⠝⠑',src:'MUSICA/LOVEISBLIND/8SUNSHINE.mp3'}
     ]}
 ];
 
