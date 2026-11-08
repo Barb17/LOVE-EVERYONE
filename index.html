@@ -49,15 +49,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    /* fade-out finale */
     transition: opacity 0.5s ease;
 }
 #splash.fade-out {
     opacity: 0;
     pointer-events: none;
 }
-
-/* Video con sfondo già trasparente (webm con canale alpha) */
 #splash-video {
     width: min(340px, 80vw);
     height: auto;
@@ -101,7 +98,6 @@ body {
     .text-menu a { font-size: 0.95em; padding: 10px 2px; }
 }
 
-/* Tutte le pagine partono sotto il nav fisso */
 .page.active { padding-top: 80px; }
 
 /* ================================================================
@@ -404,7 +400,7 @@ body {
     padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;
 }
 .modal-album-header:hover { background-color: #f9f9f9; }
-.modal-album-cover { width: 60px; height: 60px; border-radius: 4px; flex-shrink: 0; }
+.modal-album-cover { width: 60px; height: 60px; border-radius: 4px; flex-shrink: 0; object-fit: cover; }
 .modal-album-title { font-size: 1.1em; font-weight: bold; margin: 0; text-transform: uppercase; }
 .modal-tracklist {
     list-style-type: decimal; padding-left: 40px; margin: 0;
@@ -421,7 +417,7 @@ body {
 .modal-track-item:last-child { border-bottom: none; }
 
 /* ================================================================
-   VSN
+   VSN (Dynamic Solar System)
    ================================================================ */
 #page-vsn { min-height: 100vh; }
 .solar-system-container {
@@ -438,21 +434,15 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease; z-index: 10;
 }
 .solar-system { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
-.cd-wrapper { position: absolute; top: 0; left: 0; }
-
-/* Calcolo 360 / 7 = 51.43 gradi di distanza */
-.cd-1 { transform: rotate(0deg)   translateY(-200px); }
-.cd-2 { transform: rotate(51.43deg)  translateY(-200px); }
-.cd-3 { transform: rotate(102.86deg) translateY(-200px); }
-.cd-4 { transform: rotate(154.29deg) translateY(-200px); }
-.cd-5 { transform: rotate(205.71deg) translateY(-200px); }
-.cd-6 { transform: rotate(257.14deg) translateY(-200px); }
-.cd-7 { transform: rotate(308.57deg) translateY(-200px); }
-
+.cd-wrapper {
+    position: absolute; top: 0; left: 0;
+    transform: rotate(var(--angle, 0deg)) translateY(-200px);
+}
 .cd-anti-spinner { position: absolute; top: 0; left: 0; }
 .cd-content {
     position: absolute; top: -45px; left: -45px;
     width: 90px; height: 90px; cursor: pointer; transition: filter 0.4s ease;
+    transform: rotate(calc(-1 * var(--angle, 0deg)));
 }
 .cd-content img {
     width: 100%; height: 100%; object-fit: cover; border-radius: 5px;
@@ -465,23 +455,8 @@ body {
 .cd-content:hover img, .cd-content.touch-focus img { transform: scale(1.15); }
 .solar-system.hover-active .cd-content:not(:hover):not(.touch-focus) img { transform: scale(0.9); }
 
-/* Anti-rotazione per tenere le immagini dritte */
-.cd-1 .cd-content { transform: rotate(0deg); }
-.cd-2 .cd-content { transform: rotate(-51.43deg); }
-.cd-3 .cd-content { transform: rotate(-102.86deg); }
-.cd-4 .cd-content { transform: rotate(-154.29deg); }
-.cd-5 .cd-content { transform: rotate(-205.71deg); }
-.cd-6 .cd-content { transform: rotate(-257.14deg); }
-.cd-7 .cd-content { transform: rotate(-308.57deg); }
-
 @media (max-width: 600px) {
-    .cd-1 { transform: rotate(0deg)   translateY(-140px); }
-    .cd-2 { transform: rotate(51.43deg)  translateY(-140px); }
-    .cd-3 { transform: rotate(102.86deg) translateY(-140px); }
-    .cd-4 { transform: rotate(154.29deg) translateY(-140px); }
-    .cd-5 { transform: rotate(205.71deg) translateY(-140px); }
-    .cd-6 { transform: rotate(257.14deg) translateY(-140px); }
-    .cd-7 { transform: rotate(308.57deg) translateY(-140px); }
+    .cd-wrapper { transform: rotate(var(--angle, 0deg)) translateY(-140px); }
     .cd-content { top: -35px; left: -35px; width: 70px; height: 70px; }
     #center-text { font-size: 0.9em; width: 120px; }
 }
@@ -556,6 +531,7 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
+<body>
 <!-- SPLASH SCREEN -->
 <div id="splash">
     <video id="splash-video" autoplay muted playsinline preload="auto">
@@ -572,49 +548,11 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
     <a href="#shop" data-page="shop">SHOP</a>
 </nav>
 
-<!-- SND -->
-<div id="page-snd" class="page">
-    <div class="music-container"><div class="album">
-        <img src="album.jpg"  alt="LOVE EVERYONE"     class="album-cover-clickable snd-cover" data-album-index="0">
-        <h3 class="album-section-title">LOVE EVERYONE</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album2.jpg" alt="HATE EVERYONE"     class="album-cover-clickable snd-cover" data-album-index="1">
-        <h3 class="album-section-title">HATE EVERYONE</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album3.jpg" alt="LAUNDRY"           class="album-cover-clickable snd-cover" data-album-index="2">
-        <h3 class="album-section-title">LAUNDRY</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album4.jpg" alt="ECHOES OF NOTHING" class="album-cover-clickable snd-cover" data-album-index="3">
-        <h3 class="album-section-title">ECHOES OF NOTHING</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album5.jpg" alt="NOISE"             class="album-cover-clickable snd-cover" data-album-index="4">
-        <h3 class="album-section-title">NOISE</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album6.jpg" alt="LAND OF THE STONES" class="album-cover-clickable snd-cover" data-album-index="5">
-        <h3 class="album-section-title">LAND OF THE STONES</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="album7.jpg" alt="LOVE IS BLIND" class="album-cover-clickable snd-cover" data-album-index="6">
-        <h3 class="album-section-title" aria-label="LOVE IS BLIND">⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙</h3>
-    </div></div>
-</div>
+<!-- SND (Popolato automaticamente) -->
+<div id="page-snd" class="page"></div>
 
-<!-- RMX -->
-<div id="page-rmx" class="page">
-    <div class="music-container"><div class="album">
-        <img src="vulturesclubmix.png" alt="VULTURES CLUB MIX" class="album-cover-clickable rmx-cover" data-album-index="0">
-        <h3 class="album-section-title">VULTURES CLUB MIX</h3>
-    </div></div>
-    <div class="music-container"><div class="album">
-        <img src="toldyou.png" alt="TOLD YOU" class="album-cover-clickable rmx-cover" data-album-index="1">
-        <h3 class="album-section-title">TOLD YOU</h3>
-    </div></div>
-</div>
+<!-- RMX (Popolato automaticamente) -->
+<div id="page-rmx" class="page"></div>
 
 <!-- LAB -->
 <div id="page-lab" class="page">
@@ -674,29 +612,7 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
 <div id="page-vsn" class="page">
     <div class="solar-system-container">
         <h2 id="center-text"></h2>
-        <div class="solar-system" id="solar-system">
-            <div class="cd-wrapper cd-1"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="LOVE EVERYONE" data-src="3D/loveveryone3d.glb">
-                    <img src="album.jpg" alt="LOVE EVERYONE"></div></div></div>
-            <div class="cd-wrapper cd-2"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="HATE EVERYONE" data-src="3D/hateveryone3d.glb">
-                    <img src="album2.jpg" alt="HATE EVERYONE"></div></div></div>
-            <div class="cd-wrapper cd-3"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="LAUNDRY" data-src="3D/laundry3d.glb">
-                    <img src="album3.jpg" alt="LAUNDRY"></div></div></div>
-            <div class="cd-wrapper cd-4"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="ECHOES OF NOTHING" data-src="3D/echoesofnothing3d.glb">
-                    <img src="album4.jpg" alt="ECHOES OF NOTHING"></div></div></div>
-            <div class="cd-wrapper cd-5"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="NOISE" data-src="3D/noise3d.glb">
-                    <img src="album5.jpg" alt="NOISE"></div></div></div>
-            <div class="cd-wrapper cd-6"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="LAND OF THE STONES" data-src="3D/landofthestones3d.glb">
-                    <img src="album6.jpg" alt="LAND OF THE STONES"></div></div></div>
-            <div class="cd-wrapper cd-7"><div class="cd-anti-spinner">
-                <div class="cd-content" data-title="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙" data-src="3D/loveisblind3d.glb">
-                    <img src="album7.jpg" alt="LOVE IS BLIND"></div></div></div>
-        </div>
+        <div class="solar-system" id="solar-system"></div>
     </div>
     <div id="modal-3d" class="hidden">
         <button class="close-btn" id="close-3d-btn">✕</button>
@@ -710,36 +626,7 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
     <div class="shop-container">
         <div id="shop-content">
             <p class="shop-intro">HANDCRAFTED CDs. SELECT THE ALBUMS YOU WANT TO ORDER. SCROLL TO THE BOTTOM OF THE PAGE TO SEND YOUR ORDER REQUEST. YOU WILL BE CONTACTED VIA E-MAIL ASAP.</p>
-            <div class="album-grid">
-                <div class="shop-item" data-album-name="LOVE EVERYONE">
-                    <img src="cdalbum1_cut.png" alt="LOVE EVERYONE"><h3>LOVE EVERYONE</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="HATE EVERYONE">
-                    <img src="cdalbum2_cut.png" alt="HATE EVERYONE"><h3>HATE EVERYONE</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="LAUNDRY">
-                    <img src="cdalbum3_cut.png" alt="LAUNDRY"><h3>LAUNDRY</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="ECHOES OF NOTHING">
-                    <img src="cdalbum4_cut.png" alt="ECHOES OF NOTHING"><h3>ECHOES OF NOTHING</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="NOISE">
-                    <img src="cdalbum5_cut.png" alt="NOISE"><h3>NOISE</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="LAND OF THE STONES">
-                    <img src="cdalbum6_cut.png" alt="LAND OF THE STONES"><h3>LAND OF THE STONES</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-                <div class="shop-item" data-album-name="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙">
-                    <img src="cdalbum7_cut.png" alt="⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙"><h3>⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙</h3>
-                    <div class="selection-overlay">SELECTED</div>
-                </div>
-            </div>
+            <div class="album-grid" id="shop-album-grid"></div>
             <section class="order-form">
                 <div class="form-group">
                     <label>YOUR SELECTION</label>
@@ -765,7 +652,7 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
     </div>
 </div>
 
-<!-- GLOBAL PLAYER (sempre nel DOM, persiste tra le pagine) -->
+<!-- GLOBAL PLAYER -->
 <div id="global-player-container" class="hidden">
     <div id="player-bar">
         <div class="player-bar-clickable" id="open-expanded-player">
@@ -803,6 +690,7 @@ model-viewer { width: 100%; height: 100%; background-color: transparent; }
     <button id="close-tracklist-btn">&times;</button>
     <div id="tracklist-content"></div>
 </div>
+
 <script>
 'use strict';
 
@@ -816,171 +704,193 @@ function formatTime(s) {
     return m + ':' + Math.floor(s % 60).toString().padStart(2, '0');
 }
 
-/* ── DATI SND ───────────────────────────────────────────── */
-const sndAlbums = [
-    { albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:[
-        {title:'LOVE',src:'MUSICA/1LOVE.mp3'},{title:'MY SOUL',src:'MUSICA/2MYSOUL.mp3'},
-        {title:'BUZZ',src:'MUSICA/3BUZZ.mp3'},{title:'VSN',src:'MUSICA/4VSN.mp3'},
-        {title:'I WILL',src:'MUSICA/5IWILL.mp3'},{title:'STADIUM',src:'MUSICA/6STADIUM.mp3'},
-        {title:'CHURCH',src:'MUSICA/7CHURCH.mp3'},{title:'WOLVES CRY',src:'MUSICA/8WOLVESCRY.mp3'}
-    ]},
-    { albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:[
-        {title:'JEWS HANDS',src:'MUSICA/1.1JEWSHANDS.mp3'},{title:'ANGEL',src:'MUSICA/1.2ANGEL.mp3'},
-        {title:'BLIND',src:'MUSICA/1.3BLIND.mp3'},{title:'BARK',src:'MUSICA/1.4BARK.mp3'},
-        {title:'GHOST',src:'MUSICA/1.5GHOST.mp3'},{title:'FLY',src:'MUSICA/1.6FLY.mp3'},
-        {title:'MARIA',src:'MUSICA/1.7MARIA.mp3'},{title:'POPE',src:'MUSICA/1.8POPE.mp3'}
-    ]},
-    { albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:[
-        {title:'OH MY',src:'MUSICA/1.1.1OH MY.mp3'},{title:'BELL',src:'MUSICA/1.2.2BELL.mp3'},
-        {title:'HEAVEN',src:'MUSICA/1.3.3HEAVEN.mp3'},{title:'ZZ',src:'MUSICA/1.4.4ZZ.mp3'},
-        {title:'RISE',src:'MUSICA/1.5.5RISE.mp3'},{title:'OHH',src:'MUSICA/1.6.6OHH.mp3'},
-        {title:'LAUNDRY',src:'MUSICA/1.7.7LAUNDRY.mp3'},{title:'END',src:'MUSICA/1.8.8END.mp3'}
-    ]},
-    { albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:[
-        {title:'WHISPERS',src:'MUSICA/1.1.1.1WHISPERS.mp3'},{title:'HONEY LIGHT',src:'MUSICA/1.2.2.2HONEYLIGHT.mp3'},
-        {title:'BETWEEN SHADOWS',src:'MUSICA/1.3.3.3BETWEEN SHADOWS.mp3'},{title:'FIELDS',src:'MUSICA/1.4.4.4FIELDS.mp3'},
-        {title:'GOLDEN HUNGER',src:'MUSICA/1.5.5.5GOLDEN HUNGER.mp3'},{title:'WHERE THE SKY MELTS',src:'MUSICA/1.6.6.6WHERE THE SKY MELTS.mp3'},
-        {title:'LANTERN',src:'MUSICA/1.7.7.7LANTERN.mp3'},{title:'THE HOURS THAT FLOW',src:'MUSICA/1.8.8.8THE HOURS THAT FLOW.mp3'}
-    ]},
-    { albumTitle:"NOISE", albumCover:"album5.jpg", tracks:[
-        {title:'CONCRETE',src:'MUSICA/1.1.1.1.1CONCRETE.mp3'},{title:'PARTICLES',src:'MUSICA/1.2.2.2.2PARTICLES.mp3'},
-        {title:'TRACE',src:'MUSICA/1.3.3.3.3TRACE.mp3'},{title:'LURK',src:'MUSICA/1.4.4.4.4LURK.mp3'},
-        {title:'BREATHE',src:'MUSICA/1.5.5.5.5BREATHE.mp3'},{title:'GRID',src:'MUSICA/1.6.6.6.6GRID.mp3'},
-        {title:'GEAR',src:'MUSICA/1.7.7.7.7GEAR.mp3'},{title:'NOISE',src:'MUSICA/1.8.8.8.8NOISE.mp3'}
-    ]},
-    { albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:[
-        {title:'WHITE',src:'MUSICA/1.1.1.1.1.1WHITE.mp3'},{title:'APART',src:'MUSICA/1.2.2.2.2.2APART.mp3'},
-        {title:'DUST',src:'MUSICA/1.3.3.3.3.3DUST.mp3'},{title:'NECROMANCER',src:'MUSICA/1.4.4.4.4.4NECROMANCER.mp3'},
-        {title:'HOLLOW',src:'MUSICA/1.5.5.5.5.5HOLLOW.mp3'},{title:'ALONE',src:'MUSICA/1.6.6.6.6.6ALONE.mp3'},
-        {title:'CAVE',src:'MUSICA/1.7.7.7.7.7CAVE.mp3'},{title:'LOST IN THE LAND',src:'MUSICA/1.8.8.8.8.8LOST IN THE LAND.mp3'}
-    ]},
-    { albumTitle:"⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙", albumCover:"album7.jpg", tracks:[
-        {title:'⠃⠇⠊⠝⠙',src:'MUSICA/LOVEISBLIND/1BLIND.mp3'},
-        {title:'⠞⠕⠥⠉⠓',src:'MUSICA/LOVEISBLIND/2TOUCH.mp3'},
-        {title:'⠞⠑⠁⠗⠎',src:'MUSICA/LOVEISBLIND/3TEARS.mp3'},
-        {title:'⠑⠙⠍',src:'MUSICA/LOVEISBLIND/4EDM.mp3'},
-        {title:'⠙⠁⠝⠉⠑',src:'MUSICA/LOVEISBLIND/5DANCE.mp3'},
-        {title:'⠗⠓⠽⠞⠓⠍',src:'MUSICA/LOVEISBLIND/6RHYTHM.mp3'},
-        {title:'⠇⠁⠞⠑',src:'MUSICA/LOVEISBLIND/7LATE.mp3'},
-        {title:'⠎⠥⠝⠎⠓⠊⠝⠑',src:'MUSICA/LOVEISBLIND/8SUNSHINE.mp3'}
-    ]}
-];
-
-/* ── DATI RMX ───────────────────────────────────────────── */
-const rmxAlbums = [
-    { albumTitle:"VULTURES CLUB MIX", albumCover:"vulturesclubmix.png", tracks:[
-        {title:'SLIDE',src:'REMIX/VULTURESCLUBMIX/SLIDE.mp3'},
-        {title:'BURN',src:'REMIX/VULTURESCLUBMIX/BURN.mp3'},
-        {title:'PAID',src:'REMIX/VULTURESCLUBMIX/PAID.mp3'},
-        {title:'TIME MOVING SLOW',src:'REMIX/VULTURESCLUBMIX/TIME MOVING SLOW.mp3'},
-        {title:'PAPERWORK',src:'REMIX/VULTURESCLUBMIX/PAPERWORK.mp3'},
-        {title:'DO IT',src:'REMIX/VULTURESCLUBMIX/DO IT.mp3'},
-        {title:'MAYBE',src:'REMIX/VULTURESCLUBMIX/MAYBE.mp3'},
-        {title:'TAKE OFF YOUR DRESS',src:'REMIX/VULTURESCLUBMIX/TAKE OFF YOUR DRESS.mp3'},
-        {title:'HOLY MOUNTAIN',src:'REMIX/VULTURESCLUBMIX/HOLY MOUNTAIN.mp3'},
-        {title:'SO GOOD',src:'REMIX/VULTURESCLUBMIX/SO GOOD.mp3'},
-        {title:'MOTION',src:'REMIX/VULTURESCLUBMIX/MOTION (YE REMIX).mp3'},
-        {title:'NEW BODY',src:'REMIX/VULTURESCLUBMIX/NEW BODY.mp3'},
-        {title:'DRUNK',src:'REMIX/VULTURESCLUBMIX/DRUNK.mp3'}
-    ]},
-    { albumTitle:"TOLD YOU", albumCover:"toldyou.png", tracks:[
-        {title:'VAGABOND',src:'REMIX/TOLDYOU/1 - VAGABOND.mp3'},
-        {title:'MAKE ME A BELIEVER',src:'REMIX/TOLDYOU/2 - MAKE ME A BELIEVER.mp3'},
-        {title:'KING',src:'REMIX/TOLDYOU/3 - KING.mp3'},
-        {title:'SISTERS AND BROTHERS',src:'REMIX/TOLDYOU/4 - SISTERS AND BROTHERS.mp3'},
-        {title:'FATHER',src:'REMIX/TOLDYOU/5 - FATHER.mp3'},
-        {title:'FUCK SUMN',src:'REMIX/TOLDYOU/6 - FUK SUMN.mp3'},
-        {title:'THIS A MUST',src:'REMIX/TOLDYOU/7 - THIS A MUST.mp3'},
-        {title:'UNLOCK',src:'REMIX/TOLDYOU/8 - UNLOCK.mp3'},
-        {title:'FRIED',src:'REMIX/TOLDYOU/9 - FRIED.mp3'},
-        {title:'CARNIVAL',src:'REMIX/TOLDYOU/10 - CARNIVAL.mp3'},
-        {title:'HOODRAT',src:'REMIX/TOLDYOU/11 - HOODRAT.mp3'},
-        {title:'VULTURES',src:'REMIX/TOLDYOU/12 - VULTURES.mp3'},
-        {title:'SHE DEAD',src:'REMIX/TOLDYOU/13 - SHE DEAD.mp3'},
-        {title:'RIVER',src:'REMIX/TOLDYOU/14 - RIVER.mp3'},
-        {title:'MELROSE',src:'REMIX/TOLDYOU/15 - MELROSE.mp3'},
-        {title:'BEG FORGIVENESS',src:'REMIX/TOLDYOU/16 - BEG FORGIVENESS.mp3'},
-        {title:"DON'T DIE",src:"REMIX/TOLDYOU/17 - DON'T DIE.mp3"},
-        {title:'NOT INCLUSIVE',src:'REMIX/TOLDYOU/18 - NOT INCLUSIVE.mp3'},
-        {title:'PAPA WANNA SEE',src:'REMIX/TOLDYOU/19 - PAPA WANNA SEE.mp3'},
-        {title:'SECURITY',src:'REMIX/TOLDYOU/20 - SECURITY.mp3'},
-        {title:'SO SOON',src:'REMIX/TOLDYOU/21 - SO SOON.mp3'},
-        {title:'ALL THE LOVE',src:'REMIX/TOLDYOU/22 - ALL THE LOVE.mp3'},
-        {title:'DARK MATTER',src:'REMIX/TOLDYOU/23 - DARK MATTER.mp3'}
-    ]}
-];
-
-/* ── DATI LAB ───────────────────────────────────────────── */
-const songDatabase = {
-    "love-everyone":{ albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:{
-        "love":{title:"LOVE",stems:{vocals:'stems/love-everyone/love/vocals.mp3',drums:'stems/love-everyone/love/drums.mp3',bass:'stems/love-everyone/love/bass.mp3',melody:'stems/love-everyone/love/melody.mp3'}},
-        "my-soul":{title:"MY SOUL",stems:{vocals:'stems/love-everyone/my-soul/vocals.mp3',drums:'stems/love-everyone/my-soul/drums.mp3',bass:'stems/love-everyone/my-soul/bass.mp3',melody:'stems/love-everyone/my-soul/melody.mp3'}},
-        "buzz":{title:"BUZZ",stems:{vocals:'stems/love-everyone/buzz/vocals.mp3',drums:'stems/love-everyone/buzz/drums.mp3',bass:'stems/love-everyone/buzz/bass.mp3',melody:'stems/love-everyone/buzz/melody.mp3'}},
-        "vsn":{title:"VSN",stems:{vocals:'stems/love-everyone/vsn/vocals.mp3',drums:'stems/love-everyone/vsn/drums.mp3',bass:'stems/love-everyone/vsn/bass.mp3',melody:'stems/love-everyone/vsn/melody.mp3'}},
-        "i-will":{title:"I WILL",stems:{vocals:'stems/love-everyone/i-will/vocals.mp3',drums:'stems/love-everyone/i-will/drums.mp3',bass:'stems/love-everyone/i-will/bass.mp3',melody:'stems/love-everyone/i-will/melody.mp3'}},
-        "stadium":{title:"STADIUM",stems:{vocals:'stems/love-everyone/stadium/vocals.mp3',drums:'stems/love-everyone/stadium/drums.mp3',bass:'stems/love-everyone/stadium/bass.mp3',melody:'stems/love-everyone/stadium/melody.mp3'}},
-        "church":{title:"CHURCH",stems:{vocals:'stems/love-everyone/church/vocals.mp3',drums:'stems/love-everyone/church/drums.mp3',bass:'stems/love-everyone/church/bass.mp3',melody:'stems/love-everyone/church/melody.mp3'}},
-        "wolves-cry":{title:"WOLVES CRY",stems:{vocals:'stems/love-everyone/wolves-cry/vocals.mp3',drums:'stems/love-everyone/wolves-cry/drums.mp3',bass:'stems/love-everyone/wolves-cry/bass.mp3',melody:'stems/love-everyone/wolves-cry/melody.mp3'}}
-    }},
-    "hate-everyone":{ albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:{
-        "jews-hands":{title:"JEWS HANDS",stems:{vocals:'stems/hate-everyone/jews-hands/vocals.mp3',drums:'stems/hate-everyone/jews-hands/drums.mp3',bass:'stems/hate-everyone/jews-hands/bass.mp3',melody:'stems/hate-everyone/jews-hands/melody.mp3'}},
-        "angel":{title:"ANGEL",stems:{vocals:'stems/hate-everyone/angel/vocals.mp3',drums:'stems/hate-everyone/angel/drums.mp3',bass:'stems/hate-everyone/angel/bass.mp3',melody:'stems/hate-everyone/angel/melody.mp3'}},
-        "blind":{title:"BLIND",stems:{vocals:'stems/hate-everyone/blind/vocals.mp3',drums:'stems/hate-everyone/blind/drums.mp3',bass:'stems/hate-everyone/blind/bass.mp3',melody:'stems/hate-everyone/blind/melody.mp3'}},
-        "bark":{title:"BARK",stems:{vocals:'stems/hate-everyone/bark/vocals.mp3',drums:'stems/hate-everyone/bark/drums.mp3',bass:'stems/hate-everyone/bark/bass.mp3',melody:'stems/hate-everyone/bark/melody.mp3'}},
-        "ghost":{title:"GHOST",stems:{vocals:'stems/hate-everyone/ghost/vocals.mp3',drums:'stems/hate-everyone/ghost/drums.mp3',bass:'stems/hate-everyone/ghost/bass.mp3',melody:'stems/hate-everyone/ghost/melody.mp3'}},
-        "fly":{title:"FLY",stems:{vocals:'stems/hate-everyone/fly/vocals.mp3',drums:'stems/hate-everyone/fly/drums.mp3',bass:'stems/hate-everyone/fly/bass.mp3',melody:'stems/hate-everyone/fly/melody.mp3'}},
-        "maria":{title:"MARIA",stems:{vocals:'stems/hate-everyone/maria/vocals.mp3',drums:'stems/hate-everyone/maria/drums.mp3',bass:'stems/hate-everyone/maria/bass.mp3',melody:'stems/hate-everyone/maria/melody.mp3'}},
-        "pope":{title:"POPE",stems:{vocals:'stems/hate-everyone/pope/vocals.mp3',drums:'stems/hate-everyone/pope/drums.mp3',bass:'stems/hate-everyone/pope/bass.mp3',melody:'stems/hate-everyone/pope/melody.mp3'}}
-    }},
-    "laundry":{ albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:{
-        "oh-my":{title:"OH MY",stems:{vocals:'stems/laundry/oh-my/vocals.mp3',drums:'stems/laundry/oh-my/drums.mp3',bass:'stems/laundry/oh-my/bass.mp3',melody:'stems/laundry/oh-my/melody.mp3'}},
-        "bell":{title:"BELL",stems:{vocals:'stems/laundry/bell/vocals.mp3',drums:'stems/laundry/bell/drums.mp3',bass:'stems/laundry/bell/bass.mp3',melody:'stems/laundry/bell/melody.mp3'}},
-        "heaven":{title:"HEAVEN",stems:{vocals:'stems/laundry/heaven/vocals.mp3',drums:'stems/laundry/heaven/drums.mp3',bass:'stems/laundry/heaven/bass.mp3',melody:'stems/laundry/heaven/melody.mp3'}},
-        "zz":{title:"ZZ",stems:{vocals:'stems/laundry/zz/vocals.mp3',drums:'stems/laundry/zz/drums.mp3',bass:'stems/laundry/zz/bass.mp3',melody:'stems/laundry/zz/melody.mp3'}},
-        "rise":{title:"RISE",stems:{vocals:'stems/laundry/rise/vocals.mp3',drums:'stems/laundry/rise/drums.mp3',bass:'stems/laundry/rise/bass.mp3',melody:'stems/laundry/rise/melody.mp3'}},
-        "ohh":{title:"OHH",stems:{vocals:'stems/laundry/ohh/vocals.mp3',drums:'stems/laundry/ohh/drums.mp3',bass:'stems/laundry/ohh/bass.mp3',melody:'stems/laundry/ohh/melody.mp3'}},
-        "laundry":{title:"LAUNDRY",stems:{vocals:'stems/laundry/laundry/vocals.mp3',drums:'stems/laundry/laundry/drums.mp3',bass:'stems/laundry/laundry/bass.mp3',melody:'stems/laundry/laundry/melody.mp3'}},
-        "end":{title:"END",stems:{vocals:'stems/laundry/end/vocals.mp3',drums:'stems/laundry/end/drums.mp3',bass:'stems/laundry/end/bass.mp3',melody:'stems/laundry/end/melody.mp3'}}
-    }},
-    "echoes-of-nothing":{ albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:{
-        "whispers":{title:"WHISPERS",stems:{vocals:'stems/echoes-of-nothing/whispers/vocals.mp3',drums:'stems/echoes-of-nothing/whispers/drums.mp3',bass:'stems/echoes-of-nothing/whispers/bass.mp3',melody:'stems/echoes-of-nothing/whispers/melody.mp3'}},
-        "honey-light":{title:"HONEY LIGHT",stems:{vocals:'stems/echoes-of-nothing/honey-light/vocals.mp3',drums:'stems/echoes-of-nothing/honey-light/drums.mp3',bass:'stems/echoes-of-nothing/honey-light/bass.mp3',melody:'stems/echoes-of-nothing/honey-light/melody.mp3'}},
-        "between-shadows":{title:"BETWEEN SHADOWS",stems:{vocals:'stems/echoes-of-nothing/between-shadows/vocals.mp3',drums:'stems/echoes-of-nothing/between-shadows/drums.mp3',bass:'stems/echoes-of-nothing/between-shadows/bass.mp3',melody:'stems/echoes-of-nothing/between-shadows/melody.mp3'}},
-        "fields":{title:"FIELDS",stems:{vocals:'stems/echoes-of-nothing/fields/vocals.mp3',drums:'stems/echoes-of-nothing/fields/drums.mp3',bass:'stems/echoes-of-nothing/fields/bass.mp3',melody:'stems/echoes-of-nothing/fields/melody.mp3'}},
-        "golden-hunger":{title:"GOLDEN HUNGER",stems:{vocals:'stems/echoes-of-nothing/golden-hunger/vocals.mp3',drums:'stems/echoes-of-nothing/golden-hunger/drums.mp3',bass:'stems/echoes-of-nothing/golden-hunger/bass.mp3',melody:'stems/echoes-of-nothing/golden-hunger/melody.mp3'}},
-        "where-the-sky-melts":{title:"WHERE THE SKY MELTS",stems:{vocals:'stems/echoes-of-nothing/where-the-sky-melts/vocals.mp3',drums:'stems/echoes-of-nothing/where-the-sky-melts/drums.mp3',bass:'stems/echoes-of-nothing/where-the-sky-melts/bass.mp3',melody:'stems/echoes-of-nothing/where-the-sky-melts/melody.mp3'}},
-        "lantern":{title:"LANTERN",stems:{vocals:'stems/echoes-of-nothing/lantern/vocals.mp3',drums:'stems/echoes-of-nothing/lantern/drums.mp3',bass:'stems/echoes-of-nothing/lantern/bass.mp3',melody:'stems/echoes-of-nothing/lantern/melody.mp3'}},
-        "the-hours-that-flow":{title:"THE HOURS THAT FLOW",stems:{vocals:'stems/echoes-of-nothing/the-hours-that-flow/vocals.mp3',drums:'stems/echoes-of-nothing/the-hours-that-flow/drums.mp3',bass:'stems/echoes-of-nothing/the-hours-that-flow/bass.mp3',melody:'stems/echoes-of-nothing/the-hours-that-flow/melody.mp3'}}
-    }},
-    "noise":{ albumTitle:"NOISE", albumCover:"album5.jpg", tracks:{
-        "concrete":{title:"CONCRETE",stems:{vocals:'stems/noise/concrete/vocals.mp3',drums:'stems/noise/concrete/drums.mp3',bass:'stems/noise/concrete/bass.mp3',melody:'stems/noise/concrete/melody.mp3'}},
-        "particles":{title:"PARTICLES",stems:{vocals:'stems/noise/particles/vocals.mp3',drums:'stems/noise/particles/drums.mp3',bass:'stems/noise/particles/bass.mp3',melody:'stems/noise/particles/melody.mp3'}},
-        "trace":{title:"TRACE",stems:{vocals:'stems/noise/trace/vocals.mp3',drums:'stems/noise/trace/drums.mp3',bass:'stems/noise/trace/bass.mp3',melody:'stems/noise/trace/melody.mp3'}},
-        "lurk":{title:"LURK",stems:{vocals:'stems/noise/lurk/vocals.mp3',drums:'stems/noise/lurk/drums.mp3',bass:'stems/noise/lurk/bass.mp3',melody:'stems/noise/lurk/melody.mp3'}},
-        "breathe":{title:"BREATHE",stems:{vocals:'stems/noise/breathe/vocals.mp3',drums:'stems/noise/breathe/drums.mp3',bass:'stems/noise/breathe/bass.mp3',melody:'stems/noise/breathe/melody.mp3'}},
-        "grid":{title:"GRID",stems:{vocals:'stems/noise/grid/vocals.mp3',drums:'stems/noise/grid/drums.mp3',bass:'stems/noise/grid/bass.mp3',melody:'stems/noise/grid/melody.mp3'}},
-        "gear":{title:"GEAR",stems:{vocals:'stems/noise/gear/vocals.mp3',drums:'stems/noise/gear/drums.mp3',bass:'stems/noise/gear/bass.mp3',melody:'stems/noise/gear/melody.mp3'}},
-        "noise":{title:"NOISE",stems:{vocals:'stems/noise/noise/vocals.mp3',drums:'stems/noise/noise/drums.mp3',bass:'stems/noise/noise/bass.mp3',melody:'stems/noise/noise/melody.mp3'}}
-    }},
-    "land-of-the-stones":{ albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:{
-        "white":{title:"WHITE",stems:{vocals:'stems/land-of-the-stones/white/vocals.mp3',drums:'stems/land-of-the-stones/white/drums.mp3',bass:'stems/land-of-the-stones/white/bass.mp3',melody:'stems/land-of-the-stones/white/melody.mp3'}},
-        "apart":{title:"APART",stems:{vocals:'stems/land-of-the-stones/apart/vocals.mp3',drums:'stems/land-of-the-stones/apart/drums.mp3',bass:'stems/land-of-the-stones/apart/bass.mp3',melody:'stems/land-of-the-stones/apart/melody.mp3'}},
-        "dust":{title:"DUST",stems:{vocals:'stems/land-of-the-stones/dust/vocals.mp3',drums:'stems/land-of-the-stones/dust/drums.mp3',bass:'stems/land-of-the-stones/dust/bass.mp3',melody:'stems/land-of-the-stones/dust/melody.mp3'}},
-        "necromancer":{title:"NECROMANCER",stems:{vocals:'stems/land-of-the-stones/necromancer/vocals.mp3',drums:'stems/land-of-the-stones/necromancer/drums.mp3',bass:'stems/land-of-the-stones/necromancer/bass.mp3',melody:'stems/land-of-the-stones/necromancer/melody.mp3'}},
-        "hollow":{title:"HOLLOW",stems:{vocals:'stems/land-of-the-stones/hollow/vocals.mp3',drums:'stems/land-of-the-stones/hollow/drums.mp3',bass:'stems/land-of-the-stones/hollow/bass.mp3',melody:'stems/land-of-the-stones/hollow/melody.mp3'}},
-        "alone":{title:"ALONE",stems:{vocals:'stems/land-of-the-stones/alone/vocals.mp3',drums:'stems/land-of-the-stones/alone/drums.mp3',bass:'stems/land-of-the-stones/alone/bass.mp3',melody:'stems/land-of-the-stones/alone/melody.mp3'}},
-        "cave":{title:"CAVE",stems:{vocals:'stems/land-of-the-stones/cave/vocals.mp3',drums:'stems/land-of-the-stones/cave/drums.mp3',bass:'stems/land-of-the-stones/cave/bass.mp3',melody:'stems/land-of-the-stones/cave/melody.mp3'}},
-        "lost-in-the-land":{title:"LOST IN THE LAND",stems:{vocals:'stems/land-of-the-stones/lost-in-the-land/vocals.mp3',drums:'stems/land-of-the-stones/lost-in-the-land/drums.mp3',bass:'stems/land-of-the-stones/lost-in-the-land/bass.mp3',melody:'stems/land-of-the-stones/lost-in-the-land/melody.mp3'}}
-    }}
+/* ── DATI DI DEFAULT (Usati come base e sovrascritti da data.json se presente) ── */
+const DEFAULT_SITE_DATA = {
+    snd: [
+        { albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:[
+            {title:'LOVE',src:'MUSICA/1LOVE.mp3'},{title:'MY SOUL',src:'MUSICA/2MYSOUL.mp3'},
+            {title:'BUZZ',src:'MUSICA/3BUZZ.mp3'},{title:'VSN',src:'MUSICA/4VSN.mp3'},
+            {title:'I WILL',src:'MUSICA/5IWILL.mp3'},{title:'STADIUM',src:'MUSICA/6STADIUM.mp3'},
+            {title:'CHURCH',src:'MUSICA/7CHURCH.mp3'},{title:'WOLVES CRY',src:'MUSICA/8WOLVESCRY.mp3'}
+        ]},
+        { albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:[
+            {title:'JEWS HANDS',src:'MUSICA/1.1JEWSHANDS.mp3'},{title:'ANGEL',src:'MUSICA/1.2ANGEL.mp3'},
+            {title:'BLIND',src:'MUSICA/1.3BLIND.mp3'},{title:'BARK',src:'MUSICA/1.4BARK.mp3'},
+            {title:'GHOST',src:'MUSICA/1.5GHOST.mp3'},{title:'FLY',src:'MUSICA/1.6FLY.mp3'},
+            {title:'MARIA',src:'MUSICA/1.7MARIA.mp3'},{title:'POPE',src:'MUSICA/1.8POPE.mp3'}
+        ]},
+        { albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:[
+            {title:'OH MY',src:'MUSICA/1.1.1OH MY.mp3'},{title:'BELL',src:'MUSICA/1.2.2BELL.mp3'},
+            {title:'HEAVEN',src:'MUSICA/1.3.3HEAVEN.mp3'},{title:'ZZ',src:'MUSICA/1.4.4ZZ.mp3'},
+            {title:'RISE',src:'MUSICA/1.5.5RISE.mp3'},{title:'OHH',src:'MUSICA/1.6.6OHH.mp3'},
+            {title:'LAUNDRY',src:'MUSICA/1.7.7LAUNDRY.mp3'},{title:'END',src:'MUSICA/1.8.8END.mp3'}
+        ]},
+        { albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:[
+            {title:'WHISPERS',src:'MUSICA/1.1.1.1WHISPERS.mp3'},{title:'HONEY LIGHT',src:'MUSICA/1.2.2.2HONEYLIGHT.mp3'},
+            {title:'BETWEEN SHADOWS',src:'MUSICA/1.3.3.3BETWEEN SHADOWS.mp3'},{title:'FIELDS',src:'MUSICA/1.4.4.4FIELDS.mp3'},
+            {title:'GOLDEN HUNGER',src:'MUSICA/1.5.5.5GOLDEN HUNGER.mp3'},{title:'WHERE THE SKY MELTS',src:'MUSICA/1.6.6.6WHERE THE SKY MELTS.mp3'},
+            {title:'LANTERN',src:'MUSICA/1.7.7.7LANTERN.mp3'},{title:'THE HOURS THAT FLOW',src:'MUSICA/1.8.8.8THE HOURS THAT FLOW.mp3'}
+        ]},
+        { albumTitle:"NOISE", albumCover:"album5.jpg", tracks:[
+            {title:'CONCRETE',src:'MUSICA/1.1.1.1.1CONCRETE.mp3'},{title:'PARTICLES',src:'MUSICA/1.2.2.2.2PARTICLES.mp3'},
+            {title:'TRACE',src:'MUSICA/1.3.3.3.3TRACE.mp3'},{title:'LURK',src:'MUSICA/1.4.4.4.4LURK.mp3'},
+            {title:'BREATHE',src:'MUSICA/1.5.5.5.5BREATHE.mp3'},{title:'GRID',src:'MUSICA/1.6.6.6.6GRID.mp3'},
+            {title:'GEAR',src:'MUSICA/1.7.7.7.7GEAR.mp3'},{title:'NOISE',src:'MUSICA/1.8.8.8.8NOISE.mp3'}
+        ]},
+        { albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:[
+            {title:'WHITE',src:'MUSICA/1.1.1.1.1.1WHITE.mp3'},{title:'APART',src:'MUSICA/1.2.2.2.2.2APART.mp3'},
+            {title:'DUST',src:'MUSICA/1.3.3.3.3.3DUST.mp3'},{title:'NECROMANCER',src:'MUSICA/1.4.4.4.4.4NECROMANCER.mp3'},
+            {title:'HOLLOW',src:'MUSICA/1.5.5.5.5.5HOLLOW.mp3'},{title:'ALONE',src:'MUSICA/1.6.6.6.6.6ALONE.mp3'},
+            {title:'CAVE',src:'MUSICA/1.7.7.7.7.7CAVE.mp3'},{title:'LOST IN THE LAND',src:'MUSICA/1.8.8.8.8.8LOST IN THE LAND.mp3'}
+        ]},
+        { albumTitle:"⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙", ariaLabel:"LOVE IS BLIND", albumCover:"album7.jpg", tracks:[
+            {title:'⠃⠇⠊⠝⠙',src:'MUSICA/LOVEISBLIND/1BLIND.mp3'},
+            {title:'⠞⠕⠥⠉⠓',src:'MUSICA/LOVEISBLIND/2TOUCH.mp3'},
+            {title:'⠞⠑⠁⠗⠎',src:'MUSICA/LOVEISBLIND/3TEARS.mp3'},
+            {title:'⠑⠙⠍',src:'MUSICA/LOVEISBLIND/4EDM.mp3'},
+            {title:'⠙⠁⠝⠉⠑',src:'MUSICA/LOVEISBLIND/5DANCE.mp3'},
+            {title:'⠗⠓⠽⠞⠓⠍',src:'MUSICA/LOVEISBLIND/6RHYTHM.mp3'},
+            {title:'⠇⠁⠞⠑',src:'MUSICA/LOVEISBLIND/7LATE.mp3'},
+            {title:'⠎⠥⠝⠎⠓⠊⠝⠑',src:'MUSICA/LOVEISBLIND/8SUNSHINE.mp3'}
+        ]}
+    ],
+    rmx: [
+        { albumTitle:"VULTURES CLUB MIX", albumCover:"vulturesclubmix.png", tracks:[
+            {title:'SLIDE',src:'REMIX/VULTURESCLUBMIX/SLIDE.mp3'},
+            {title:'BURN',src:'REMIX/VULTURESCLUBMIX/BURN.mp3'},
+            {title:'PAID',src:'REMIX/VULTURESCLUBMIX/PAID.mp3'},
+            {title:'TIME MOVING SLOW',src:'REMIX/VULTURESCLUBMIX/TIME MOVING SLOW.mp3'},
+            {title:'PAPERWORK',src:'REMIX/VULTURESCLUBMIX/PAPERWORK.mp3'},
+            {title:'DO IT',src:'REMIX/VULTURESCLUBMIX/DO IT.mp3'},
+            {title:'MAYBE',src:'REMIX/VULTURESCLUBMIX/MAYBE.mp3'},
+            {title:'TAKE OFF YOUR DRESS',src:'REMIX/VULTURESCLUBMIX/TAKE OFF YOUR DRESS.mp3'},
+            {title:'HOLY MOUNTAIN',src:'REMIX/VULTURESCLUBMIX/HOLY MOUNTAIN.mp3'},
+            {title:'SO GOOD',src:'REMIX/VULTURESCLUBMIX/SO GOOD.mp3'},
+            {title:'MOTION',src:'REMIX/VULTURESCLUBMIX/MOTION (YE REMIX).mp3'},
+            {title:'NEW BODY',src:'REMIX/VULTURESCLUBMIX/NEW BODY.mp3'},
+            {title:'DRUNK',src:'REMIX/VULTURESCLUBMIX/DRUNK.mp3'}
+        ]},
+        { albumTitle:"TOLD YOU", albumCover:"toldyou.png", tracks:[
+            {title:'VAGABOND',src:'REMIX/TOLDYOU/1 - VAGABOND.mp3'},
+            {title:'MAKE ME A BELIEVER',src:'REMIX/TOLDYOU/2 - MAKE ME A BELIEVER.mp3'},
+            {title:'KING',src:'REMIX/TOLDYOU/3 - KING.mp3'},
+            {title:'SISTERS AND BROTHERS',src:'REMIX/TOLDYOU/4 - SISTERS AND BROTHERS.mp3'},
+            {title:'FATHER',src:'REMIX/TOLDYOU/5 - FATHER.mp3'},
+            {title:'FUCK SUMN',src:'REMIX/TOLDYOU/6 - FUK SUMN.mp3'},
+            {title:'THIS A MUST',src:'REMIX/TOLDYOU/7 - THIS A MUST.mp3'},
+            {title:'UNLOCK',src:'REMIX/TOLDYOU/8 - UNLOCK.mp3'},
+            {title:'FRIED',src:'REMIX/TOLDYOU/9 - FRIED.mp3'},
+            {title:'CARNIVAL',src:'REMIX/TOLDYOU/10 - CARNIVAL.mp3'},
+            {title:'HOODRAT',src:'REMIX/TOLDYOU/11 - HOODRAT.mp3'},
+            {title:'VULTURES',src:'REMIX/TOLDYOU/12 - VULTURES.mp3'},
+            {title:'SHE DEAD',src:'REMIX/TOLDYOU/13 - SHE DEAD.mp3'},
+            {title:'RIVER',src:'REMIX/TOLDYOU/14 - RIVER.mp3'},
+            {title:'MELROSE',src:'REMIX/TOLDYOU/15 - MELROSE.mp3'},
+            {title:'BEG FORGIVENESS',src:'REMIX/TOLDYOU/16 - BEG FORGIVENESS.mp3'},
+            {title:"DON'T DIE",src:"REMIX/TOLDYOU/17 - DON'T DIE.mp3"},
+            {title:'NOT INCLUSIVE',src:'REMIX/TOLDYOU/18 - NOT INCLUSIVE.mp3'},
+            {title:'PAPA WANNA SEE',src:'REMIX/TOLDYOU/19 - PAPA WANNA SEE.mp3'},
+            {title:'SECURITY',src:'REMIX/TOLDYOU/20 - SECURITY.mp3'},
+            {title:'SO SOON',src:'REMIX/TOLDYOU/21 - SO SOON.mp3'},
+            {title:'ALL THE LOVE',src:'REMIX/TOLDYOU/22 - ALL THE LOVE.mp3'},
+            {title:'DARK MATTER',src:'REMIX/TOLDYOU/23 - DARK MATTER.mp3'}
+        ]}
+    ],
+    lab: {
+        "love-everyone":{ albumTitle:"LOVE EVERYONE", albumCover:"album.jpg", tracks:{
+            "love":{title:"LOVE",stems:{vocals:'stems/love-everyone/love/vocals.mp3',drums:'stems/love-everyone/love/drums.mp3',bass:'stems/love-everyone/love/bass.mp3',melody:'stems/love-everyone/love/melody.mp3'}},
+            "my-soul":{title:"MY SOUL",stems:{vocals:'stems/love-everyone/my-soul/vocals.mp3',drums:'stems/love-everyone/my-soul/drums.mp3',bass:'stems/love-everyone/my-soul/bass.mp3',melody:'stems/love-everyone/my-soul/melody.mp3'}},
+            "buzz":{title:"BUZZ",stems:{vocals:'stems/love-everyone/buzz/vocals.mp3',drums:'stems/love-everyone/buzz/drums.mp3',bass:'stems/love-everyone/buzz/bass.mp3',melody:'stems/love-everyone/buzz/melody.mp3'}},
+            "vsn":{title:"VSN",stems:{vocals:'stems/love-everyone/vsn/vocals.mp3',drums:'stems/love-everyone/vsn/drums.mp3',bass:'stems/love-everyone/vsn/bass.mp3',melody:'stems/love-everyone/vsn/melody.mp3'}},
+            "i-will":{title:"I WILL",stems:{vocals:'stems/love-everyone/i-will/vocals.mp3',drums:'stems/love-everyone/i-will/drums.mp3',bass:'stems/love-everyone/i-will/bass.mp3',melody:'stems/love-everyone/i-will/melody.mp3'}},
+            "stadium":{title:"STADIUM",stems:{vocals:'stems/love-everyone/stadium/vocals.mp3',drums:'stems/love-everyone/stadium/drums.mp3',bass:'stems/love-everyone/stadium/bass.mp3',melody:'stems/love-everyone/stadium/melody.mp3'}},
+            "church":{title:"CHURCH",stems:{vocals:'stems/love-everyone/church/vocals.mp3',drums:'stems/love-everyone/church/drums.mp3',bass:'stems/love-everyone/church/bass.mp3',melody:'stems/love-everyone/church/melody.mp3'}},
+            "wolves-cry":{title:"WOLVES CRY",stems:{vocals:'stems/love-everyone/wolves-cry/vocals.mp3',drums:'stems/love-everyone/wolves-cry/drums.mp3',bass:'stems/love-everyone/wolves-cry/bass.mp3',melody:'stems/love-everyone/wolves-cry/melody.mp3'}}
+        }},
+        "hate-everyone":{ albumTitle:"HATE EVERYONE", albumCover:"album2.jpg", tracks:{
+            "jews-hands":{title:"JEWS HANDS",stems:{vocals:'stems/hate-everyone/jews-hands/vocals.mp3',drums:'stems/hate-everyone/jews-hands/drums.mp3',bass:'stems/hate-everyone/jews-hands/bass.mp3',melody:'stems/hate-everyone/jews-hands/melody.mp3'}},
+            "angel":{title:"ANGEL",stems:{vocals:'stems/hate-everyone/angel/vocals.mp3',drums:'stems/hate-everyone/angel/drums.mp3',bass:'stems/hate-everyone/angel/bass.mp3',melody:'stems/hate-everyone/angel/melody.mp3'}},
+            "blind":{title:"BLIND",stems:{vocals:'stems/hate-everyone/blind/vocals.mp3',drums:'stems/hate-everyone/blind/drums.mp3',bass:'stems/hate-everyone/blind/bass.mp3',melody:'stems/hate-everyone/blind/melody.mp3'}},
+            "bark":{title:"BARK",stems:{vocals:'stems/hate-everyone/bark/vocals.mp3',drums:'stems/hate-everyone/bark/drums.mp3',bass:'stems/hate-everyone/bark/bass.mp3',melody:'stems/hate-everyone/bark/melody.mp3'}},
+            "ghost":{title:"GHOST",stems:{vocals:'stems/hate-everyone/ghost/vocals.mp3',drums:'stems/hate-everyone/ghost/drums.mp3',bass:'stems/hate-everyone/ghost/bass.mp3',melody:'stems/hate-everyone/ghost/melody.mp3'}},
+            "fly":{title:"FLY",stems:{vocals:'stems/hate-everyone/fly/vocals.mp3',drums:'stems/hate-everyone/fly/drums.mp3',bass:'stems/hate-everyone/fly/bass.mp3',melody:'stems/hate-everyone/fly/melody.mp3'}},
+            "maria":{title:"MARIA",stems:{vocals:'stems/hate-everyone/maria/vocals.mp3',drums:'stems/hate-everyone/maria/drums.mp3',bass:'stems/hate-everyone/maria/bass.mp3',melody:'stems/hate-everyone/maria/melody.mp3'}},
+            "pope":{title:"POPE",stems:{vocals:'stems/hate-everyone/pope/vocals.mp3',drums:'stems/hate-everyone/pope/drums.mp3',bass:'stems/hate-everyone/pope/bass.mp3',melody:'stems/hate-everyone/pope/melody.mp3'}}
+        }},
+        "laundry":{ albumTitle:"LAUNDRY", albumCover:"album3.jpg", tracks:{
+            "oh-my":{title:"OH MY",stems:{vocals:'stems/laundry/oh-my/vocals.mp3',drums:'stems/laundry/oh-my/drums.mp3',bass:'stems/laundry/oh-my/bass.mp3',melody:'stems/laundry/oh-my/melody.mp3'}},
+            "bell":{title:"BELL",stems:{vocals:'stems/laundry/bell/vocals.mp3',drums:'stems/laundry/bell/drums.mp3',bass:'stems/laundry/bell/bass.mp3',melody:'stems/laundry/bell/melody.mp3'}},
+            "heaven":{title:"HEAVEN",stems:{vocals:'stems/laundry/heaven/vocals.mp3',drums:'stems/laundry/heaven/drums.mp3',bass:'stems/laundry/heaven/bass.mp3',melody:'stems/laundry/heaven/melody.mp3'}},
+            "zz":{title:"ZZ",stems:{vocals:'stems/laundry/zz/vocals.mp3',drums:'stems/laundry/zz/drums.mp3',bass:'stems/laundry/zz/bass.mp3',melody:'stems/laundry/zz/melody.mp3'}},
+            "rise":{title:"RISE",stems:{vocals:'stems/laundry/rise/vocals.mp3',drums:'stems/laundry/rise/drums.mp3',bass:'stems/laundry/rise/bass.mp3',melody:'stems/laundry/rise/melody.mp3'}},
+            "ohh":{title:"OHH",stems:{vocals:'stems/laundry/ohh/vocals.mp3',drums:'stems/laundry/ohh/drums.mp3',bass:'stems/laundry/ohh/bass.mp3',melody:'stems/laundry/ohh/melody.mp3'}},
+            "laundry":{title:"LAUNDRY",stems:{vocals:'stems/laundry/laundry/vocals.mp3',drums:'stems/laundry/laundry/drums.mp3',bass:'stems/laundry/laundry/bass.mp3',melody:'stems/laundry/laundry/melody.mp3'}},
+            "end":{title:"END",stems:{vocals:'stems/laundry/end/vocals.mp3',drums:'stems/laundry/end/drums.mp3',bass:'stems/laundry/end/bass.mp3',melody:'stems/laundry/end/melody.mp3'}}
+        }},
+        "echoes-of-nothing":{ albumTitle:"ECHOES OF NOTHING", albumCover:"album4.jpg", tracks:{
+            "whispers":{title:"WHISPERS",stems:{vocals:'stems/echoes-of-nothing/whispers/vocals.mp3',drums:'stems/echoes-of-nothing/whispers/drums.mp3',bass:'stems/echoes-of-nothing/whispers/bass.mp3',melody:'stems/echoes-of-nothing/whispers/melody.mp3'}},
+            "honey-light":{title:"HONEY LIGHT",stems:{vocals:'stems/echoes-of-nothing/honey-light/vocals.mp3',drums:'stems/echoes-of-nothing/honey-light/drums.mp3',bass:'stems/echoes-of-nothing/honey-light/bass.mp3',melody:'stems/echoes-of-nothing/honey-light/melody.mp3'}},
+            "between-shadows":{title:"BETWEEN SHADOWS",stems:{vocals:'stems/echoes-of-nothing/between-shadows/vocals.mp3',drums:'stems/echoes-of-nothing/between-shadows/drums.mp3',bass:'stems/echoes-of-nothing/between-shadows/bass.mp3',melody:'stems/echoes-of-nothing/between-shadows/melody.mp3'}},
+            "fields":{title:"FIELDS",stems:{vocals:'stems/echoes-of-nothing/fields/vocals.mp3',drums:'stems/echoes-of-nothing/fields/drums.mp3',bass:'stems/echoes-of-nothing/fields/bass.mp3',melody:'stems/echoes-of-nothing/fields/melody.mp3'}},
+            "golden-hunger":{title:"GOLDEN HUNGER",stems:{vocals:'stems/echoes-of-nothing/golden-hunger/vocals.mp3',drums:'stems/echoes-of-nothing/golden-hunger/drums.mp3',bass:'stems/echoes-of-nothing/golden-hunger/bass.mp3',melody:'stems/echoes-of-nothing/golden-hunger/melody.mp3'}},
+            "where-the-sky-melts":{title:"WHERE THE SKY MELTS",stems:{vocals:'stems/echoes-of-nothing/where-the-sky-melts/vocals.mp3',drums:'stems/echoes-of-nothing/where-the-sky-melts/drums.mp3',bass:'stems/echoes-of-nothing/where-the-sky-melts/bass.mp3',melody:'stems/echoes-of-nothing/where-the-sky-melts/melody.mp3'}},
+            "lantern":{title:"LANTERN",stems:{vocals:'stems/echoes-of-nothing/lantern/vocals.mp3',drums:'stems/echoes-of-nothing/lantern/drums.mp3',bass:'stems/echoes-of-nothing/lantern/bass.mp3',melody:'stems/echoes-of-nothing/lantern/melody.mp3'}},
+            "the-hours-that-flow":{title:"THE HOURS THAT FLOW",stems:{vocals:'stems/echoes-of-nothing/the-hours-that-flow/vocals.mp3',drums:'stems/echoes-of-nothing/the-hours-that-flow/drums.mp3',bass:'stems/echoes-of-nothing/the-hours-that-flow/bass.mp3',melody:'stems/echoes-of-nothing/the-hours-that-flow/melody.mp3'}}
+        }},
+        "noise":{ albumTitle:"NOISE", albumCover:"album5.jpg", tracks:{
+            "concrete":{title:"CONCRETE",stems:{vocals:'stems/noise/concrete/vocals.mp3',drums:'stems/noise/concrete/drums.mp3',bass:'stems/noise/concrete/bass.mp3',melody:'stems/noise/concrete/melody.mp3'}},
+            "particles":{title:"PARTICLES",stems:{vocals:'stems/noise/particles/vocals.mp3',drums:'stems/noise/particles/drums.mp3',bass:'stems/noise/particles/bass.mp3',melody:'stems/noise/particles/melody.mp3'}},
+            "trace":{title:"TRACE",stems:{vocals:'stems/noise/trace/vocals.mp3',drums:'stems/noise/trace/drums.mp3',bass:'stems/noise/trace/bass.mp3',melody:'stems/noise/trace/melody.mp3'}},
+            "lurk":{title:"LURK",stems:{vocals:'stems/noise/lurk/vocals.mp3',drums:'stems/noise/lurk/drums.mp3',bass:'stems/noise/lurk/bass.mp3',melody:'stems/noise/lurk/melody.mp3'}},
+            "breathe":{title:"BREATHE",stems:{vocals:'stems/noise/breathe/vocals.mp3',drums:'stems/noise/breathe/drums.mp3',bass:'stems/noise/breathe/bass.mp3',melody:'stems/noise/breathe/melody.mp3'}},
+            "grid":{title:"GRID",stems:{vocals:'stems/noise/grid/vocals.mp3',drums:'stems/noise/grid/drums.mp3',bass:'stems/noise/grid/bass.mp3',melody:'stems/noise/grid/melody.mp3'}},
+            "gear":{title:"GEAR",stems:{vocals:'stems/noise/gear/vocals.mp3',drums:'stems/noise/gear/drums.mp3',bass:'stems/noise/gear/bass.mp3',melody:'stems/noise/gear/melody.mp3'}},
+            "noise":{title:"NOISE",stems:{vocals:'stems/noise/noise/vocals.mp3',drums:'stems/noise/noise/drums.mp3',bass:'stems/noise/noise/bass.mp3',melody:'stems/noise/noise/melody.mp3'}}
+        }},
+        "land-of-the-stones":{ albumTitle:"LAND OF THE STONES", albumCover:"album6.jpg", tracks:{
+            "white":{title:"WHITE",stems:{vocals:'stems/land-of-the-stones/white/vocals.mp3',drums:'stems/land-of-the-stones/white/drums.mp3',bass:'stems/land-of-the-stones/white/bass.mp3',melody:'stems/land-of-the-stones/white/melody.mp3'}},
+            "apart":{title:"APART",stems:{vocals:'stems/land-of-the-stones/apart/vocals.mp3',drums:'stems/land-of-the-stones/apart/drums.mp3',bass:'stems/land-of-the-stones/apart/bass.mp3',melody:'stems/land-of-the-stones/apart/melody.mp3'}},
+            "dust":{title:"DUST",stems:{vocals:'stems/land-of-the-stones/dust/vocals.mp3',drums:'stems/land-of-the-stones/dust/drums.mp3',bass:'stems/land-of-the-stones/dust/bass.mp3',melody:'stems/land-of-the-stones/dust/melody.mp3'}},
+            "necromancer":{title:"NECROMANCER",stems:{vocals:'stems/land-of-the-stones/necromancer/vocals.mp3',drums:'stems/land-of-the-stones/necromancer/drums.mp3',bass:'stems/land-of-the-stones/necromancer/bass.mp3',melody:'stems/land-of-the-stones/necromancer/melody.mp3'}},
+            "hollow":{title:"HOLLOW",stems:{vocals:'stems/land-of-the-stones/hollow/vocals.mp3',drums:'stems/land-of-the-stones/hollow/drums.mp3',bass:'stems/land-of-the-stones/hollow/bass.mp3',melody:'stems/land-of-the-stones/hollow/melody.mp3'}},
+            "alone":{title:"ALONE",stems:{vocals:'stems/land-of-the-stones/alone/vocals.mp3',drums:'stems/land-of-the-stones/alone/drums.mp3',bass:'stems/land-of-the-stones/alone/bass.mp3',melody:'stems/land-of-the-stones/alone/melody.mp3'}},
+            "cave":{title:"CAVE",stems:{vocals:'stems/land-of-the-stones/cave/vocals.mp3',drums:'stems/land-of-the-stones/cave/drums.mp3',bass:'stems/land-of-the-stones/cave/bass.mp3',melody:'stems/land-of-the-stones/cave/melody.mp3'}},
+            "lost-in-the-land":{title:"LOST IN THE LAND",stems:{vocals:'stems/land-of-the-stones/lost-in-the-land/vocals.mp3',drums:'stems/land-of-the-stones/lost-in-the-land/drums.mp3',bass:'stems/land-of-the-stones/lost-in-the-land/bass.mp3',melody:'stems/land-of-the-stones/lost-in-the-land/melody.mp3'}}
+        }}
+    },
+    vsn: [
+        { title: "LOVE EVERYONE", cover: "album.jpg", modelSrc: "3D/loveveryone3d.glb" },
+        { title: "HATE EVERYONE", cover: "album2.jpg", modelSrc: "3D/hateveryone3d.glb" },
+        { title: "LAUNDRY", cover: "album3.jpg", modelSrc: "3D/laundry3d.glb" },
+        { title: "ECHOES OF NOTHING", cover: "album4.jpg", modelSrc: "3D/echoesofnothing3d.glb" },
+        { title: "NOISE", cover: "album5.jpg", modelSrc: "3D/noise3d.glb" },
+        { title: "LAND OF THE STONES", cover: "album6.jpg", modelSrc: "3D/landofthestones3d.glb" },
+        { title: "⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙", alt: "LOVE IS BLIND", cover: "album7.jpg", modelSrc: "3D/loveisblind3d.glb" }
+    ],
+    shop: [
+        { albumName: "LOVE EVERYONE", cover: "cdalbum1_cut.png" },
+        { albumName: "HATE EVERYONE", cover: "cdalbum2_cut.png" },
+        { albumName: "LAUNDRY", cover: "cdalbum3_cut.png" },
+        { albumName: "ECHOES OF NOTHING", cover: "cdalbum4_cut.png" },
+        { albumName: "NOISE", cover: "cdalbum5_cut.png" },
+        { albumName: "LAND OF THE STONES", cover: "cdalbum6_cut.png" },
+        { albumName: "⠇⠕⠧⠑ ⠊⠎ ⠃⠇⠊⠝⠙", cover: "cdalbum7_cut.png" }
+    ]
 };
+
+let sndAlbums    = DEFAULT_SITE_DATA.snd;
+let rmxAlbums    = DEFAULT_SITE_DATA.rmx;
+let songDatabase = DEFAULT_SITE_DATA.lab;
+let vsnItems     = DEFAULT_SITE_DATA.vsn;
+let shopItems    = DEFAULT_SITE_DATA.shop;
 
 /* ══════════════════════════════════════════════════════════
    SPLASH SCREEN
    ══════════════════════════════════════════════════════════ */
 (function() {
-    const splash     = document.getElementById('splash');
-    const splashVideo= document.getElementById('splash-video');
-    let dismissed    = false;
+    const splash      = document.getElementById('splash');
+    const splashVideo = document.getElementById('splash-video');
+    let dismissed     = false;
 
     function dismissSplash() {
         if (dismissed) return;
@@ -990,12 +900,8 @@ const songDatabase = {
         setTimeout(() => { splash.style.display = 'none'; }, 500);
     }
 
-    // Fine video (2 secondi) → dismiss automatico
     splashVideo.addEventListener('ended', dismissSplash);
-    // Sicurezza: dopo 2.5s dismiss comunque
     setTimeout(dismissSplash, 2500);
-
-    // Click / tap → skip immediato
     splash.addEventListener('click', dismissSplash);
 })();
 
@@ -1031,22 +937,15 @@ window.addEventListener('popstate', e => {
     const page = (e.state && e.state.page) || location.hash.replace('#','') || 'snd';
     navigateTo(page);
 });
-(function() {
-    const hash = location.hash.replace('#','');
-    navigateTo(ALL_PAGES.includes(hash) ? hash : 'snd');
-})();
 
 /* ══════════════════════════════════════════════════════════
-   GLOBAL AUDIO PLAYER (SND / RMX)
-   + LOGICA SORGENTE ATTIVA (snd | lab)
+   GLOBAL AUDIO PLAYER (SND / RMX) + SORGENTE ATTIVA
    ══════════════════════════════════════════════════════════ */
 const globalAudio = new Audio();
 let gAlbumList  = sndAlbums;
 let gAlbumIndex = 0;
 let gTrackIndex = 0;
 let gIsPlaying  = false;
-
-// 'snd' = player SND/RMX attivo, 'lab' = stem LAB attivi
 let activeSource = 'snd';
 
 const gPC    = document.getElementById('global-player-container');
@@ -1071,14 +970,12 @@ const closeTlBtn     = document.getElementById('close-tracklist-btn');
 const tlContent      = document.getElementById('tracklist-content');
 const barClickable   = document.getElementById('open-expanded-player');
 
-/* ── Aggiorna icone play/pause in base alla sorgente attiva ── */
 function gUpdateUI() {
     const playing = activeSource === 'lab' ? isPlaying : gIsPlaying;
     barPP.innerHTML  = playing ? PAUSE_SVG : PLAY_SVG;
     gPlayB.innerHTML = playing ? PAUSE_SVG : PLAY_SVG;
 }
 
-/* ── Mostra nel miniplayer una traccia SND/RMX ── */
 function gLoadTrack(albumIndex, trackIndex, autoPlay) {
     gAlbumIndex = albumIndex;
     gTrackIndex = trackIndex;
@@ -1086,14 +983,11 @@ function gLoadTrack(albumIndex, trackIndex, autoPlay) {
     const track = album.tracks[trackIndex];
     globalAudio.src    = track.src;
     activeSource       = 'snd';
-    // miniplayer
     barCov.src         = album.albumCover;
     barTrk.textContent = track.title;
     barAlb.textContent = album.albumTitle;
     barAlb.style.color = '#555';
-    // ripristina click → expanded player
     barClickable.dataset.labMode = '';
-    // expanded player
     expCov.src         = album.albumCover;
     expTrk.textContent = track.title;
     expAlb.textContent = album.albumTitle;
@@ -1108,23 +1002,24 @@ function gLoadTrack(albumIndex, trackIndex, autoPlay) {
         gDur.textContent = formatTime(globalAudio.duration || 0);
     }, { once: true });
     if ('mediaSession' in navigator) {
+        const mime = album.albumCover.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: track.title, artist: 'VSN', album: album.albumTitle,
-            artwork: [{ src: album.albumCover, type: 'image/jpeg' }]
+            title: track.title,
+            artist: track.artist || album.artist || 'VSN',
+            album: album.albumTitle,
+            artwork: [{ src: album.albumCover, type: mime }]
         });
     }
     if (autoPlay) gPlayAudio();
     else gUpdateUI();
 }
 
-/* ── Mostra nel miniplayer la traccia LAB (stem) ── */
-function labUpdateMiniplayer(cover, title, albumTitle, labIsCurrentlyPlaying) {
+function labUpdateMiniplayer(cover, title, albumTitle) {
     activeSource = 'lab';
     barCov.src         = cover;
     barTrk.textContent = title;
     barAlb.textContent = 'LAB — ' + albumTitle;
     barAlb.style.color = '#888';
-    // click sulla barra → vai al LAB
     barClickable.dataset.labMode = 'true';
     gPC.classList.remove('hidden');
     gUpdateUI();
@@ -1140,18 +1035,12 @@ function gPauseAudio() {
     gIsPlaying = false;
     gUpdateUI();
 }
-
-/* ── Toggle unificato: agisce su chi è attivo ── */
 function gToggle() {
-    if (activeSource === 'lab') {
-        togglePlayback(); // funzione del LAB
-    } else {
-        if (gIsPlaying) gPauseAudio(); else gPlayAudio();
-    }
+    if (activeSource === 'lab') togglePlayback();
+    else { if (gIsPlaying) gPauseAudio(); else gPlayAudio(); }
 }
-
 function gNextFn() {
-    if (activeSource === 'lab') return; // nessun next per il LAB
+    if (activeSource === 'lab') return;
     gTrackIndex = (gTrackIndex + 1) % gAlbumList[gAlbumIndex].tracks.length;
     gLoadTrack(gAlbumIndex, gTrackIndex, gIsPlaying);
 }
@@ -1178,7 +1067,6 @@ gPlayB.addEventListener('click', gToggle);
 gNextB.addEventListener('click', gNextFn);
 gPrevB.addEventListener('click', gPrevFn);
 
-/* ── Click sulla barra: LAB → vai al LAB; SND → apri expanded ── */
 barClickable.addEventListener('click', () => {
     if (barClickable.dataset.labMode === 'true') {
         navigateTo('lab');
@@ -1237,52 +1125,39 @@ modalBackdrop.addEventListener('click', closeTracklist);
 tlContent.addEventListener('click', e => {
     const li = e.target.closest('.tracklist-item');
     if (!li) return;
-    // Avvio SND/RMX → ferma e resetta completamente il LAB
     labStopAndReset();
     gLoadTrack(parseInt(li.dataset.albumIndex), parseInt(li.dataset.trackIndex), true);
     closeTracklist();
-});
-document.querySelectorAll('.snd-cover').forEach(img => {
-    img.addEventListener('click', e => {
-        gAlbumList = sndAlbums;
-        showTracklist(parseInt(e.currentTarget.dataset.albumIndex));
-    });
-});
-document.querySelectorAll('.rmx-cover').forEach(img => {
-    img.addEventListener('click', e => {
-        gAlbumList = rmxAlbums;
-        showTracklist(parseInt(e.currentTarget.dataset.albumIndex));
-    });
 });
 
 /* ══════════════════════════════════════════════════════════
    LAB — STEM PLAYER
    ══════════════════════════════════════════════════════════ */
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioContext    = null;
-let audioBuffers    = {};
-let sourceNodes     = {};
-let gainNodes       = {};
-let isPlaying       = false;
-let currentTrackData= null;
-let isLoading       = false;
-let songDuration    = 0;
-let startTime       = 0;
-let startOffset     = 0;
-let animationFrameId= null;
+let audioContext     = null;
+let audioBuffers     = {};
+let sourceNodes      = {};
+let gainNodes        = {};
+let isPlaying        = false;
+let currentTrackData = null;
+let isLoading        = false;
+let songDuration     = 0;
+let startTime        = 0;
+let startOffset      = 0;
+let animationFrameId = null;
 
-const playButton           = document.getElementById('lab-play-pause-btn');
-const progressBar          = document.getElementById('lab-progress-bar');
-const currentTimeEl        = document.getElementById('lab-current-time');
-const durationEl           = document.getElementById('lab-duration');
-const songSelectorBox      = document.getElementById('song-selector-box');
-const selectedTrackTitleEl = document.getElementById('selected-track-title');
-const selectedTrackArtistEl= document.getElementById('selected-track-artist');
-const selectedTrackCoverEl = document.getElementById('selected-track-cover');
-const labModalBackdrop     = document.getElementById('lab-modal-backdrop');
-const labTracklistModal    = document.getElementById('lab-tracklist-modal');
-const labCloseTlBtn        = document.getElementById('lab-close-tracklist-btn');
-const labTlContent         = document.getElementById('lab-tracklist-content');
+const playButton            = document.getElementById('lab-play-pause-btn');
+const progressBar           = document.getElementById('lab-progress-bar');
+const currentTimeEl         = document.getElementById('lab-current-time');
+const durationEl            = document.getElementById('lab-duration');
+const songSelectorBox       = document.getElementById('song-selector-box');
+const selectedTrackTitleEl  = document.getElementById('selected-track-title');
+const selectedTrackArtistEl = document.getElementById('selected-track-artist');
+const selectedTrackCoverEl  = document.getElementById('selected-track-cover');
+const labModalBackdrop      = document.getElementById('lab-modal-backdrop');
+const labTracklistModal     = document.getElementById('lab-tracklist-modal');
+const labCloseTlBtn         = document.getElementById('lab-close-tracklist-btn');
+const labTlContent          = document.getElementById('lab-tracklist-content');
 const sliders = {
     vocals: document.getElementById('stem-vocals'),
     drums:  document.getElementById('stem-drums'),
@@ -1319,7 +1194,6 @@ async function loadSong(albumKey, trackKey) {
     const trackData = albumData.tracks[trackKey];
     if (!trackData || !trackData.stems || isLoading || currentTrackData === trackData) return;
 
-    // Avvio caricamento stem → ferma SND/RMX
     if (gIsPlaying) gPauseAudio();
 
     isLoading = true;
@@ -1334,7 +1208,6 @@ async function loadSong(albumKey, trackKey) {
     selectedTrackCoverEl.src          = albumData.albumCover;
     selectedTrackCoverEl.classList.remove('hidden');
 
-    // Reset slider a 100 per ogni nuova traccia
     Object.values(sliders).forEach(s => s.value = 100);
 
     audioBuffers = {};
@@ -1358,8 +1231,7 @@ async function loadSong(albumKey, trackKey) {
         durationEl.textContent = formatTime(songDuration);
         Object.values(lights).forEach(l => l.classList.add('active'));
         setupGainNodes();
-        // Aggiorna il miniplayer globale con i dati della traccia LAB
-        labUpdateMiniplayer(albumData.albumCover, trackData.title, albumData.albumTitle, false);
+        labUpdateMiniplayer(albumData.albumCover, trackData.title, albumData.albumTitle);
     } else {
         selectedTrackTitleEl.textContent  = 'LOAD ERROR';
         selectedTrackArtistEl.textContent = 'Mancano file stem';
@@ -1410,7 +1282,6 @@ function playAll(offset) {
     playButton.innerHTML = PAUSE_SVG;
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     updateLabProgress();
-    // Sincronizza icona miniplayer globale
     if (activeSource === 'lab') gUpdateUI();
 }
 
@@ -1424,7 +1295,6 @@ function stopAll() {
     sourceNodes = {};
     isPlaying   = false;
     playButton.innerHTML = PLAY_SVG;
-    // Sincronizza icona miniplayer globale
     if (activeSource === 'lab') gUpdateUI();
 }
 
@@ -1433,7 +1303,6 @@ function togglePlayback() {
     if (isPlaying) {
         stopAll();
     } else {
-        // Avvio riproduzione stem → ferma SND/RMX
         if (gIsPlaying) gPauseAudio();
         playAll();
     }
@@ -1465,7 +1334,6 @@ function handleScrubbing() {
     if (wasPlaying) playAll(newOffset);
 }
 
-// Ferma e resetta tutto il LAB (chiamato quando SND/RMX avvia una traccia)
 function labStopAndReset() {
     if (isPlaying) stopAll();
     currentTrackData = null;
@@ -1480,13 +1348,11 @@ function labStopAndReset() {
     selectedTrackArtistEl.textContent = 'SELECT A TRACK';
     selectedTrackCoverEl.classList.add('hidden');
     Object.values(sliders).forEach(s => s.value = 100);
-    // Ripristina il miniplayer alla modalità SND/RMX
     activeSource = 'snd';
     barClickable.dataset.labMode = '';
     barAlb.style.color = '#555';
 }
 
-// Slider
 for (const key in sliders) {
     sliders[key].addEventListener('input', e => {
         const vol = e.target.value / 100;
@@ -1497,7 +1363,6 @@ for (const key in sliders) {
 playButton.addEventListener('click', togglePlayback);
 progressBar.addEventListener('input', handleScrubbing);
 
-/* ── LAB MODAL ─────────────────────────────────────────── */
 function openLabModal() {
     labTlContent.innerHTML = '';
     for (const albumKey in songDatabase) {
@@ -1552,22 +1417,43 @@ labTlContent.addEventListener('click', e => {
     }
 });
 
-// Init LAB
 setAllControlsDisabled(true);
 playButton.innerHTML = PLAY_SVG;
 selectedTrackCoverEl.classList.add('hidden');
 
 /* ══════════════════════════════════════════════════════════
-   VSN — SOLAR SYSTEM
+   VSN — SOLAR SYSTEM (Dinamico)
    ══════════════════════════════════════════════════════════ */
-let vsnAngle         = 0;
-let vsnCurrentSpeed  = 0;
-let vsnTargetSpeed   = 0;
-let vsnNormalSpeed   = 0;
-let vsnRafId         = null;
-let vsnInited        = false;
+let vsnAngle        = 0;
+let vsnCurrentSpeed = 0;
+let vsnTargetSpeed  = 0;
+let vsnNormalSpeed  = 0;
+let vsnRafId        = null;
+let vsnInited       = false;
+let currentFocused  = null;
 
 function getVsnNormal() { return window.innerWidth <= 600 ? 0.05 : 0.08; }
+const isTouch = () => window.matchMedia('(hover: none)').matches;
+
+function showCenterText(title) {
+    const centerText  = document.getElementById('center-text');
+    const solarSystem = document.getElementById('solar-system');
+    centerText.textContent      = title;
+    centerText.style.opacity    = '1';
+    centerText.style.visibility = 'visible';
+    centerText.style.transform  = 'translate(-50%, -50%) scale(1)';
+    vsnTargetSpeed = 0;
+    solarSystem.classList.add('hover-active');
+}
+function hideCenterText() {
+    const centerText  = document.getElementById('center-text');
+    const solarSystem = document.getElementById('solar-system');
+    centerText.style.opacity    = '0';
+    centerText.style.visibility = 'hidden';
+    centerText.style.transform  = 'translate(-50%, -50%) scale(0.9)';
+    vsnTargetSpeed = vsnNormalSpeed;
+    solarSystem.classList.remove('hover-active');
+}
 
 function vsnResume() {
     if (!vsnInited) {
@@ -1582,51 +1468,6 @@ function vsnResume() {
             vsnNormalSpeed = ns;
         });
 
-        const solarSystem  = document.getElementById('solar-system');
-        const antiSpinners = document.querySelectorAll('.cd-anti-spinner');
-        const cdContents   = document.querySelectorAll('.cd-content');
-        const centerText   = document.getElementById('center-text');
-        let currentFocused = null;
-        const isTouch = () => window.matchMedia('(hover: none)').matches;
-
-        function showCenterText(title) {
-            centerText.textContent          = title;
-            centerText.style.opacity        = '1';
-            centerText.style.visibility     = 'visible';
-            centerText.style.transform      = 'translate(-50%, -50%) scale(1)';
-            vsnTargetSpeed = 0;
-            solarSystem.classList.add('hover-active');
-        }
-        function hideCenterText() {
-            centerText.style.opacity    = '0';
-            centerText.style.visibility = 'hidden';
-            centerText.style.transform  = 'translate(-50%, -50%) scale(0.9)';
-            vsnTargetSpeed = vsnNormalSpeed;
-            solarSystem.classList.remove('hover-active');
-        }
-
-        cdContents.forEach(el => {
-            const title = el.dataset.title;
-            const src   = el.dataset.src;
-            el.addEventListener('mouseenter', () => { if (!isTouch()) showCenterText(title); });
-            el.addEventListener('mouseleave', () => { if (!isTouch()) hideCenterText(); });
-            el.addEventListener('click', e => {
-                if (isTouch()) {
-                    if (currentFocused !== el) {
-                        e.preventDefault();
-                        if (currentFocused) currentFocused.classList.remove('touch-focus');
-                        currentFocused = el;
-                        el.classList.add('touch-focus');
-                        showCenterText(title);
-                    } else {
-                        vsnOpenModal(src, title);
-                    }
-                } else {
-                    vsnOpenModal(src, title);
-                }
-            });
-        });
-
         document.addEventListener('click', e => {
             if (isTouch() && currentFocused && !e.target.closest('.cd-content')) {
                 currentFocused.classList.remove('touch-focus');
@@ -1638,15 +1479,15 @@ function vsnResume() {
         document.getElementById('close-3d-btn').addEventListener('click', vsnCloseModal);
     }
 
-    // (Re)avvia il RAF se non è in esecuzione
     if (!vsnRafId) {
-        const solarSystem  = document.getElementById('solar-system');
-        const antiSpinners = document.querySelectorAll('.cd-anti-spinner');
+        const solarSystem = document.getElementById('solar-system');
         function frame() {
             vsnCurrentSpeed += (vsnTargetSpeed - vsnCurrentSpeed) * 0.05;
             vsnAngle        += vsnCurrentSpeed;
             solarSystem.style.transform = `rotate(${vsnAngle}deg)`;
-            antiSpinners.forEach(s => s.style.transform = `rotate(${-vsnAngle}deg)`);
+            solarSystem.querySelectorAll('.cd-anti-spinner').forEach(s => {
+                s.style.transform = `rotate(${-vsnAngle}deg)`;
+            });
             vsnRafId = requestAnimationFrame(frame);
         }
         vsnRafId = requestAnimationFrame(frame);
@@ -1672,16 +1513,6 @@ function vsnCloseModal() {
    SHOP
    ══════════════════════════════════════════════════════════ */
 let selectedAlbums = [];
-
-document.querySelectorAll('.shop-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const name = item.dataset.albumName;
-        const idx  = selectedAlbums.indexOf(name);
-        if (idx > -1) { selectedAlbums.splice(idx, 1); item.classList.remove('selected'); }
-        else          { selectedAlbums.push(name);     item.classList.add('selected');    }
-        updateShopSummary();
-    });
-});
 
 function updateShopSummary() {
     const summary = document.getElementById('visual-summary');
@@ -1731,28 +1562,178 @@ document.getElementById('shop-back-btn').addEventListener('click', () => {
     btn.disabled = false; btn.textContent = 'SEND ORDER REQUEST';
 });
 
+/* ══════════════════════════════════════════════════════════
+   RENDER DINAMICO DELLE SEZIONI (Da data.json)
+   ══════════════════════════════════════════════════════════ */
+function renderAllSections(data) {
+    sndAlbums    = data.snd  || DEFAULT_SITE_DATA.snd;
+    rmxAlbums    = data.rmx  || DEFAULT_SITE_DATA.rmx;
+    songDatabase = data.lab  || DEFAULT_SITE_DATA.lab;
+    vsnItems     = data.vsn  || DEFAULT_SITE_DATA.vsn;
+    shopItems    = data.shop || DEFAULT_SITE_DATA.shop;
+
+    // 1. Render SND
+    const pageSnd = document.getElementById('page-snd');
+    pageSnd.innerHTML = '';
+    sndAlbums.forEach((album, idx) => {
+        const container = document.createElement('div');
+        container.className = 'music-container';
+        const albumDiv = document.createElement('div');
+        albumDiv.className = 'album';
+        const img = document.createElement('img');
+        img.src = album.albumCover;
+        img.alt = album.ariaLabel || album.albumTitle;
+        img.className = 'album-cover-clickable snd-cover';
+        img.dataset.albumIndex = idx;
+        img.addEventListener('click', () => {
+            gAlbumList = sndAlbums;
+            showTracklist(idx);
+        });
+        const h3 = document.createElement('h3');
+        h3.className = 'album-section-title';
+        if (album.ariaLabel) h3.setAttribute('aria-label', album.ariaLabel);
+        h3.textContent = album.albumTitle;
+        albumDiv.appendChild(img);
+        albumDiv.appendChild(h3);
+        container.appendChild(albumDiv);
+        pageSnd.appendChild(container);
+    });
+
+    // 2. Render RMX
+    const pageRmx = document.getElementById('page-rmx');
+    pageRmx.innerHTML = '';
+    rmxAlbums.forEach((album, idx) => {
+        const container = document.createElement('div');
+        container.className = 'music-container';
+        const albumDiv = document.createElement('div');
+        albumDiv.className = 'album';
+        const img = document.createElement('img');
+        img.src = album.albumCover;
+        img.alt = album.albumTitle;
+        img.className = 'album-cover-clickable rmx-cover';
+        img.dataset.albumIndex = idx;
+        img.addEventListener('click', () => {
+            gAlbumList = rmxAlbums;
+            showTracklist(idx);
+        });
+        const h3 = document.createElement('h3');
+        h3.className = 'album-section-title';
+        h3.textContent = album.albumTitle;
+        albumDiv.appendChild(img);
+        albumDiv.appendChild(h3);
+        container.appendChild(albumDiv);
+        pageRmx.appendChild(container);
+    });
+
+    // 3. Render VSN (calcolo automatico dei gradi sul cerchio)
+    const solarSystem = document.getElementById('solar-system');
+    solarSystem.innerHTML = '';
+    const totalVsn = vsnItems.length || 1;
+    vsnItems.forEach((item, idx) => {
+        const angle = ((360 / totalVsn) * idx).toFixed(2);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'cd-wrapper';
+        wrapper.style.setProperty('--angle', angle + 'deg');
+
+        const antiSpinner = document.createElement('div');
+        antiSpinner.className = 'cd-anti-spinner';
+
+        const content = document.createElement('div');
+        content.className = 'cd-content';
+        content.dataset.title = item.title;
+        content.dataset.src   = item.modelSrc;
+
+        const img = document.createElement('img');
+        img.src = item.cover;
+        img.alt = item.alt || item.title;
+
+        content.appendChild(img);
+        antiSpinner.appendChild(content);
+        wrapper.appendChild(antiSpinner);
+        solarSystem.appendChild(wrapper);
+
+        content.addEventListener('mouseenter', () => { if (!isTouch()) showCenterText(item.title); });
+        content.addEventListener('mouseleave', () => { if (!isTouch()) hideCenterText(); });
+        content.addEventListener('click', e => {
+            if (isTouch()) {
+                if (currentFocused !== content) {
+                    e.preventDefault();
+                    if (currentFocused) currentFocused.classList.remove('touch-focus');
+                    currentFocused = content;
+                    content.classList.add('touch-focus');
+                    showCenterText(item.title);
+                } else {
+                    vsnOpenModal(item.modelSrc, item.title);
+                }
+            } else {
+                vsnOpenModal(item.modelSrc, item.title);
+            }
+        });
+    });
+
+    // 4. Render SHOP
+    const shopGrid = document.getElementById('shop-album-grid');
+    shopGrid.innerHTML = '';
+    shopItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'shop-item';
+        div.dataset.albumName = item.albumName;
+
+        const img = document.createElement('img');
+        img.src = item.cover;
+        img.alt = item.albumName;
+
+        const h3 = document.createElement('h3');
+        h3.textContent = item.albumName;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'selection-overlay';
+        overlay.textContent = 'SELECTED';
+
+        div.appendChild(img);
+        div.appendChild(h3);
+        div.appendChild(overlay);
+        shopGrid.appendChild(div);
+
+        div.addEventListener('click', () => {
+            const name = item.albumName;
+            const idx  = selectedAlbums.indexOf(name);
+            if (idx > -1) { selectedAlbums.splice(idx, 1); div.classList.remove('selected'); }
+            else          { selectedAlbums.push(name);     div.classList.add('selected');    }
+            updateShopSummary();
+        });
+    });
+}
+
+// Render immediato coi dati di base + caricamento data.json aggiornato (Network-First)
+renderAllSections(DEFAULT_SITE_DATA);
+fetch('./data.json?t=' + Date.now(), {
+    cache: 'no-store',
+    headers: { 'Accept': 'text/html,application/json' }
+})
+.then(r => r.ok ? r.json() : null)
+.then(customData => {
+    if (customData) renderAllSections(customData);
+})
+.catch(() => {});
+
+// Avvio pagina iniziale
+(function() {
+    const hash = location.hash.replace('#','');
+    navigateTo(ALL_PAGES.includes(hash) ? hash : 'snd');
+})();
 </script>
 
-<!-- ================================================================
-     LVEVR — Registrazione Service Worker (Web App / PWA)
-     Non altera in alcun modo estetica o funzionalità del sito.
-     Serve solo a rendere il sito installabile come app e a garantire
-     che i contenuti restino sempre allineati a GitHub Pages.
-     ================================================================ -->
+<!-- Registrazione Service Worker -->
 <script>
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js').then(reg => {
-            // Controlla periodicamente se è disponibile una nuova versione del SW
-            setInterval(() => reg.update(), 60 * 60 * 1000); // ogni ora
-
+            setInterval(() => reg.update(), 60 * 60 * 1000);
             reg.addEventListener('updatefound', () => {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // Nuova versione dei file "di sistema" pronta: la attiva subito.
-                        // I contenuti della pagina (index.html) sono comunque già
-                        // aggiornati in automatico grazie alla strategia network-first.
                         newWorker.postMessage('SKIP_WAITING');
                     }
                 });
